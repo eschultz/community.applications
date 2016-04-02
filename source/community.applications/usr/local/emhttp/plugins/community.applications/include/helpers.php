@@ -108,7 +108,6 @@ function startsWith($haystack, $needle) {
 function fixPopUpDescription($PopUpDescription) {
   $PopUpDescription = str_replace("'","&#39;",$PopUpDescription);
   $PopUpDescription = str_replace('"','&quot;',$PopUpDescription);
-  $PopUpDescription = str_replace("<br>","\n",$PopUpDescription);
   $PopUpDescription = strip_tags($PopUpDescription);
   $PopUpDescription = trim($PopUpDescription);
   return ($PopUpDescription);

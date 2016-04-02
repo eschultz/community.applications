@@ -1951,7 +1951,7 @@ case 'resourceInitialize':
   $dockerClient = new DockerClient();
   $dockerRunning = $dockerClient->getDockerContainers();
 
-  $o = "<a href='AddContainer?xmlTemplate=default:/usr/local/emhttp/plugins/community.applications/xml/cadvisor.xml'>here</a> (This will install cAdvisor)";
+  $o = "<a href='AddContainer?xmlTemplate=default:/usr/local/emhttp/plugins/community.applications/xml/cadvisor.xml'>here</a> (This will install cAdvisor)<br> Note: when adding cAdvisor, do not change any of the volume mappings.  They are ALL correct as is.  Only change the HOST port if needed";
   $cadvisor = searchArray($dockerRunning,"Image","google/cadvisor:latest");
 
   if ( $cadvisor !== false ) {
