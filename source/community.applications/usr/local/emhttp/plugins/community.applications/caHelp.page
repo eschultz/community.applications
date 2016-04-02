@@ -1,0 +1,268 @@
+Menu="CA"
+Title="Help"
+Icon="community.applications.png"
+---
+<style>
+
+.back-to-top {
+  background: none;
+  margin: 0;
+  position: fixed;
+  bottom: 50px;
+  right: 0;
+  width: 70px;
+  height: 70px;
+  z-index: 100;
+  display: none;
+  text-decoration: none;
+  color: #ffffff;
+}
+
+</style>
+<script>
+
+jQuery(document).ready(function() {
+  var offset = 250;
+  var duration = 500;
+  jQuery(window).scroll(function() {
+    if (jQuery(this).scrollTop() > offset) {
+      jQuery('.back-to-top').fadeIn(duration);
+    } else {
+      jQuery('.back-to-top').fadeOut(duration);
+    }
+  });
+
+  jQuery('.back-to-top').click(function(event) {
+    event.preventDefault();
+    jQuery('html, body').animate({scrollTop: 0}, duration);
+    return false;
+  })
+});
+
+</script>
+
+
+<center><strong><font size="4">Community Applications Manual</font></strong></center>
+
+<strong><font color="red">Note:</font> If any display abberations appear on unRaid's menu (ie: the Feedback, Help, Info, Log buttons are displaying over top of some of the menu tabs) then you should go to the unRaid's Display Settings and move the USERS tab to within Settings</strong>
+
+<font color="red" size="3">Overview</font>
+
+Community Applications is a plugin designed to make finding, installing, and managing docker and plugin applications.  When using this plugin, there is no longer any need to use the <em>Repositories</em> section of the Docker Tab
+
+From top to bottom will explain all aspects of Community Applications starting from the basic and going to the more advanced options.
+
+All items within this plugin have tooltips enabled to further guide you in operation.  For a help for the settings for this plugin, load the settings page and press Help.  Each item will have associated help text displayed.
+
+After installation, a new tab will appear on unRaid's main menu called "Apps".  Additionally, there will be a section within the Settings tab called Community Applications which has some extra utilities to customize the operation of this plugin.
+<hr>
+
+<font size="3" color="red">Categories</font>
+
+To begin with, at the top of the page are the Category navigation buttons.  Clicking these buttons will display the recommended applications within the appropriate category.  Some of the categories (Network Services, Media Applications, and Media Servers) also have "sub-categories" to choose from.
+
+<input class='allButtons' type=button id='backup' value='Backup' style='margin:1px'; onclick='getContent(false,"backup:","Backup",false);'></input>
+<input class='allButtons' type=button id='cloud' value='Cloud' style='margin:1px'; onclick='getContent(false,"cloud:","Cloud",false);'></input>
+<input class='allButtons' type=button id='downloaders' value='Downloaders' style='margin:1px'; onclick='getContent(false,"downloaders:","Downloaders",false);'></input>
+<input class='allButtons' type=button id='HomeAutomation' value='Home Automation' style='margin:1px'; onclick='getContent(false,"HomeAutomation:","Home Automation",false);'></input>
+<input class='allButtons' type=button value='Network Services' style='margin:1px'; onclick='getContent(false,"network:","All Network Services",false);'></input>
+<input class='allButtons' type=button value='Media Applications' style='margin:1px'; onclick='getContent(false,"MediaApp:","All Media Applications",false);'></input>
+<input class='allButtons' type=button value='Media Servers' style='margin:1px'; onclick='getContent(false,"MediaServer:","All Media Servers",false);'></input>
+<input class='allButtons' type=button id='productivity' value='Productivity' style='margin:1px'; onclick='getContent(false,"productivity:","Productivity",false);'></input>
+<input class='allButtons' type=button id='tools' value='Tools/Utilities' style='margin:1px'; onclick='getContent(false,"tools:","Tools / Utilities",false);'></input>
+<input class='allButtons' type=button id='other' value='Other' style='margin:1px'; onclick='getContent(false,"other:","Other",false);'></input>
+<input class='allButtons' type=button id='plugins' value='Plugins' style='margin:1px';></input>
+<span style='float:right'>
+<input class='allButtons' type=button id="New" style='margin:1px'; value='New/Updated' onclick='getContent(false,"New","New / Updated Applications",true);'></input>
+<input class='allButtons' type=button id="UNCATEGORIZED" style='margin:1px'; value='Uncategorized' onclick='getContent(false,"UNCATEGORIZED","All Uncategorized Applications",false);'></input>
+<input class='allButtons' type=button id="All" style='margin:1px'; value='All Applications' onclick='getContent(false,"All","All Applications",false);'></input>
+<input class='allButtons' type=button id='MainButton' style='margin:1px'; value='Back to unRaid Search' hidden onclick='backToSearch();'></input>
+</span>
+<hr>
+
+<font size="3" color="red">View Modes</font>
+
+
+These buttons change how the results are displayed.  Either displayed in a table, icons, or a combination of the two (Icon Details).  Additionally, you can sort the results by Name, Repository, Author, or Date Changed
+
+<center>
+<span id='sortButtons'>View Mode:
+<input type='button' class='viewButton' value='Tables' id='viewTable' onclick='changeSortOrder("viewTable");' style='margin:1px'>
+<input type='button' class='viewButton' value='Icon Details' id='viewDetail' onclick='changeSortOrder("viewDetail");' style='margin:1px'>
+<input type='button' class='viewButton' value='Icons' id='viewIcon' onclick='changeSortOrder("viewIcon");'  style='margin:1px'>
+Sort By:
+<input type='button' class='sortButton' id='Name' value='Name' onclick='changeSortOrder("Name");' style='margin:1px'>
+<input type='button' class='sortButton' id='RepoName' value='Repository' onclick='changeSortOrder("RepoName");' style='margin:1px'>
+<input type='button' class='sortButton' id='Author' value='Author' onclick='changeSortOrder("Author");' style='margin:1px'>
+<input type='button' class='sortButton' id='Date' value='Date' onclick='changeSortOrder("Date");' style='margin:1px'>
+Sort Direction:
+<input type='button' class='dirButton' id='Up' value='Ascending' onclick='changeSortOrder("Up");' style='margin:1px'>
+<input type='button' class='dirButton' id='Down' value='Descending' onclick='changeSortOrder("Down");' style='margin:1px'>
+</center></span>
+<span id='dockerButtons' hidden><center>View Mode:
+<input type='button' class='dockerView' id='dockerTable' value='Tables' onclick='changeDockerView("dockerTable");' style='margin:1px'>
+<input type='button' class='dockerView' id='dockerDetail' value='Icon Details' onclick='changeDockerView("dockerDetail");' style='margin:1px'>
+<input type='button' class='dockerView' id='dockerIcon' value='Icons' onclick='changeDockerView("dockerIcon");' style='margin:1px'></center></span>
+<hr>
+
+<font size="3" color="red">Displayed Results</font>
+
+After selecting a category, the applications will appear: (example from Icon Details Mode)
+<br><br><br><br>
+<table><tr>
+<td><center>Author: <strong><a style='cursor:pointer'>limetech</a></strong><br>
+<center><a style='cursor:pointer'>Official Limetech Repository</a></center>
+<figure><center><a><img src='http://d2631fvi2jdnb6.cloudfront.net/docker/limetech/plex.png' style='width:96px;height:96px'></a></center>
+<figcaption><strong><font size="3">PlexMediaServer</font></strong><img src='/plugins/community.applications/images/information.png'><img src='/plugins/community.applications/images/star.png' style='width:15px;height:15px;'></figcaption>
+<input type='button' value='Add' style='margin:2px'></td><td style='display:inline-block;width:350px;text-align:left'>
+<strong>Categories:</strong> MediaApp:Video MediaApp:Music MediaApp:Photos MediaServer:Video MediaServer:Music MediaServer:Photos<br><br>
+The Plex Media Server enriches your life by organizing all your personal media, presenting it beautifully and streaming it to all of your devices. It's easy to use, it's awesome, and it's free!
+<br><strong><center>Date Updated: August 9, 2015</center></strong>
+<br><br><center><font color='red'>Support Thread&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Project Home Page</font></center>
+</td></tr></table>
+<li>Clicking on the author (limetech) will display all other applications from that author.<br></li>
+<li>Clicking on the Repository (official Limetech Repository) will open a new tab in your browser with the Announcement thread for that repository<br></li>
+<li>Clicking on the Support Thread will open a new tab in your browser for the Support thread for that application<br></li>
+<li>Clicking on the Project Home Page will open a new tab in your browser for the Project's home page (in this example, http://plex.tv)<br></li>
+<li>Click on the application's icon to display more details about the application<br></li>
+<li>Click on <img src='/plugins/community.applications/images/information.png'> to display the application's change log<br></li>
+<li>The <img src='/plugins/community.applications/images/star.png' style='height:15px;width:15px'> will display if the application has been added or updated recently<br></li>
+<li>The <img src='/plugins/community.applications/images/red-star.png' style='height:15px;width:15px'> will display dockerHub's rating on the application (Note that in and by itself this does not mean that application "A" is better than application "B"</li>
+<li>Selecting <input type='button' value='Add'> will take you to the Add Container screen where you can set any path mountings and install the application.<br></li>
+<li>Selecting <input type='button' value='Edit'> will allow you to change the settings of an already installed application.<br></li>
+<li>Selecting <input type='button' value='Default'> will allow you to reset the settings of an already installed application back to the author's default settings.<br></li>
+<li>Selecting <input type='button' value='Install Plugin'> will install the application / utility if it is a <i>Plugin</i><br></li>
+<li>Selecting <input type='button' value='Settings'>will take you to a plugin's Setting page (note: Not all plugins have a settings page)</br></li>
+
+<font size="3" color="red">Searching and Updating</font>
+
+At the top right of the page is a search box.  Enter a search string here to search for either an application's name, author's name, repository name, or description<br><br>
+
+The <input type='button' value='Update Applications'> button forces an update of all available applications.  Community Applications normally downloads the updated application lists whenever entering it loads.  However, there is a delay of up to two hours before a new application may appear on the feed.  If you know that a new application is available, but it is not appearing, then you should Update the Applications if you want to use that particular application.
+
+<hr>
+
+<font size='3' color='red'>Installed / Previously Installed Applications</font>
+
+By selecting <input type='button' value='Installed Apps'></input> will display all applications which are currently installed, and allow you to edit them.
+A <img src='/plugins/dynamix.docker.manager/images/remove.png' width='20px'></img> will appear next to the application.  Selecting this will allow you to uninstall the application, and optionally delete the appdata folder for the application (See <b>Settings</b> section)<br><br>
+
+By selecting <input type='button' value='Previous Apps'></input> will display all applications which have been previously installed, and allow you to re-install them.
+A <img src='/plugins/dynamix.docker.manager/images/remove.png' width='20px'></img> will appear next to the application.  Selecting this will remove (ie: delete the user template) from the list of previously installed applications<br><br>
+<hr>
+
+<font size='3' color='red'>Resource Monitor</font>
+
+The resource monitor will display some statistics on the currently running docker applications (% CPU, % Memory, Network Utilization).  Additionally, it will also calculate the size of the various application's appData.
+
+It also features cAdvisor integration.  If the cAdvisor application is not currently installed, a direct link to install it will be present (highly recommended to install it).  Once installed, clicking on each application's icon will take you directly to cAdvisor's page for that application which will display even more useful information about the application.
+
+<font size="3" color="red">Advanced - dockerHub Integration</font>
+
+
+There is a setting which you can enable which will allow you to search dockerHub for other applications beyond the ones which have had unRaid templates created for them.
+
+When this option is enabled, a few more options are available.
+
+<li>Clicking on the Application's Name of any application will then search dockerHub for that application.
+<li>After performing any search for applications, a button will appear (<input type='button' value='Get more results from dockerHub' style='margin:0px'>) to then allow you to search dockerHub for that application.
+
+Within the dockerHub search results, you can navigate and search as before.  Clicking the author's name will search for all applications from that author.  Clicking the application's name will search for more results for that application name.
+
+Clicking <input type='button' value='Add'> will attempt to create a template for that application and install it.  There are however some caveats with regards to the conversion process.  See this thread for more details: <a href='http://lime-technology.com/forum/index.php?topic=40262.msg401570#msg401570' target='_blank'>http://lime-technology.com/forum/index.php?topic=40262.msg401570#msg401570</a>
+
+At a later time if you wish to manage the application added (Edit / restore to defaults, etc), the application will be available under the UNCATEGORIZED category.  (Alternatively, you could categorize the plugin by using the Docker Categorizer plugin <a href='http://lime-technology.com/forum/index.php?topic=40111.0'>HERE</a>
+
+Depending upon what search term is currently being used, Community Applications may also offer you some alternate search terms for more relevant containers.
+
+<strong>NOTE:</strong> When adding an application from dockerHub, popups must be enabled within your browser
+
+<hr>
+
+<font size="3" color="red">Private Repositories</font>
+
+If you have access to a so-called private repository (or wish to create your own), there are two options for integrating it into CA
+
+<li>Create a folder called <strong>/boot/config/plugins/community.applications/repositoryName</strong><br>
+
+Within this folder, place any custom / private templates you might have.  (If using the dockerHub conversion section of this plugin, a folder will be automatically created here called <strong>dockerHub</strong><br>
+
+Or alternatively,
+
+<li>Create a GitHub repository, and then on your flash drive, create a file called <strong>/boot/config/plugins/community.applications/private.repositories.json</strong>
+<br>This file has the following format:
+<blockquote>
+[<br>
+&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;"name": "Whatever you want to call the repository",<br>
+&nbsp;&nbsp;&nbsp;&nbsp;"url":&nbsp;&nbsp;"the full URL to the GitHub repository"<br>
+&nbsp;&nbsp;}<br>
+]
+</blockquote>
+
+
+In either case, the templates contained in the private repository will be flagged when displayed as <font color="red">Private</font>
+
+<strong>NOTE:</strong> Storing the private templates on the flash drive is the recommended way of creating a private repository</strong>
+<hr>
+<font size="3" color="red">Settings</font>
+
+<font color="red">Time to display applications as new / updated</font><br>
+This option dictates the amount of time that a new or updated application will be flagged as new and displayed under the <strong>New / Updated</strong> category.  Defaults to 3 Months
+
+<font color="red">Initial View Mode</font><br>
+This option sets the initial view mode when you first load the plugin.  Defaults to Icons
+
+<font color="red">Favourite Repository</font><br>
+This option allows you to set a "favourite" repository.  If set, then applications from that repository will display before all others.  Defaults to None
+
+<font color="red">Icon Size</font><br>
+This option only applies to view modes Icons and Icon Details.  It sets the displaying of the icons to be either large or small (Defaults to Large)
+
+<font color="red">Number of Columns</font><br>
+This option only applies to Icon mode.  It will set the number of columns of applications displayed per line.  Useful on mobile devices.  Defaults to 5
+
+<font color="red">Group Beta and Private Apps into Super Categories</font><br>
+This option separates Private and Beta applications into their own sections on any displayed result
+
+<font color="red">Open Add / Edit / Settings in new Tab</font></br>
+This option determines whether or not a new tab will open when you add or edit or go to an app's settings.  Defaults to the same tab.
+
+<font color="red">Hide Incompatible Applications</font><br>
+If CA thinks that an application is incompatible with the version of unRaid that you are using, by default it will not display the application.
+
+<font color="red">Enable additional search results from dockerHub</font><br>
+This option enables the plugin to perform additional searches from dockerHub when looking for an application.  See above (Advanced - dockerHub integration for more details) Default: No
+
+
+<hr>
+ 
+
+<font color="red" size="3">Technical Stuff</font>
+
+Community Applications (and its predecessor Community Repositories) introduced a number of additional XML tags in order to perform it's magic.  Any application / template author and/or maintainer should check out the list of schema additions here:  <a href='http://lime-technology.com/forum/index.php?topic=40299.0' target='_blank'>http://lime-technology.com/forum/index.php?topic=40299.0</a>
+
+Depending upon which browser you are using, there may be a slight delay (~1-2 seconds) in displaying the results (in particular, All Applications using Table mode).  Some browsers are faster than others are sorting out all the displayed information.  In my testing, on a PC, Chrome is by far the fastest at rendering the results.  Note that generally whenever CA searches or re-renders the display, a spinning ring will appear.  <strong>When that ring stops spinning, CA has finished, and any delays from that point onwards are 100% entirely due to your browser</strong>
+
+
+<hr>
+<font color="red" size="3">Plugin Credits</font><br><br>
+<center><table width="200"><tr>
+<td width='60'><img src='http://www.jrj-socrates.com/Cartoon%20Pics/Misc/Tripping%20The%20Rift/Chode_300.gif' style='height:48px;width:50px'></td><td width='120'><strong>Andrew Zawadzki</strong></td><td>Main Development</td></tr>
+<tr><td></td><td><strong>bonienl</strong></td><td>Additional Contributions</td></tr>
+<tr><td><img src='http://fanart.tv/ftv_128.jpg' style='height:48px;width:48px'></td><td><strong>Kode</strong></td><td>Application Feed</td></tr>
+<tr><td><img src='http://i.imgur.com/hpBxTJX.jpg' style='height:48px;width:48px'></td><td><strong>CHBMB</strong></td><td>Additional Testing</td></tr>
+<tr><td><img src='http://i.imgur.com/VFMJTol.jpg' style='height:48px;width:48px'></td><td><strong>sparklyballs</strong></td><td>Additional Testing</td></tr>
+<tr><td><img src='http://i61.tinypic.com/id537n.png' width='48px' height='48px'></td><td><strong>linuxserver.io</strong></td><td>Additional Testing, etc</td></tr>
+
+</table></center>
+
+
+<em>Community Applications</em> Copyright 2015-2016, Andrew Zawadzki
+
+
+<strong>For any support issues with this plugin, go to <a href='http://lime-technology.com/forum/index.php?topic=40262.0' target='_blank'>Plugin Support Page</a>
+<a href="#" class="back-to-top" style="display: inline;">
+<img src='/plugins/community.applications/images/up.png' style='width:50px;height:50px' href="#" class="back-to-top"></img>
+</a>
+
