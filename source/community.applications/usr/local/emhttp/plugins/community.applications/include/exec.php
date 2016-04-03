@@ -1915,7 +1915,10 @@ case 'resourceMonitor':
       $myDisplay[] = $display;
     }
   }
-
+  if ( ! count($myDisplay) ) {
+    echo "</table><center>No docker applications running!</center>";
+    break;
+  }
   usort($myDisplay,"mySort");
 
   foreach ($myDisplay as $display) {

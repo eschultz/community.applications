@@ -438,16 +438,31 @@ function forceUpdate() {
   $("#updateButton").prop("disabled",true);
   $("#Category").html("");
   $("#updateTime").html("In Progress...");
-
   $("#Total").html("Updating...");
-  myAlert("Updating Applications", "Downloading updated application templates.  This may take a minute or two<br><br><b>There is normally no reason to manually force an update, as Community Applications automatically downloads the updated application lists whenever it starts up</b>","/plugins/community.applications/images/spinner2.gif","40x40");
   clearSearchBox();
   $.post(URL,{action:'force_update'},function(){getContent(false,'All',"All Applications");});
 }
 
 function forceUpdateButton() {
-  $.post(URL,{action:'force_update_button'});
-  forceUpdate();
+  swal({
+    title: "Update Application Lists?",
+    text: "<strong>Normally there is no reason to manually update the application lists as Community Applications automatically downloads the latest application list whenever it starts up (updated every two hours)</strong><br><br><font color='red'>This process once begun cannot be aborted and will take 2-3 minutes</font>",
+    type: "warning",
+    confirmButtonColor: "#DD6B55",
+    confirmButtonText: "Update Lists",
+    showCancelButton: true,
+    showConfirmButton: true,
+    closeOnConfirm: false,
+    showLoaderOnConfirm: true,
+    html: true
+  },
+  function(isConfirm) {
+    if (isConfirm) {
+      $.post(URL,{action:'force_update_button'});
+      swal("Updating Applications","This will take a few minutes","info");
+      forceUpdate();
+    }
+  });
 }
 
 function enableButtons() {
