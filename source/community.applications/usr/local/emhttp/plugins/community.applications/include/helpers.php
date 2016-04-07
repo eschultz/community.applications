@@ -204,7 +204,7 @@ function findAppdata($volumes) {
   if ( is_array($volumes) ) {
     foreach ($volumes as $volume) {
       $temp = explode(":",$volume);
-      $testPath = $temp[1];
+      $testPath = strtolower($temp[1]);
     
       if (startsWith($testPath,"/config") ) {
         $path = $temp[0];
@@ -251,7 +251,6 @@ function fixTemplates($template) {
     }
   }
   if ( ! is_string($template['Description']) ) {
-    unset($template['Description']);
     $template['Description'] = "";
   }
   if ( $template['Category'] == "" ) {
@@ -261,7 +260,6 @@ function fixTemplates($template) {
     unset($template['Overview']);
   }
   if ( ! is_string($template['Category']) ) {
-    unset($template['Category']);
     $template['Category'] = "";
   }
   
@@ -277,7 +275,7 @@ function fixTemplates($template) {
     $template['Beta'] = "true";
   }
   
-  # support v6.2 redefining deprecating the <Beta> tag and moving it to a category (of which LT had no right to do)
+  # support v6.2 redefining deprecating the <Beta> tag and moving it to a category
   if ( stripos($template['Category'],":Beta") ) {
     $template['Beta'] = "true";
   } else {
