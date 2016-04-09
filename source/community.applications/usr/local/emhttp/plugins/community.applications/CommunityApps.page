@@ -133,6 +133,7 @@ jQuery(document).ready(function() {
 var URL = "/plugins/<?=$plugin?>/include/exec.php";
 var monitorInterval;
 var last = $('input[name$="tabs"]').length;
+var initialLoad = true;
 
 var categorySub = {
   backup:"backup:",
@@ -288,7 +289,7 @@ if ( "<?=$dockerRunning?>" == "false" && "<?=$dockerWarningAccepted?>" == "true"
 if ( "<?=$dockerRunning?>" == "false" ) {
   $("#monitor").hide();
 }
-
+myAlert("Updating Content","Retrieving the latest application Lists","/plugins/community.applications/images/spinner2.gif","40x40");
 $.post(URL,{action:'force_update'});
 
 if ( "<?=$cfg['viewMode']?>" == "icon" ) $("#viewIcon").prop("disabled",true);
@@ -613,6 +614,7 @@ function getContent(init,category,description,newApp) {
             readMore();
           });
         });
+        myCloseAlert();
         if ( ! initialize )
         {
           myCloseAlert();
@@ -1016,7 +1018,7 @@ Sort Direction:
 
 <div class='dockerSearch' style='display:none'><center><input type=button class='initDockerSearch' value='Get more results from dockerHub'></input></center></div>
 <table>
-<br><br><tbody id='templates_content'><?=$waiting?></tbody>
+<br><br><tbody id='templates_content'></tbody>
 </table>
 <div id='resourceMonitor' hidden>
 <center>Sort By:
