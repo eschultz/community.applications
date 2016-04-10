@@ -2,8 +2,8 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.applications">
 <!ENTITY author    "Andrew Zawadzki">
-<!ENTITY version   "2016.04.01">
-<!ENTITY md5       "7b95d1eeea61167bb7a95960d58e325f">
+<!ENTITY version   "2016.04.10">
+<!ENTITY md5       "d18f4e2a7a138a7ccdd74d133c0a07fc">
 <!ENTITY launch    "Apps">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/community.applications">
@@ -13,6 +13,15 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
+###2016.04.10###
+- Enhanced: Further security improvements
+- Enhanced: cAdvisor template is now 6.2 compliant
+- Fix: Suppress error if no docker applications running when in resource monitor
+- Added: Ability to install updates for docker applications
+- Enhanced: Better determination of appFeed failure
+- Added: Confirmation on Update Applications button
+- Updated: Manual, Credits
+
 ###2016.04.01###
 - Fix: Under certain circumstances, data structures could get corrupted
 - Enhanced: Further security enhancements
