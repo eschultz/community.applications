@@ -345,6 +345,7 @@ function readMore() {
 
 function showInfo(appNumber,appName) {
   openBox('<?=$execPath?>/showInfo.php<?=$commandArg?>' + appNumber,appName + " Changelog / More Information",550,550);
+
 }
 
 function showCredits() {

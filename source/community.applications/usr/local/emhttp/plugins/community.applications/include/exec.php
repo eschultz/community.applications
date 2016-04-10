@@ -1594,7 +1594,7 @@ case 'previous_apps':
           if ( startsWith($installedImage,$template['Repository']) ) {
             $template['Uninstall'] = true;
             $template['MyPath'] = $template['Path'];
-            if ( $dockerUpdateStatus[$installedImage]['status'] == "false" ) {
+            if ( $dockerUpdateStatus[$installedImage]['status'] == "false" || $dockerUpdateStatus[$template['Name']] == "false" ) {
               $template['UpdateAvailable'] = true;
               $template['FullRepo'] = $installedImage;
             }
@@ -1645,7 +1645,7 @@ case 'previous_apps':
                   $o['Name'] = $installedName;
                   $o['MyPath'] = $tempPath;
                   $o['SortName'] = $installedName;
-                  if ( $dockerUpdateStatus[$installedImage]['status'] == "false" ) {
+                  if ( $dockerUpdateStatus[$installedImage]['status'] == "false" || $dockerUpdateStatus[$template['Name']] == "false" ) {
                     $o['UpdateAvailable'] = true;
                     $o['FullRepo'] = $installedImage;
                   }
