@@ -58,6 +58,11 @@ $Credits = "
         <td><strong>eschutlz</strong></td>
         <td>Security Consultant</td>
       </tr>
+      <tr>
+        <td><img src='http://chjc.goalline.ca/news_images/org_1242/Image/Molson.jpg' width=48px' height='48px'></td>
+        <td><strong>Molson Canadian</strong></td>
+        <td>Sustenance</td>
+      </tr>
     </table></center>
     <br>
     <center><em><font size='1'>Copyright 2015-2016 Andrew Zawadzki</font></em></center>
@@ -454,6 +459,7 @@ function forceUpdateButton() {
     showCancelButton: true,
     showConfirmButton: true,
     closeOnConfirm: false,
+    allowOutsideClick: true,
     showLoaderOnConfirm: true,
     html: true
   },
