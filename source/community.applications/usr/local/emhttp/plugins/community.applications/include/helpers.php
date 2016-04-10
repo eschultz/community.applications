@@ -322,7 +322,11 @@ function makeXML($template) {
 function changeUpdateTime() {
   global $communityPaths;
 
-  $appFeedTime = readJsonFile($communityPaths['lastUpdated-old']);
+  if ( is_file($communityPaths['lastUpdated-old']) ) {
+    $appFeedTime = readJsonFile($communityPaths['lastUpdated-old']);
+  } else {
+    $appFeedTime['last_updated_timestamp'] = filemtime($communityPaths['community-templates-info']);
+  }
 
   $updateTime = date("F d Y H:i",$appFeedTime['last_updated_timestamp']);
 
