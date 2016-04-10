@@ -247,13 +247,15 @@ Depending upon which browser you are using, there may be a slight delay (~1-2 se
 
 <hr>
 <font color="red" size="3">Plugin Credits</font><br><br>
-<center><table width="200"><tr>
-<td width='60'><img src='http://www.jrj-socrates.com/Cartoon%20Pics/Misc/Tripping%20The%20Rift/Chode_300.gif' style='height:48px;width:50px'></td><td width='120'><strong>Andrew Zawadzki</strong></td><td>Main Development</td></tr>
-<tr><td></td><td><strong>bonienl</strong></td><td>Additional Contributions</td></tr>
-<tr><td><img src='http://fanart.tv/ftv_128.jpg' style='height:48px;width:48px'></td><td><strong>Kode</strong></td><td>Application Feed</td></tr>
-<tr><td><img src='http://i.imgur.com/hpBxTJX.jpg' style='height:48px;width:48px'></td><td><strong>CHBMB</strong></td><td>Additional Testing</td></tr>
-<tr><td><img src='http://i.imgur.com/VFMJTol.jpg' style='height:48px;width:48px'></td><td><strong>sparklyballs</strong></td><td>Additional Testing</td></tr>
-<tr><td><img src='http://i61.tinypic.com/id537n.png' width='48px' height='48px'></td><td><strong>linuxserver.io</strong></td><td>Additional Testing, etc</td></tr>
+    <center><table width=200>
+      <tr><td width=60><img src='http://www.jrj-socrates.com/Cartoon%20Pics/Misc/Tripping%20The%20Rift/Chode_300.gif' width='50px';height='48px'></td><td width=130><strong>Andrew Zawadzki</strong></td><td>Main Development</td></tr>
+      <tr><td></td><td><strong>bonienl</strong></td><td>Additional Contributions</td></tr>
+      <tr><td><img src='http://fanart.tv/ftv_128.jpg' height='48px' width='48px'></td><td><strong>Kode</strong></td><td>Application Feed</td></tr>
+      <tr><td><img src='http://i.imgur.com/VFMJTol.jpg' width='48px' height='48px'></td><td><strong>Sparklyballs</strong></td><td>Additional Testing</td></tr>
+      <tr><td><img src='http://i.imgur.com/hpBxTJX.jpg' width='48px' height='48px'></td><td><strong>CHBMB</strong></td><td>Additional Testing</td></tr>
+      <tr><td><img src='http://lime-technology.com/forum/index.php?action=dlattach;attach=26324;type=avatar' width='48px' height='48px'></td><td><strong>eschutlz</strong></td><td>Security Consultant</td></tr>
+      <tr><td><img src='http://chjc.goalline.ca/news_images/org_1242/Image/Molson.jpg' width='48px' height='48px'></td><td><strong>Molson Canadian</strong></td><td>Sustenance</td></tr>
+    </table></center>
 
 </table></center>
 

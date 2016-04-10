@@ -59,7 +59,7 @@ $Credits = "
         <td>Security Consultant</td>
       </tr>
       <tr>
-        <td><img src='http://chjc.goalline.ca/news_images/org_1242/Image/Molson.jpg' width=48px' height='48px'></td>
+        <td><img src='http://chjc.goalline.ca/news_images/org_1242/Image/Molson.jpg' width='48px' height='48px'></td>
         <td><strong>Molson Canadian</strong></td>
         <td>Sustenance</td>
       </tr>
