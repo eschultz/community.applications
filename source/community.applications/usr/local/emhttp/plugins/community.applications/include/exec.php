@@ -1582,7 +1582,7 @@ case 'previous_apps':
 # $info contains all installed containers
 
 # now correlate that to a template;
-
+# this section handles containers that have not been renamed from the appfeed
   if ( $installed == "true" ) {
     foreach ($info as $installedDocker) {
       $installedImage = $installedDocker['Image'];
@@ -1606,12 +1606,12 @@ case 'previous_apps':
     }
     $all_files = @array_diff(@scandir("/boot/config/plugins/dockerMan/templates-user"),array(".",".."));
 
+# handle renamed containers
     foreach ($all_files as $xmlfile) {
       if ( pathinfo($xmlfile,PATHINFO_EXTENSION) == "xml" ) {
         $o = readXmlFile("/boot/config/plugins/dockerMan/templates-user/$xmlfile",$moderation);
         $o['MyPath'] = "/boot/config/plugins/dockerMan/templates-user/$xmlfile";
         $o['UnknownCompatible'] = true;
-    # Overwrite any template values with the moderated values
 
         if ( is_array($moderation[$o['Repository']]) ) {
           $o = array_merge($o, $moderation[$o['Repository']]);
@@ -1847,6 +1847,12 @@ case 'accept_docker_warning':
   file_put_contents($communityPaths['accept_docker_warning'],"accepted");
   break;
 
+############################################################
+#                                                          #
+# Displays a table of basic stats for runnings docker apps #
+#                                                          #
+############################################################
+
 case 'resourceMonitor':
   $sortKey = isset($_POST['sortBy']) ? urldecode(($_POST['sortBy'])) : "Name";
   $sortDir = isset($_POST['sortDir']) ? urldecode(($_POST['sortDir'])) : "Up";
@@ -1969,6 +1975,12 @@ case 'resourceMonitor':
 
   break;
 
+#################################################
+#                                               #
+# Initialization stuff for the resource monitor #
+#                                               #
+#################################################
+
 case 'resourceInitialize':
   $dockerClient = new DockerClient();
   $dockerRunning = $dockerClient->getDockerContainers();
@@ -1999,10 +2011,22 @@ case 'resourceInitialize':
   echo $o;
   break;
 
+####################################################
+#                                                  #
+# starts a script to calculate the size of appData #
+#                                                  #
+####################################################
+  
 case 'calculateAppdata':
   $commandLine = $communityPaths['calculateAppdataScript']." > /dev/null | at NOW -M >/dev/null 2>&1";
   exec($commandLine);
   break;
+
+##############################################################
+#                                                            #
+# Enable / disable the calc appdata button if script running #
+#                                                            #
+##############################################################
 
 case 'checkCalculations':
     if ( is_file($communityPaths['calculateAppdataProgress']) ) {
@@ -2012,6 +2036,12 @@ case 'checkCalculations':
   }
   echo $o;
   break;
+
+###############################################
+#                                             #
+# starts the cAdvisor app bypassing dockerMan #
+#                                             #
+###############################################
 
 case 'startCadvisor':
   $dockerClient = new DockerClient();
