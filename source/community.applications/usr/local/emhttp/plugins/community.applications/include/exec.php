@@ -145,7 +145,6 @@ function DownloadCommunityTemplates() {
 
   @unlink($downloadURL);
   $i = $appCount;
-  file_put_contents("/tmp/debug",print_r($templates,1));
   foreach ($Repos as $Repo) {
     if ( ! is_array($templates[$Repo['url']]) ) {
       continue;
@@ -1240,18 +1239,23 @@ case 'force_update':
   } else {
     $lastUpdatedOld['last_updated_timestamp'] = 0;
   }
-
+  @unlink($communityPaths['lastUpdated']);
   download_url($communityPaths['application-feed-last-updated'],$communityPaths['lastUpdated']);
 
   $latestUpdate = readJsonFile($communityPaths['lastUpdated']);
+  if ( ! $latestUpdate['last_updated_timestamp'] ) {
+    $latestUpdate['last_updated_timestamp'] = INF;
+    @unlink($communityPaths['lastUpdated']);
+  }
 
   if ( $latestUpdate['last_updated_timestamp'] > $lastUpdatedOld['last_updated_timestamp'] ) {
-    copy($communityPaths['lastUpdated'],$communityPaths['lastUpdated-old']);
+    if ( $latestUpdate['last_updated_timestamp'] != INF ) {
+      copy($communityPaths['lastUpdated'],$communityPaths['lastUpdated-old']);
+    }
     unlink($infoFile);
   } else {
     moderateTemplates();
   }
-
   break;
 
 ####################################################################################################
