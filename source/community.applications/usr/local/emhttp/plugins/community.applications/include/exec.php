@@ -644,7 +644,11 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
           $t .= "</b></strong><font color='red'><b>Moderator Comments:</b></font> ".$template['ModeratorComment'];
         }
         if ( $template['UpdateAvailable'] ) {
-          $t .= "<br><center><font color='red'><b>Update Available.  Click <a onclick='installPLGupdate(&quot;".$template['MyPath']."&quot;,&quot;".$template['Name']."&quot;);' style='cursor:pointer'>Here</a> to Install</b></center></font>";
+          if ( $template['Plugin'] ) {
+            $t .= "<br><center><font color='red'><b>Update Available.  Click <a onclick='installPLGupdate(&quot;".$template['MyPath']."&quot;,&quot;".$template['Name']."&quot;);' style='cursor:pointer'>Here</a> to Install</b></center></font>";
+          } else {
+            $t .= "<br><center><font color='red'><b>Update Available.  Click <a href='Docker'>Here</a> to install</b></font></center>";
+          }
         }
         $t .= "</b></strong><center>";
         $t .= ($template['Support']) ? "<a href='".$template['Support']."' target='_blank' title='Click to go to the support thread'><font color=red>Support Thread</font></a>" : "";
@@ -738,7 +742,11 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
         $t .= "</strong></b><b><font color='red'>Moderator Comments:</font></b> ".$template['ModeratorComment'];
       }
       if ( $template['UpdateAvailable'] ) {
-        $t .= "<br><center><font color='red'><b>Update Available.  Click <a onclick='installPLGupdate(&quot;".$template['MyPath']."&quot;,&quot;".$template['Name']."&quot;);' style='cursor:pointer'>Here</a> to Install</b></center></font>";
+        if ( $template['Plugin'] ) {
+          $t .= "<br><center><font color='red'><b>Update Available.  Click <a onclick='installPLGupdate(&quot;".$template['MyPath']."&quot;,&quot;".$template['Name']."&quot;);' style='cursor:pointer'>Here</a> to Install</b></center></font>";
+        }  else {
+            $t .= "<br><center><font color='red'><b>Update Available.  Click <a href='Docker'>Here</a> to install</b></font></center>";
+        }
       }
 
       $t .= "</td>";
@@ -1557,6 +1565,8 @@ case 'previous_apps':
 
   $installed = isset($_POST['installed']) ? urldecode(($_POST['installed'])) : "";
 
+  $dockerUpdateStatus = readJsonFile($communityPaths['dockerUpdateStatus']);
+  
   if ( is_file($communityPaths['moderation']) ) {
     $moderation = readJsonFile($communityPaths['moderation']);
   } else {
@@ -1580,9 +1590,14 @@ case 'previous_apps':
 
       foreach ($file as $template) {
         if ( $installedName == $template['Name'] ) {
+          $template['testrepo'] = $installedImage;
           if ( startsWith($installedImage,$template['Repository']) ) {
             $template['Uninstall'] = true;
             $template['MyPath'] = $template['Path'];
+            if ( $dockerUpdateStatus[$installedImage]['status'] == "false" ) {
+              $template['UpdateAvailable'] = true;
+              $template['FullRepo'] = $installedImage;
+            }
             $displayed[] = $template;
             break;
           }
@@ -1630,6 +1645,10 @@ case 'previous_apps':
                   $o['Name'] = $installedName;
                   $o['MyPath'] = $tempPath;
                   $o['SortName'] = $installedName;
+                  if ( $dockerUpdateStatus[$installedImage]['status'] == "false" ) {
+                    $o['UpdateAvailable'] = true;
+                    $o['FullRepo'] = $installedImage;
+                  }
                 }
                 break;;
               }

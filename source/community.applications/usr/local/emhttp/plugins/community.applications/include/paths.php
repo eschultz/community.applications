@@ -42,6 +42,7 @@ $communityPaths['calculateAppdataScript']        = "/usr/local/emhttp/plugins/co
 $communityPaths['calculateAppdataProgress']      = $communityPaths['tempFiles']."/appdata/inprogress";
 $communityPaths['cAdvisor']                      = $communityPaths['tempFiles']."/cAdvisorURL";                         /* URL of cadvisor (if installed) */
 $communityPaths['updateErrors']                  = $communityPaths['tempFiles']."/updateErrors.txt";
+$communityPaths['dockerUpdateStatus']            = "/var/lib/docker/unraid-update-status.json";
 
 $infoFile                                        = $communityPaths['community-templates-info'];
 $docker_repos                                    = $communityPaths['template-repos'];
