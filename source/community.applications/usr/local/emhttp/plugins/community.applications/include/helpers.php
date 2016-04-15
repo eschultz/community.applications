@@ -373,7 +373,7 @@ function readXmlFile($xmlfile) {
   $o['DockerHubName'] = strtolower($o['Name']);
   $o['Beta']        = strtolower(stripslashes($doc->getElementsByTagName( "Beta" )->item(0)->nodeValue));
   $o['Changes']     = $doc->getElementsByTagName( "Changes" )->item(0)->nodeValue;
-  $o['Date']        = $doc->getElementsByTagName( "Date" ) ->item(0)->nodeValue;
+  $o['Date']        = strtotime($doc->getElementsByTagName( "Date" ) ->item(0)->nodeValue);
   $o['Project']     = $doc->getElementsByTagName( "Project" ) ->item(0)->nodeValue;
   $o['Date']        = ( $o['Date'] ) ? strtotime( $o['Date'] ) : 0;
   $o['SortAuthor']  = $o['Author'];
