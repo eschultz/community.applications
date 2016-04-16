@@ -2,8 +2,8 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.applications">
 <!ENTITY author    "Andrew Zawadzki">
-<!ENTITY version   "2016.04.10">
-<!ENTITY md5       "d18f4e2a7a138a7ccdd74d133c0a07fc">
+<!ENTITY version   "2016.04.16">
+<!ENTITY md5       "7133c09a1fc9f801d60da1db00b85e84">
 <!ENTITY launch    "Apps">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/community.applications">
@@ -13,6 +13,10 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
+###2016.04.16###
+- Fix: PHP exception when only a single Config entry is present
+- Fix: Date application updated when in Legacy mode
+
 ###2016.04.10###
 - Enhanced: Further security improvements
 - Enhanced: cAdvisor template is now 6.2 compliant
