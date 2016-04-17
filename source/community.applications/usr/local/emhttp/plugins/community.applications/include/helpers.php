@@ -16,7 +16,7 @@ require_once("/usr/local/emhttp/plugins/dynamix/include/Wrappers.php");
 function checkPluginUpdate($filename) {
   $filename = basename($filename);
   $installedVersion = exec("/usr/local/emhttp/plugins/dynamix.plugin.manager/scripts/plugin version /var/log/plugins/$filename");
-  if ( is_file("/tmp/plugins/community.applications.plg") ) {
+  if ( is_file("/tmp/plugins/$filename") ) {
     $upgradeVersion = exec("/usr/local/emhttp/plugins/dynamix.plugin.manager/scripts/plugin version /tmp/plugins/$filename");
   } else {
     $upgradeVersion = "0";

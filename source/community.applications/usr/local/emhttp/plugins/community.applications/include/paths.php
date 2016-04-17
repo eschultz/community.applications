@@ -43,7 +43,7 @@ $communityPaths['calculateAppdataProgress']      = $communityPaths['tempFiles'].
 $communityPaths['cAdvisor']                      = $communityPaths['tempFiles']."/cAdvisorURL";                         /* URL of cadvisor (if installed) */
 $communityPaths['updateErrors']                  = $communityPaths['tempFiles']."/updateErrors.txt";
 $communityPaths['dockerUpdateStatus']            = "/var/lib/docker/unraid-update-status.json";
-
+$communityPaths['autoUpdateSettings']            = "/boot/config/plugins/community.applications/AutoUpdate.json";
 $infoFile                                        = $communityPaths['community-templates-info'];
 $docker_repos                                    = $communityPaths['template-repos'];
 

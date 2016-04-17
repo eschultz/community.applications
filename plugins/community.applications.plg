@@ -13,6 +13,9 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
+###2016.04.17###
+- Added: Ability to Auto Update Selected Plugins
+
 ###2016.04.16###
 - Fix: PHP exception when only a single Config entry is present
 - Fix: Date application updated when in Legacy mode
@@ -426,6 +429,7 @@ echo "Creating Directories"
 mkdir -p /var/lib/docker/unraid/templates-community-apps
 mkdir -p /var/lib/docker/unraid/community.applications.datastore
 mkdir -p /tmp/community.applications/tempFiles
+cp /usr/local/emhttp/plugins/community.applications/scripts/updateApplications.sh /etc/cron.daily/updateApplications.sh
 
 echo ""
 echo "----------------------------------------------------"
@@ -443,6 +447,7 @@ The 'remove' script.
 <FILE Run="/bin/bash" Method="remove">
 <INLINE>
 removepkg &name;-&version;
+rm /etc/cron.daily/updateApplications.php
 rm -rf &plugdir;
 rm -rf /boot/config/plugins/&name;
 rm -rf /var/lib/docker/unraid/templates-community

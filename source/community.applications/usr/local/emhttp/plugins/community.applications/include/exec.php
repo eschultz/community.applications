@@ -2056,5 +2056,24 @@ case 'startCadvisor':
   echo "done";
   break;
   
+case 'autoUpdatePlugins':
+  $globalUpdate = isset($_POST['globalUpdate']) ? urldecode(($_POST['globalUpdate'])) : "no";
+  $pluginList   = isset($_POST['pluginList']) ? urldecode(($_POST['pluginList'])) : "";
+
+  if ( $globalUpdate == "yes" ) {
+    $updateArray['Global'] = "true";
+  } else {
+    $updateArray['Global'] = "false";
+  }
+  $plugins = explode("*",$pluginList);
+  if ( is_array($plugins) ) {
+    foreach ($plugins as $plg) {
+      if (is_file("/boot/config/plugins/$plg") ) {
+        $updateArray[$plg] = "true";
+      }
+    }
+  }
+  writeJsonFile($communityPaths['autoUpdateSettings'],$updateArray);
+  break;
 }
 ?>

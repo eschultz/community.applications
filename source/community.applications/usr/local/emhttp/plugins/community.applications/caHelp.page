@@ -207,6 +207,9 @@ In either case, the templates contained in the private repository will be flagge
 <hr>
 <font size="3" color="red">Settings</font>
 
+Within unRaid's Settings tab, there is a section called <em>Community Applications</em>.  A program called <em>General Settings</em> allows you to fine tune the operation of Community Applications as detailed below:
+
+
 <font color="red">Time to display applications as new / updated</font><br>
 This option dictates the amount of time that a new or updated application will be flagged as new and displayed under the <strong>New / Updated</strong> category.  Defaults to 3 Months
 
@@ -236,7 +239,17 @@ This option enables the plugin to perform additional searches from dockerHub whe
 
 
 <hr>
+<font color="red" size="3">Auto Update Settings</font>
+
+Within the Community Applications section of <em>Settings</em> there is a program called "Auto Update Settings".  This program will allow your unRaid server to automatically update any or all of the plugin applications currently installed to the latest versions as they become available without any user intervention.
+
+To utilize this option, then you must first configure the dynamix UI to check for plugin settings.  This is done via <em>Settings - Notification Settings - Plugin Version Notification</em>  Set this value to be whatever you desire (I recommend at least once per day).  Community Applications will then automatically install any available updates.  Note that you should still keep the Notifcation method of Browser / Email / Agents enabled simply to let unRaid inform you of any updates to the OS itself.  However if you keep Browser notifications active, you will still have to acknowledge the alert even if the plugin has already been updated by Community Applications.
+
+unRaid's syslog will have some additional entries as Community Applications installs or skips (if the plugin is set to not autoupdate).
  
+<font color='red'><strong>Note:</strong></font> Community Applications will NOT automatically install any unRaid OS updates.
+
+<hr>
 
 <font color="red" size="3">Technical Stuff</font>
 
