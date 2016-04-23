@@ -16,11 +16,11 @@ function checkPluginUpdate($filename) {
   }
 }
 
-if ( ! is_file("/boot/config/plugins/community.applications/AutoUpdate.json") ) {
-  exit;
-}
 
-$appList = json_decode(file_get_contents("/boot/config/plugins/community.applications/AutoUpdate.json"),true);
+$appList = json_decode(@file_get_contents("/boot/config/plugins/community.applications/AutoUpdate.json"),true);
+if ( ! $appList ) {
+  $appList['community.applications.plg'] = "true";
+}
 
 $pluginsInstalled = scandir("/boot/config/plugins");
 exec("logger Community Applications Auto Update Running");

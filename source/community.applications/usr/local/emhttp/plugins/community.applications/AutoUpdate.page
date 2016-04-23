@@ -14,11 +14,15 @@ $pluginsFolder = scandir("/boot/config/plugins");
 
 $updateSettings = json_decode(@file_get_contents("/boot/config/plugins/community.applications/AutoUpdate.json"),true);
 
+if ( ! $updateSettings ) {
+  $updateSettings['community.applications.plg'] = "true";
+}
+
 if ( $updateSettings['Global'] == "true" ) {
   $globalUpdate = "selected";
 } 
 
-$displayOptions = "<table class='tablesorter'>";
+$displayOptions = "<table class='tablesorter'><thead><th>&nbsp;</th><th></th><th></th><th></th></thead><tbody>";
 foreach ($pluginsFolder as $pluginFile) {
   if ( ! is_file("/boot/config/plugins/$pluginFile") ) {
     continue;
@@ -38,7 +42,7 @@ foreach ($pluginsFolder as $pluginFile) {
     $displayoptions .= "</select></td></tr>";
   }
 }
-$displayOptions .= "</table>";
+$displayOptions .= "</tbody></table>";
 ?>
 
 <style>

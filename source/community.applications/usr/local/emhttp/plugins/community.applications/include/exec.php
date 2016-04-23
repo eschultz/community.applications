@@ -2056,6 +2056,12 @@ case 'startCadvisor':
   echo "done";
   break;
   
+#################################################
+#                                               #
+# Setup the json file for the cron autoupdating #
+#                                               #
+#################################################
+
 case 'autoUpdatePlugins':
   $globalUpdate = isset($_POST['globalUpdate']) ? urldecode(($_POST['globalUpdate'])) : "no";
   $pluginList   = isset($_POST['pluginList']) ? urldecode(($_POST['pluginList'])) : "";
