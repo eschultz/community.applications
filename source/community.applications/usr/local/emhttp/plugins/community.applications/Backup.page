@@ -1,6 +1,6 @@
 Menu="CA"
 Title="Backup Appdata"
-Icon="community.applications.png"
+Icon="backup.png"
 ---
 <?
 ###############################################################
