@@ -6,4 +6,10 @@ then
   logger "Terminating $PID"
   kill $PID
 fi
-
+if [[ -e /tmp/community.applications/tempFiles/backupInProgress ]]
+then
+  logger "Community Applications Backup / Restore of Appdata in progress"
+  PID=`cat /tmp/community.applications/tempFiles/backupInProgress`
+  logger "Terminating $PID"
+  kill $PID
+fi

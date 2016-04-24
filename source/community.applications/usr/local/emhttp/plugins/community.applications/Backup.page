@@ -1,0 +1,278 @@
+Menu="CA"
+Title="Backup Appdata"
+Icon="community.applications.png"
+---
+<?
+###############################################################
+#                                                             #
+# Community Applications copyright 2015-2016, Andrew Zawadzki #
+#                                                             #
+###############################################################
+
+$plugin = "community.applications";
+
+$backupOptions = json_decode(@file_get_contents("/boot/config/plugins/community.applications/BackupOptions.json"),true);
+if ( ! $backupOptions['rsyncOption'] ) {
+  $backupOptions['rsyncOption'] = "-avXHq --delete --safe-links";
+}
+
+$udList = array_diff(scandir("/mnt/disks"),array(".",".."));
+$sharesList = array_diff(scandir("/mnt/cache"),array(".",".."));
+$disksList = array_diff(scandir("/mnt/"),array(".","..","user","user0","disks","cache"));
+natsort($disksList);
+
+$sourceShares = "<option value=''>Select A Share</option>";
+foreach ($sharesList as $addShare) {
+  $selected = "";
+  if ( ! is_dir("/mnt/cache/$addShare") ) {
+    continue;
+  }
+  if ( $backupOptions['source'] == "/mnt/cache/$addShare" ) {
+    $selected = "selected";
+  }    
+  $sourceShares .= "<option value='/mnt/cache/$addShare' $selected>$addShare</option>";
+}
+foreach ($udList as $udShare) {
+  $selected = "";
+  if ( ! is_dir("/mnt/disks/$udShare") ) {
+    continue;
+  }
+  if ( $backupOptions['source'] == "/mnt/disks/$udShare" ) {
+    $selected = "selected";
+  }
+  $sourceShares .= "<option value='/mnt/disks/$udShare' $selected>$udShare (via Unassigned Devices)</option>";
+}
+
+$destinationShares = "<option value=''>Select A Disk</option>";
+foreach ($disksList as $addShare) {
+  $selected = "";
+  if ( ! is_dir("/mnt/$addShare") ) {
+    continue;
+  }
+  if ( $backupOptions['destination'] == "/mnt/$addShare" ) {
+    $selected = "selected";
+  }
+  $destinationShares .= "<option value='/mnt/$addShare' $selected>$addShare</option>";
+}
+foreach ($udList as $udShare) {
+  $selected = "";
+  if ( ! is_dir("/mnt/disks/$udShare") ) {
+    continue;
+  }
+  if ( $backupOptions['destination'] == "/mnt/disks/$udShare" ) {
+    $selected = "selected";
+  }
+  $destinationShares .= "<option value='/mnt/disks/$udShare' $selected>$udShare (via Unassigned Devices)</option>";
+}
+
+for ( $minute = 1; $minute < 61; $minute++ ) {
+  $cronMinute .= "<option value='$minute'>$minute</option>";
+}
+
+for ( $hour = 0; $hour < 24; $hour++ ) {
+  if ( $hour > 11 ) { $suffix = "PM"; $easyHour = $hour - 12; } else { $suffix = "AM"; $easyHour = $hour; }
+  if ( $easyHour == 0 ) { $easyHour = 12; }
+
+  $cronHour .= "<option value='$hour'>$easyHour$suffix</option>";
+}
+
+?>
+
+<script>
+var URL = "/plugins/<?=$plugin?>/include/exec.php";
+var appliedChanges = false;
+
+$(function() {
+  $("#cronSetting").val("<?=$backupOptions['cronSetting']?>");
+  $("#cronDay").val("<?=$backupOptions['cronDay']?>");
+  $("#cronMonth").val("<?=$backupOptions['cronMonth']?>");
+  $("#cronHour").val("<?=$backupOptions['cronHour']?>");
+  $("#cronMinute").val("<?=$backupOptions['cronMinute']?>");
+  $("#cronCustom").val("<?=$backupOptions['cronCustom']?>");
+
+  validateOptions(true);
+});
+
+function validateOptions(initialization) {
+  if (initialization != true ) {
+    appliedChanges = true;
+  }
+
+  var cronSetting = $("#cronSetting").val();
+  switch (cronSetting) {
+    case 'daily':
+      $("#cronDay,#cronMonth,#cronCustom").prop("disabled",true);
+      $("#cronHour,#cronMinute").prop("disabled",false);
+      break;
+    case 'weekly':
+      $("#cronMonth,#cronCustom").prop("disabled",true);
+      $("#cronDay,#cronHour,#cronMinute").prop("disabled",false);
+      break;
+    case 'monthly':
+      $("#cronCustom,#cronDay").prop("disabled",true);
+      $("#cronMonth,#cronHour,#cronMinute").prop("disabled",false);
+      break;
+    case 'custom':
+      $("#cronCustom").prop("disabled",false);
+      $("#cronDay,#cronMonth,#cronHour,#cronMinute").prop("disabled",true);
+      break;
+    case 'disabled':
+      $("#cronCusom,#cronDay,#cronMonth,#cronHour,#cronMinute").prop("disabled",true);
+      break;
+  }
+  
+  var source = $("#source").val();
+  var destination = $("#destination").val();
+  var stopScript = $("#stopScript").val();
+  var startScript = $("#startScript").val();
+  stopScript = stopScript.trim();
+  startScript = startScript.trim();
+  
+  $.post(URL,{action:'validateBackupOptions',source:source,destination:destination,stopScript:stopScript,startScript:startScript}, function (data) {
+    if (data) {
+      data = data.trim();
+      if ( data == "NONE" ) {
+        if ( appliedChanges ) {
+          $("#Apply").prop("disabled",false);
+          $("#Backup").prop("disabled",true);
+        } else {
+          $("#errors").html("false");
+          $("#Apply").prop("disabled",true);
+          $("#Backup").prop("disabled",false);
+        }          
+        $("#errors").html("");
+      } else {
+        $("#errors").html(data);
+        $("#Apply,#Backup").prop("disabled",true);
+      }
+    }
+  });
+}  
+  
+function apply() {
+  appliedChanges = false;
+  
+  var source = $("#source").val();
+  var destination = $("#destination").val();
+  var stopScript = $("#stopScript").val();
+  var startScript = $("#startScript").val();
+  var rsyncOption = $("#rsyncOption").val();
+  var cronSetting = $("#cronSetting").val();
+  var cronDay = $("#cronDay").val();
+  var cronMonth = $("#cronMonth").val();
+  var cronHour = $("#cronHour").val();
+  var cronMinute = $("#cronMinute").val();
+  var cronCustom = $("#cronCustom").val();
+  
+  rsyncOption = rsyncOption.trim();
+  stopScript = stopScript.trim();
+  startScript = startScript.trim();
+  
+  $.post(URL,{action:'applyBackupOptions',source:source,destination:destination,stopScript:stopScript,startScript:startScript,rsyncOption:rsyncOption,cronDay:cronDay,cronMonth:cronMonth,cronHour:cronHour,cronMinute:cronMinute,cronCustom:cronCustom,cronSetting:cronSetting});
+  
+  validateOptions(true);
+}  
+  
+  
+</script>
+
+> For an explanation of these items, please see the online manual
+
+
+<table>
+<tr>
+  <td><b>Appdata Share (Source):</b><br>(If your appData share is not listed, this CA module is not for you)</td>
+  <td><select id='source' onchange='validateOptions();'><?=$sourceShares?></select></td>
+</tr>
+<tr>
+  <td><b>Backup To Disk (Destination):</b><br>Files will be written to a folder on the disk called "CommunityApplicationsAppdataBackup"</td>
+  <td><select id='destination' onchange='validateOptions();'><?=$destinationShares?></select></td>
+</tr>
+<tr>
+  <td><b>Path To Custom Stop Script:</b></td>
+  <td><input onchange='validateOptions();' id='stopScript' type='text'></input></td>
+</tr>
+<tr>
+  <td><b>Path To Custom Start Script:</b></td>
+  <td><input onchange='validateOptions();' id='startScript' type='text'></input></td>
+</tr>
+<tr>
+  <td><b>Rsync Options:</b><br>*Don't change if you don't know what you're doing</td>
+  <td><input id='rsyncOption' type='text' value='<?=$backupOptions['rsyncOption']?>' onchange='validateOptions();'></td>
+</tr>
+<tr>
+  <td><b>Cron Settings</b></td>
+  <td><select id='cronSetting' onchange='validateOptions();'>
+        <option value='disabled'>Disabled</option>
+        <option value='daily'>Daily</option>
+        <option value='weekly'>Weekly</option>
+        <option value='monthly'>Monthly</option>
+        <option value='custom'>Custom</option>
+      </select>
+  </td>
+</tr>
+<tr>
+  <td><b>Day of Week:</b></td>
+  <td><select id='cronDay'>
+        <option value='0'>Sunday</option>
+        <option value='1'>Monday</option>
+        <option value='2'>Tuesday</option>
+        <option value='3'>Wednesday</option>
+        <option value='4'>Thursday</option>
+        <option value='5'>Friday</option>
+        <option value='6'>Saturday</option>
+      </select>
+  </td>
+</tr>
+<tr>
+  <td><b>Day of Month:</b></td>
+  <td><select id='cronMonth'>
+        <option value='1'>1st</option>
+        <option value='2'>2nd<option>
+        <option value='3'>3rd</option>
+        <option value='4'>4th</option>
+        <option value='5'>5th</option>
+        <option value='6'>6th</option>
+        <option value='7'>7th</option>
+        <option value='8'>8th</option>
+        <option value='9'>9th</option>
+        <option value='10'>10th</option>
+        <option value='11'>11th</option>
+        <option value='12'>12th</option>
+        <option value='13'>13th</option>
+        <option value='14'>14th</option>
+        <option value='15'>15th</option>
+        <option value='16'>16th</option>
+        <option value='17'>17th</option>
+        <option value='18'>18th</option>
+        <option value='19'>19th</option>
+        <option value='20'>20th</option>
+        <option value='21'>21st</option>
+        <option value='22'>22nd</option>
+        <option value='23'>23rd</option>
+        <option value='24'>24th</option>
+        <option value='25'>25th</option>
+        <option value='26'>26th</option>
+        <option value='27'>27th</option>
+        <option value='28'>28th</option>
+        <option value='29'>29th</option>
+        <option value='30'>30th</option>
+        <option value='31'>31st</option>
+      </select>
+  </td>
+</tr>
+<tr>
+  <td><b>Hour:</b></td>
+  <td><select id='cronHour'><?=$cronHour?></select></td>
+</tr>
+<tr>
+  <td><b>Minute:</b></td>
+  <td><select id='cronMinute'><?=$cronMinute?></select></td>
+</tr>
+<tr>
+  <td><b>Custom Cron Entry:</b></td>
+  <td><input type='text' id='cronCustom'></input></td>
+</tr>
+</table>
+<input type='button' value='Apply' id='Apply' onclick='apply();'><input type='button' value='Backup Now' id='Backup'>
+<br><br><font color='red'><span id='errors'></span></font><span id='error1'></span>

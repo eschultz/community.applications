@@ -3,7 +3,11 @@ Icon="community.applications.png"
 Title="Community Applications"
 ---
 <?
-/* Copyright 2015-2016 Andrew Zawadzki */
+###############################################################
+#                                                             #
+# Community Applications copyright 2015-2016, Andrew Zawadzki #
+#                                                             #
+###############################################################
 
 $installedVersion = exec("/usr/local/emhttp/plugins/dynamix.plugin.manager/scripts/plugin version /var/log/plugins/community.applications.plg");
 if ( is_file("/tmp/plugins/community.applications.plg") ) {

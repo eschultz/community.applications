@@ -1453,7 +1453,6 @@ case 'convert_docker':
     $dockerfile['Privileged'] = "false";
     $dockerfile['Networking']['Mode'] = "bridge";
     $dockerfile['Icon'] = $docker['Icon'];
-    
   }
   $dockerXML = makeXML($dockerfile);
 
@@ -2081,5 +2080,64 @@ case 'autoUpdatePlugins':
   }
   writeJsonFile($communityPaths['autoUpdateSettings'],$updateArray);
   break;
+
+case 'validateBackupOptions':
+  $source = isset($_POST['source']) ? urldecode(($_POST['source'])) : "";
+  $destination = isset($_POST['destination']) ? urldecode(($_POST['destination'])) : "";
+  $stopScript = isset($_POST['stopScript']) ? urldecode(($_POST['stopScript'])) : "";
+  $startScript = isset($_POST['startScript']) ? urldecode(($_POST['startScript'])) : "";
+  
+  if ( $source == "" ) {
+    $errors .= "Source Must Be Specified<br>";
+  }
+  if ( $destination == "" ) {
+    $errors .= "Destination Must Be Specified<br>";
+  }
+  
+  if ( $source != "" && $source == $destination ) {
+    $errors .= "Source and Destination Cannot Be The Same<br>";
+  }
+
+  if ( $stopScript ) {
+    if ( ! is_file($stopScript) ) {
+      $errors .= "No Script at $stopScript<br>";
+    } else {
+      if ( ! is_executable($stopScript) ) {
+        $errors .= "Stop Script $stopScript is not executable<br>";
+      }
+    }
+  }
+  if ( $startScript ) {
+    if ( ! is_file(startScript) ) {
+      $errors .= "No Script at $startScript";
+    } else {
+        if ( ! is_executable($startScript) ) {
+        $errors .= "Start Script $startScript is not executable<br>";
+      }
+    }
+  }
+  if ( ! $errors ) {
+    $errors = "NONE";
+  }
+  echo $errors;
+  
+  break;
+  
+case 'applyBackupOptions':
+  $backupOptions['source']      = isset($_POST['source']) ? urldecode(($_POST['source'])) : "";
+  $backupOptions['destination'] = isset($_POST['destination']) ? urldecode(($_POST['destination'])) : "";
+  $backupOptions['stopScript']  = isset($_POST['stopScript']) ? urldecode(($_POST['stopScript'])) : "";
+  $backupOptions['startScript'] = isset($_POST['startScript']) ? urldecode(($_POST['startScript'])) : "";
+  $backupOptions['rsyncOption'] = isset($_POST['rsyncOption']) ? urldecode(($_POST['rsyncOption'])) : "";
+  $backupOptions['cronSetting'] = isset($_POST['cronSetting']) ? urldecode(($_POST['cronSetting'])) : "";
+  $backupOptions['cronDay']     = isset($_POST['cronDay']) ? urldecode(($_POST['cronDay'])) : "";
+  $backupOptions['cronMonth']   = isset($_POST['cronMonth']) ? urldecode(($_POST['cronMonth'])) : "";
+  $backupOptions['cronHour']    = isset($_POST['cronHour']) ? urldecode(($_POST['cronHour'])) : "";
+  $backupOptions['cronMinute']  = isset($_POST['cronMinute']) ? urldecode(($_POST['cronMinute'])) : "";
+  $backupOptions['cronCustom']  = isset($_POST['cronCustom']) ? urldecode(($_POST['cronCustom'])) : "";
+  
+  writeJsonFile($communityPaths['backupOptions'],$backupOptions);
+  break; 
 }
+
 ?>

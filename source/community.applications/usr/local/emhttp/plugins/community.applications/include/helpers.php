@@ -447,5 +447,36 @@ function moderateTemplates() {
   writeJsonFile($communityPaths['community-templates-info'],$o);
 }
 
+############################################
+#                                          #
+# Function to write a string to the syslog #
+#                                          #
+############################################
+
+function logger($string) {
+  shell_exec("logger '$string'");
+}
+
+###########################################
+#                                         #
+# Function to send a dynamix notification #
+#                                         #
+###########################################
+
+function notify($event,$subject,$description,$message="",$type="normal") {
+  $command = '/usr/local/emhttp/plugins/dynamix/scripts/notify -e "'.$event.'" -s "'.$subject.'" -d "'.$description.'" -m "'.$message.'" -i "'.$type.'"';
+  echo $command;
+  shell_exec($command);
+}
+
+#######################################################
+#                                                     #
+# Function to convert a Linux text file to dos format #
+#                                                     #
+#######################################################
+
+function toDOS($input,$output) {
+  shell_exec('/usr/bin/todos < "$input" > "$output"');
+}
 
 ?>

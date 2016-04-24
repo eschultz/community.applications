@@ -44,6 +44,10 @@ $communityPaths['cAdvisor']                      = $communityPaths['tempFiles'].
 $communityPaths['updateErrors']                  = $communityPaths['tempFiles']."/updateErrors.txt";
 $communityPaths['dockerUpdateStatus']            = "/var/lib/docker/unraid-update-status.json";
 $communityPaths['autoUpdateSettings']            = "/boot/config/plugins/community.applications/AutoUpdate.json";
+$communityPaths['backupOptions']                 = "/boot/config/plugins/community.applications/BackupOptions.json";
+$communityPaths['backupProgress']                = $communityPaths['tempFiles']."/backupInProgress";
+$communityPaths['backupLog']                     = $communityPaths['persistentDataStore']."/appdata_backup.log";
+
 $infoFile                                        = $communityPaths['community-templates-info'];
 $docker_repos                                    = $communityPaths['template-repos'];
 
