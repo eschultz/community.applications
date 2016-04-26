@@ -2135,9 +2135,32 @@ case 'applyBackupOptions':
   $backupOptions['cronHour']    = isset($_POST['cronHour']) ? urldecode(($_POST['cronHour'])) : "";
   $backupOptions['cronMinute']  = isset($_POST['cronMinute']) ? urldecode(($_POST['cronMinute'])) : "";
   $backupOptions['cronCustom']  = isset($_POST['cronCustom']) ? urldecode(($_POST['cronCustom'])) : "";
+  $backupOptions['runRsync']    = isset($_POST['runRsync']) ?urldecode(($_POST['runRsync'])) : "";
   
   writeJsonFile($communityPaths['backupOptions'],$backupOptions);
+  
+  exec($communityPaths['addCronScript']);
+       
   break; 
+  
+case 'checkBackup':
+  if ( is_file($communityPaths['backupLog']) ) {
+    $backupLines = "<font size='0'>".shell_exec("tail -n2 ".$communityPaths['backupLog'])."</font>";
+    $backupLines = str_replace("\n","<br>",$backupLines);
+  } else {
+    $backupLines = "<br><br><br>";
+  }
+  if ( is_file($communityPaths['backupProgress']) ) {
+    $backupLines .= "<script>$('#backupStatus').html('<font color=red>Running</font>');</script>";
+  } else {
+    $backupLines .= "<script>$('#backupStatus').html('<font color=green>Not Running</font>');</script>";
+  }
+  echo $backupLines;
+  break;
+  
+case 'backupNow':
+  shell_exec("/usr/local/emhttp/plugins/community.applications/scripts/backup.sh");
+  break;
 }
 
 ?>

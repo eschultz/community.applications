@@ -465,7 +465,6 @@ function logger($string) {
 
 function notify($event,$subject,$description,$message="",$type="normal") {
   $command = '/usr/local/emhttp/plugins/dynamix/scripts/notify -e "'.$event.'" -s "'.$subject.'" -d "'.$description.'" -m "'.$message.'" -i "'.$type.'"';
-  echo $command;
   shell_exec($command);
 }
 

@@ -10,6 +10,8 @@ require_once("/usr/local/emhttp/plugins/dynamix.docker.manager/include/DockerCli
 require_once("/usr/local/emhttp/plugins/community.applications/include/paths.php");
 require_once("/usr/local/emhttp/plugins/community.applications/include/helpers.php");
 
+exec("mkdir -p /tmp/community.applications/tempFiles/");
+
 function getRsyncReturnValue($returnValue) {
   $returnMessage[0] = "Success";
   $returnMessage[1] = "Syntax or usage error";
@@ -43,6 +45,8 @@ function getRsyncReturnValue($returnValue) {
 if ( is_file($communityPaths['backupProgress']) ) {
   exit;
 }
+@unlink($communityPaths['backupLog']);
+
 file_put_contents($communityPaths['backupProgress'],getmypid());
   
 $dockerClient = new DockerClient();
@@ -78,7 +82,6 @@ logger("Backing up appData from ".$backupOptions['source']." to ".$backupOptions
 $command = '/usr/bin/rsync '.$backupOptions['rsyncOption'].' --log-file="'.$communityPaths['backupLog'].'" "'.$backupOptions['source'].'/" "'.$backupOptions['destination'].'/CommunityApplicationsAppdataBackup" > /dev/null 2>&1';
 
 logger('Using command: '.$command);
-echo $command;
 exec($command,$output,$returnValue);
 
 if ( is_array($dockerRunning) ) {
@@ -98,14 +101,13 @@ logger("appData backup complete");
 logger('"-----------------------"');
 if ( $returnValue > 0 ) {
   $message = getRsyncReturnValue($returnValue);
-  $status = ".  Errors occurred";
+  $status = "- Errors occurred";
   $type = "warning";
 } else {
   $type = "normal";
 }
-notify("Community Applications","appData Backup","Backup of appData complete.$status","Log is available on the flash drive at /config/plugins/community.applications/backup.log",$message,$type);
-toDOS($communityPaths['backupLog'],"/boot/config/plugins/community.applications/backup.log");
-unlink($communityPaths['backupLog']);
+notify("Community Applications","appData Backup","Backup of appData complete $status - Log is available on the flash drive at /config/plugins/community.applications/backup.log",$message,$type);
+exec("cp ".$communityPaths['backupLog']." /boot/config/plugins/community.applications/backup.log");
 unlink($communityPaths['backupProgress']);
   
 ?>

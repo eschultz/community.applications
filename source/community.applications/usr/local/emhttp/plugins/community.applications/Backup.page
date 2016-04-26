@@ -13,7 +13,7 @@ $plugin = "community.applications";
 
 $backupOptions = json_decode(@file_get_contents("/boot/config/plugins/community.applications/BackupOptions.json"),true);
 if ( ! $backupOptions['rsyncOption'] ) {
-  $backupOptions['rsyncOption'] = "-avXHq --delete --safe-links";
+  $backupOptions['rsyncOption'] = "-avXHq --delete";
 }
 
 $udList = array_diff(scandir("/mnt/disks"),array(".",".."));
@@ -83,6 +83,10 @@ var URL = "/plugins/<?=$plugin?>/include/exec.php";
 var appliedChanges = false;
 
 $(function() {
+  setInterval(function() {
+    checkBackup();
+  }, 1000);
+
   $("#cronSetting").val("<?=$backupOptions['cronSetting']?>");
   $("#cronDay").val("<?=$backupOptions['cronDay']?>");
   $("#cronMonth").val("<?=$backupOptions['cronMonth']?>");
@@ -163,22 +167,33 @@ function apply() {
   var cronHour = $("#cronHour").val();
   var cronMinute = $("#cronMinute").val();
   var cronCustom = $("#cronCustom").val();
+  var runRsync = $("#runRsync").val();
   
   rsyncOption = rsyncOption.trim();
   stopScript = stopScript.trim();
   startScript = startScript.trim();
   
-  $.post(URL,{action:'applyBackupOptions',source:source,destination:destination,stopScript:stopScript,startScript:startScript,rsyncOption:rsyncOption,cronDay:cronDay,cronMonth:cronMonth,cronHour:cronHour,cronMinute:cronMinute,cronCustom:cronCustom,cronSetting:cronSetting});
+  $.post(URL,{action:'applyBackupOptions',source:source,destination:destination,stopScript:stopScript,startScript:startScript,rsyncOption:rsyncOption,cronDay:cronDay,cronMonth:cronMonth,cronHour:cronHour,cronMinute:cronMinute,cronCustom:cronCustom,cronSetting:cronSetting,runRsync:runRsync});
   
   validateOptions(true);
 }  
-  
-  
+
+function checkBackup() {
+  $.post(URL,{action:'checkBackup'},function(data) {
+    if (data) {
+      $("#backupLines").html(data);
+    }
+  });
+}
+
+function backupNow() {
+  $.post(URL,{action:'backupNow'});
+}
 </script>
 
 > For an explanation of these items, please see the online manual
 
-
+<div style='width:75%;align:center;margin:auto'>
 <table>
 <tr>
   <td><b>Appdata Share (Source):</b><br>(If your appData share is not listed, this CA module is not for you)</td>
@@ -199,6 +214,14 @@ function apply() {
 <tr>
   <td><b>Rsync Options:</b><br>*Don't change if you don't know what you're doing</td>
   <td><input id='rsyncOption' type='text' value='<?=$backupOptions['rsyncOption']?>' onchange='validateOptions();'></td>
+</tr>
+<tr>
+  <td><b>Run scripts in place of rsync or in addition to:</b></td>
+  <td><select id='runRsync' onchange='validateOptions();'>
+        <option value='true'>In Addition To</option>
+        <option value='false'>In replacement of</option>
+      </select>
+  </td>
 </tr>
 <tr>
   <td><b>Cron Settings</b></td>
@@ -274,5 +297,8 @@ function apply() {
   <td><input type='text' id='cronCustom'></input></td>
 </tr>
 </table>
-<input type='button' value='Apply' id='Apply' onclick='apply();'><input type='button' value='Backup Now' id='Backup'>
-<br><br><font color='red'><span id='errors'></span></font><span id='error1'></span>
+<input type='button' value='Apply' id='Apply' onclick='apply();'><input type='button' value='Backup Now' id='Backup' onclick='backupNow();'>
+</div><br><font color='red'><span id='errors'></span></font><span id='error1'></span>
+<div style='border:1px;border-style:solid;border-color:red'><font size='2'>Backup Status: <span id='backupStatus'></span>
+<br>
+<span id='backupLines'><br><br><br></span></div>

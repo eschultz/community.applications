@@ -47,6 +47,8 @@ $communityPaths['autoUpdateSettings']            = "/boot/config/plugins/communi
 $communityPaths['backupOptions']                 = "/boot/config/plugins/community.applications/BackupOptions.json";
 $communityPaths['backupProgress']                = $communityPaths['tempFiles']."/backupInProgress";
 $communityPaths['backupLog']                     = $communityPaths['persistentDataStore']."/appdata_backup.log";
+$communityPaths['backupScript']                  = "/usr/local/emhttp/plugins/community.applications/scripts/backup.php";
+$communityPaths['addCronScript']                 = "/usr/local/emhttp/plugins/community.applications/scripts/addCron.php";
 
 $infoFile                                        = $communityPaths['community-templates-info'];
 $docker_repos                                    = $communityPaths['template-repos'];
