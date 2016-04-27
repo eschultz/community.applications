@@ -2151,7 +2151,7 @@ case 'checkBackup':
     $backupLines = "<br><br><br>";
   }
   if ( is_file($communityPaths['backupProgress']) ) {
-    $backupLines .= "<script>$('#backupStatus').html('<font color=red>Running</font>');</script>";
+    $backupLines .= "<script>$('#backupStatus').html('<font color=red>Running</font> Your docker containers will be automatically restarted at the conclusion of the backup');</script>";
   } else {
     $backupLines .= "<script>$('#backupStatus').html('<font color=green>Not Running</font>');</script>";
   }

@@ -83,6 +83,8 @@ var URL = "/plugins/<?=$plugin?>/include/exec.php";
 var appliedChanges = false;
 
 $(function() {
+  myAlert("Appdata Backup","When a Backup is running (<em>either manually or a scheduled backup</em>), your docker applications will be <b>stopped</b> and then <b>restarted</b> at the conclusion of the backup","","",false,"",true,"warning");
+  
   setInterval(function() {
     checkBackup();
   }, 1000);
@@ -97,6 +99,24 @@ $(function() {
   validateOptions(true);
 });
 
+function myAlert(description,textdescription,textimage,imagesize, outsideClick, showCancel, showConfirm, alertType) {
+  if ( !outsideClick ) outsideClick = false;
+  if ( !showCancel )   showCancel = false;
+  if ( !showConfirm )  showConfirm = false;
+  if ( imagesize == "" ) { imagesize = "80x80"; }
+   
+  swal({
+    title: description,
+    text: textdescription,
+    imageUrl: textimage,
+    imageSize: imagesize,
+    allowOutsideClick: outsideClick,
+    showConfirmButton: showConfirm,
+    showCancelButton: showCancel,
+    type: alertType,
+    html: true
+  });
+}
 function validateOptions(initialization) {
   if (initialization != true ) {
     appliedChanges = true;
