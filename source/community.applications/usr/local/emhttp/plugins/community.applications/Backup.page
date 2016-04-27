@@ -206,6 +206,9 @@ function checkBackup() {
   });
 }
 
+function restoreBackup() {
+  myAlert("Appdata Restore","This will restore the backup of your appdata back to your cache drive.  Are you sure you want to do this?","","",true,true,"warning");
+}
 function backupNow() {
   $.post(URL,{action:'backupNow'});
 }
@@ -317,7 +320,7 @@ function backupNow() {
   <td><input type='text' id='cronCustom'></input></td>
 </tr>
 </table>
-<input type='button' value='Apply' id='Apply' onclick='apply();'><input type='button' value='Backup Now' id='Backup' onclick='backupNow();'>
+<input type='button' value='Apply' id='Apply' onclick='apply();'><input type='button' value='Backup Now' id='Backup' onclick='backupNow();'><span style='float:right'><input type='button' value='Restore' onclick='restoreBackup();'></span>
 </div><br><font color='red'><span id='errors'></span></font><span id='error1'></span>
 <div style='border:1px;border-style:solid;border-color:red'><font size='2'>Backup Status: <span id='backupStatus'></span>
 <br>
