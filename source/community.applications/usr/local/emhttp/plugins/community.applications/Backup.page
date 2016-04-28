@@ -16,6 +16,27 @@ if ( ! $backupOptions['rsyncOption'] ) {
   $backupOptions['rsyncOption'] = "-avXHq --delete";
 }
 
+if ( ! $backupOptions['cronSetting'] ) {
+  $backupOptions['cronSetting'] = "disabled";
+}
+
+if ( ! $backupOptions['cronDay'] ) {
+  $backupOptions['cronDay'] = 1;
+}
+
+if ( ! $backupOptions['cronMonth'] ) {
+  $backupOptions['cronMonth'] = 2;
+}
+
+if ( ! $backupOptions['cronHour'] ) {
+  $backupOptions['cronHour'] = 3;
+}
+
+if ( ! $backupOptions['cronMinute'] ) {
+  $backupOptions['cronMinute'] = 0;
+}
+
+$destinationShareList = array_diff(scandir("/mnt/user"),array(".",".."));
 $udList = array_diff(scandir("/mnt/disks"),array(".",".."));
 $sharesList = array_diff(scandir("/mnt/cache"),array(".",".."));
 $disksList = array_diff(scandir("/mnt/"),array(".","..","user","user0","disks","cache"));
@@ -65,7 +86,18 @@ foreach ($udList as $udShare) {
   $destinationShares .= "<option value='/mnt/disks/$udShare' $selected>$udShare (via Unassigned Devices)</option>";
 }
 
-for ( $minute = 1; $minute < 61; $minute++ ) {
+$destinationUserList = "<option value=''>Select A Share</option>";
+foreach ($destinationShareList as $destinationList) {
+  if ( is_dir("/mnt/user/$destinationList") ) {
+    $selected = "";
+    if ( $backupOptions['destinationShare'] == $destinationList ) {
+      $selected = "selected";
+    }
+    $destinationUserList .= "<option value='$destinationList' $selected>$destinationList</option>";
+  }
+}
+
+for ( $minute = 0; $minute < 60; $minute++ ) {
   $cronMinute .= "<option value='$minute'>$minute</option>";
 }
 
@@ -147,12 +179,13 @@ function validateOptions(initialization) {
   
   var source = $("#source").val();
   var destination = $("#destination").val();
+  var destinationShare = $("#destinationShare").val();
   var stopScript = $("#stopScript").val();
   var startScript = $("#startScript").val();
   stopScript = stopScript.trim();
   startScript = startScript.trim();
   
-  $.post(URL,{action:'validateBackupOptions',source:source,destination:destination,stopScript:stopScript,startScript:startScript}, function (data) {
+  $.post(URL,{action:'validateBackupOptions',source:source,destinationShare:destinationShare,destination:destination,stopScript:stopScript,startScript:startScript}, function (data) {
     if (data) {
       data = data.trim();
       if ( data == "NONE" ) {
@@ -177,6 +210,7 @@ function apply() {
   appliedChanges = false;
   
   var source = $("#source").val();
+  var destinationShare = $("#destinationShare").val();
   var destination = $("#destination").val();
   var stopScript = $("#stopScript").val();
   var startScript = $("#startScript").val();
@@ -193,7 +227,7 @@ function apply() {
   stopScript = stopScript.trim();
   startScript = startScript.trim();
   
-  $.post(URL,{action:'applyBackupOptions',source:source,destination:destination,stopScript:stopScript,startScript:startScript,rsyncOption:rsyncOption,cronDay:cronDay,cronMonth:cronMonth,cronHour:cronHour,cronMinute:cronMinute,cronCustom:cronCustom,cronSetting:cronSetting,runRsync:runRsync});
+  $.post(URL,{action:'applyBackupOptions',source:source,destinationShare:destinationShare,destination:destination,stopScript:stopScript,startScript:startScript,rsyncOption:rsyncOption,cronDay:cronDay,cronMonth:cronMonth,cronHour:cronHour,cronMinute:cronMinute,cronCustom:cronCustom,cronSetting:cronSetting,runRsync:runRsync});
   
   validateOptions(true);
 }  
@@ -216,6 +250,7 @@ function backupNow() {
 
 > For an explanation of these items, please see the online manual
 
+<font color='red'><span id='errors'></span></font><span id='error1'></span>
 <div style='width:75%;align:center;margin:auto'>
 <table>
 <tr>
@@ -223,7 +258,11 @@ function backupNow() {
   <td><select id='source' onchange='validateOptions();'><?=$sourceShares?></select></td>
 </tr>
 <tr>
-  <td><b>Backup To Disk (Destination):</b><br>Files will be written to a folder on the disk called "CommunityApplicationsAppdataBackup"</td>
+  <td><b>Destination Share:</b></td>
+  <td><select id='destinationShare' onchange='validateOptions();'><?=$destinationUserList?></select?></td>
+</tr>
+<tr>
+  <td><b>Backup To Disk (Destination):</b></td>
   <td><select id='destination' onchange='validateOptions();'><?=$destinationShares?></select></td>
 </tr>
 <tr>
@@ -259,7 +298,7 @@ function backupNow() {
 </tr>
 <tr>
   <td><b>Day of Week:</b></td>
-  <td><select id='cronDay'>
+  <td><select id='cronDay' onchange='validateOptions();'>
         <option value='0'>Sunday</option>
         <option value='1'>Monday</option>
         <option value='2'>Tuesday</option>
@@ -272,9 +311,9 @@ function backupNow() {
 </tr>
 <tr>
   <td><b>Day of Month:</b></td>
-  <td><select id='cronMonth'>
+  <td><select id='cronMonth' onchange='validateOptions();'>
         <option value='1'>1st</option>
-        <option value='2'>2nd<option>
+        <option value='2'>2nd</option>
         <option value='3'>3rd</option>
         <option value='4'>4th</option>
         <option value='5'>5th</option>
@@ -309,19 +348,21 @@ function backupNow() {
 </tr>
 <tr>
   <td><b>Hour:</b></td>
-  <td><select id='cronHour'><?=$cronHour?></select></td>
+  <td><select id='cronHour' onchange='validateOptions();'><?=$cronHour?></select></td>
 </tr>
 <tr>
   <td><b>Minute:</b></td>
-  <td><select id='cronMinute'><?=$cronMinute?></select></td>
+  <td><select id='cronMinute' onchange='validateOptions();'><?=$cronMinute?></select></td>
 </tr>
 <tr>
   <td><b>Custom Cron Entry:</b></td>
-  <td><input type='text' id='cronCustom'></input></td>
+  <td><input type='text' id='cronCustom' onchange='validateOptions();'></input></td>
 </tr>
 </table>
+<font size='3' color='red'><b>NOTE:</b></font> <b>All files</b> within your chosen destination share will be deleted when the backup runs.  Only select a share created <b>SPECIFICALLY<b> for appdata backup purposes<br>
+
 <input type='button' value='Apply' id='Apply' onclick='apply();'><input type='button' value='Backup Now' id='Backup' onclick='backupNow();'><span style='float:right'><input type='button' value='Restore' onclick='restoreBackup();'></span>
-</div><br><font color='red'><span id='errors'></span></font><span id='error1'></span>
+</div><br>
 <div style='border:1px;border-style:solid;border-color:red'><font size='2'>Backup Status: <span id='backupStatus'></span>
 <br>
 <span id='backupLines'><br><br><br></span></div>

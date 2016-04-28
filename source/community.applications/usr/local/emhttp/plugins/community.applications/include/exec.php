@@ -2086,16 +2086,21 @@ case 'validateBackupOptions':
   $destination = isset($_POST['destination']) ? urldecode(($_POST['destination'])) : "";
   $stopScript = isset($_POST['stopScript']) ? urldecode(($_POST['stopScript'])) : "";
   $startScript = isset($_POST['startScript']) ? urldecode(($_POST['startScript'])) : "";
+  $destinationShare = isset($_POST['destinationShare']) ? urldecode(($_POST['destinationShare'])) : "";
   
   if ( $source == "" ) {
     $errors .= "Source Must Be Specified<br>";
   }
-  if ( $destination == "" ) {
+  if ( $destination == "" || $destinationShare == "" ) {
     $errors .= "Destination Must Be Specified<br>";
   }
   
   if ( $source != "" && $source == $destination ) {
     $errors .= "Source and Destination Cannot Be The Same<br>";
+  }
+  
+  if ( basename($source) == $destinationShare ) {
+    $errors .= "Source and Destination Cannot Be The Same Share";
   }
 
   if ( $stopScript ) {
@@ -2125,6 +2130,7 @@ case 'validateBackupOptions':
   
 case 'applyBackupOptions':
   $backupOptions['source']      = isset($_POST['source']) ? urldecode(($_POST['source'])) : "";
+  $backupOptions['destinationShare'] = isset($_POST['destinationShare']) ? urldecode(($_POST['destinationShare'])) : "";
   $backupOptions['destination'] = isset($_POST['destination']) ? urldecode(($_POST['destination'])) : "";
   $backupOptions['stopScript']  = isset($_POST['stopScript']) ? urldecode(($_POST['stopScript'])) : "";
   $backupOptions['startScript'] = isset($_POST['startScript']) ? urldecode(($_POST['startScript'])) : "";
@@ -2151,7 +2157,7 @@ case 'checkBackup':
     $backupLines = "<br><br><br>";
   }
   if ( is_file($communityPaths['backupProgress']) ) {
-    $backupLines .= "<script>$('#backupStatus').html('<font color=red>Running</font> Your docker containers will be automatically restarted at the conclusion of the backup');</script>";
+    $backupLines .= "<script>$('#backupStatus').html('<font color=red>Running</font> Your docker containers will be automatically restarted at the conclusion of the backup');$('#Backup').prop('disabled',true);</script>";
   } else {
     $backupLines .= "<script>$('#backupStatus').html('<font color=green>Not Running</font>');</script>";
   }

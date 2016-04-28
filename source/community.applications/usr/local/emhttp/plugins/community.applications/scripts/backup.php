@@ -78,7 +78,7 @@ if ( is_array($dockerRunning) ) {
   }
 }
   
-logger("Backing up appData from ".$backupOptions['source']." to ".$backupOptions['destination']."/CommunityApplicationsAppdataBackup");
+logger("Backing up appData from ".$backupOptions['source']." to ".$backupOptions['destination']."/".$backupOptions['destinationShare']);
 $command = '/usr/bin/rsync '.$backupOptions['rsyncOption'].' --log-file="'.$communityPaths['backupLog'].'" "'.$backupOptions['source'].'/" "'.$backupOptions['destination'].'/CommunityApplicationsAppdataBackup" > /dev/null 2>&1';
 
 logger('Using command: '.$command);
