@@ -10,7 +10,7 @@ require_once("/usr/local/emhttp/plugins/community.applications/include/helpers.p
 require_once("/usr/local/emhttp/plugins/community.applications/include/paths.php");
 
 $backupOptions = readJsonFile($communityPaths['backupOptions']);
-
+if ( ! $backupOptions ) { exit; } 
 if ($backupOptions['cronSetting'] != "disabled") {
   switch ($backupOptions['cronSetting']) {
     case 'custom':
