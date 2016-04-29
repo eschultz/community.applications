@@ -2,8 +2,8 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.applications">
 <!ENTITY author    "Andrew Zawadzki">
-<!ENTITY version   "2016.04.17">
-<!ENTITY md5       "e5f077f5202f37af138109b60d45a603">
+<!ENTITY version   "2016.04.28">
+<!ENTITY md5       "668b4be9855cf8aa215e4bf317aece10">
 <!ENTITY launch    "Apps">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/community.applications">
@@ -13,6 +13,9 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
+###2016.04.28###
+- Added: Support for manual / scheduled backups of appData
+
 ###2016.04.17###
 - Added: Ability to Auto Update Selected Plugins
 
@@ -430,7 +433,7 @@ mkdir -p /var/lib/docker/unraid/templates-community-apps
 mkdir -p /var/lib/docker/unraid/community.applications.datastore
 mkdir -p /tmp/community.applications/tempFiles
 cp /usr/local/emhttp/plugins/community.applications/scripts/updateApplications.sh /etc/cron.daily/updateApplications.sh
-
+/usr/local/emhttp/plugins/community.applications/scripts/addCron.php
 echo ""
 echo "----------------------------------------------------"
 echo " &name; has been installed."
@@ -446,6 +449,7 @@ The 'remove' script.
 -->
 <FILE Run="/bin/bash" Method="remove">
 <INLINE>
+/usr/local/emhttp/plugins/community.applications/scripts/removeCron.php
 removepkg &name;-&version;
 rm /etc/cron.daily/updateApplications.php
 rm -rf &plugdir;

@@ -12,40 +12,31 @@ Icon="backup.png"
 $plugin = "community.applications";
 
 $backupOptions = json_decode(@file_get_contents("/boot/config/plugins/community.applications/BackupOptions.json"),true);
-if ( ! $backupOptions['rsyncOption'] ) {
-  $backupOptions['rsyncOption'] = "-avXHq --delete";
-}
+if ( ! $backupOptions['rsyncOption'] ) {  $backupOptions['rsyncOption'] = "-avXHq --delete"; }
+if ( ! $backupOptions['cronSetting'] ) {  $backupOptions['cronSetting'] = "disabled"; }
+if ( ! $backupOptions['cronDay'] )     {  $backupOptions['cronDay'] = 1; }
+if ( ! $backupOptions['cronMonth'] )   {  $backupOptions['cronMonth'] = 2; }
+if ( ! $backupOptions['cronHour'] )    {  $backupOptions['cronHour'] = 3; }
+if ( ! $backupOptions['cronMinute'] )  {  $backupOptions['cronMinute'] = 0; }
+if ( ! $backupOptions['runRsync'] )    {  $backupOptions['runRsync'] = "true"; }
+$destinationShareList = array();
+$udList = array();
+$sharesList = array();
+$disksList = array();
 
-if ( ! $backupOptions['cronSetting'] ) {
-  $backupOptions['cronSetting'] = "disabled";
-}
-
-if ( ! $backupOptions['cronDay'] ) {
-  $backupOptions['cronDay'] = 1;
-}
-
-if ( ! $backupOptions['cronMonth'] ) {
-  $backupOptions['cronMonth'] = 2;
-}
-
-if ( ! $backupOptions['cronHour'] ) {
-  $backupOptions['cronHour'] = 3;
-}
-
-if ( ! $backupOptions['cronMinute'] ) {
-  $backupOptions['cronMinute'] = 0;
-}
-
-$destinationShareList = array_diff(scandir("/mnt/user"),array(".",".."));
-$udList = array_diff(scandir("/mnt/disks"),array(".",".."));
-$sharesList = array_diff(scandir("/mnt/cache"),array(".",".."));
-$disksList = array_diff(scandir("/mnt/"),array(".","..","user","user0","disks","cache"));
+if ( is_dir("/mnt/user") )  { $destinationShareList = array_diff(scandir("/mnt/user"),array(".","..")); }
+if ( is_dir("/mnt/disks") ) { $udList = array_diff(scandir("/mnt/disks"),array(".","..")); }
+if ( is_dir("/mnt/cache") ) { $sharesList = array_diff(scandir("/mnt/cache"),array(".","..")); }
+if ( is_dir("/mnt/") )      { $disksList = array_diff(scandir("/mnt/"),array(".","..","user","user0","disks","cache")); }
 natsort($disksList);
 
 $sourceShares = "<option value=''>Select A Share</option>";
 foreach ($sharesList as $addShare) {
   $selected = "";
   if ( ! is_dir("/mnt/cache/$addShare") ) {
+    continue;
+  }
+  if ( is_dir("/mnt/user0/$addShare") ) {
     continue;
   }
   if ( $backupOptions['source'] == "/mnt/cache/$addShare" ) {
@@ -127,7 +118,8 @@ $(function() {
   $("#cronHour").val("<?=$backupOptions['cronHour']?>");
   $("#cronMinute").val("<?=$backupOptions['cronMinute']?>");
   $("#cronCustom").val("<?=$backupOptions['cronCustom']?>");
-
+  $("#runRsync").val("<?=$backupOptions['runRsync']?>");
+  
   validateOptions(true);
 });
 
@@ -200,7 +192,7 @@ function validateOptions(initialization) {
         $("#errors").html("");
       } else {
         $("#errors").html(data);
-        $("#Apply,#Backup").prop("disabled",true);
+        $("#Apply,#Backup,#restore").prop("disabled",true);
       }
     }
   });
@@ -241,16 +233,41 @@ function checkBackup() {
 }
 
 function restoreBackup() {
-  myAlert("Appdata Restore","This will restore the backup of your appdata back to your cache drive.  Are you sure you want to do this?","","",true,true,"warning");
+  var source = $('#destination').val() + "/" + $('#destinationShare').val();
+  var destination = $('#source').val();
+  
+  swal({
+    title: "Are you sure?",
+    text: "This will restore your appdata folder from <b><em><font color='red'>" + source + "</em></b></font> to <em><b><font color='red'>" + destination,
+    showCancelButton: true,
+    html: true,
+    closeOnConfirm: true
+    },
+    function() {
+      $.post(URL,{action:'restoreNow'});
+    });
 }
 function backupNow() {
   $.post(URL,{action:'backupNow'});
 }
+
+function abort() {
+  swal({
+    title: "Are you sure?",
+    text: "This will abort the current backup / restore operation and restart your applications",
+    showCancelButton: true,
+    closeOnConfirm: true
+    },
+    function() {
+      $.post(URL,{action:'abortBackup'});
+    });
+}
+
 </script>
 
 > For an explanation of these items, please see the online manual
 
-<font color='red'><span id='errors'></span></font><span id='error1'></span>
+<font color='red'><center><span id='errors'></span></font><span id='error1'></span></center>
 <div style='width:75%;align:center;margin:auto'>
 <table>
 <tr>
@@ -262,7 +279,7 @@ function backupNow() {
   <td><select id='destinationShare' onchange='validateOptions();'><?=$destinationUserList?></select?></td>
 </tr>
 <tr>
-  <td><b>Backup To Disk (Destination):</b></td>
+  <td><b>Save To Disk #:</b></td>
   <td><select id='destination' onchange='validateOptions();'><?=$destinationShares?></select></td>
 </tr>
 <tr>
@@ -286,7 +303,7 @@ function backupNow() {
   </td>
 </tr>
 <tr>
-  <td><b>Cron Settings</b></td>
+  <td><b>Scheduled Backup Frequency</b></td>
   <td><select id='cronSetting' onchange='validateOptions();'>
         <option value='disabled'>Disabled</option>
         <option value='daily'>Daily</option>
@@ -361,8 +378,8 @@ function backupNow() {
 </table>
 <font size='3' color='red'><b>NOTE:</b></font> <b>All files</b> within your chosen destination share will be deleted when the backup runs.  Only select a share created <b>SPECIFICALLY<b> for appdata backup purposes<br>
 
-<input type='button' value='Apply' id='Apply' onclick='apply();'><input type='button' value='Backup Now' id='Backup' onclick='backupNow();'><span style='float:right'><input type='button' value='Restore' onclick='restoreBackup();'></span>
+<input type='button' value='Apply' id='Apply' onclick='apply();'><input type='button' value='Backup Now' id='Backup' onclick='backupNow();'><span style='float:right'><input type='button' value='Restore' id='restore' onclick='restoreBackup();'><input type='button' value='Abort' id='abort' onclick='abort();' disabled'></span>
 </div><br>
-<div style='border:1px;border-style:solid;border-color:red'><font size='2'>Backup Status: <span id='backupStatus'></span>
+<div style='border:1px;border-style:solid;border-color:red'><font size='2'>Backup / Restore Status: <span id='backupStatus'></span>
 <br>
 <span id='backupLines'><br><br><br></span></div>

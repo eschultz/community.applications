@@ -2081,6 +2081,12 @@ case 'autoUpdatePlugins':
   writeJsonFile($communityPaths['autoUpdateSettings'],$updateArray);
   break;
 
+##############################################################
+#                                                            #
+# Returns errors on settings for backup / restore of appData #
+#                                                            #
+##############################################################
+
 case 'validateBackupOptions':
   $source = isset($_POST['source']) ? urldecode(($_POST['source'])) : "";
   $destination = isset($_POST['destination']) ? urldecode(($_POST['destination'])) : "";
@@ -2113,7 +2119,7 @@ case 'validateBackupOptions':
     }
   }
   if ( $startScript ) {
-    if ( ! is_file(startScript) ) {
+    if ( ! is_file($startScript) ) {
       $errors .= "No Script at $startScript";
     } else {
         if ( ! is_executable($startScript) ) {
@@ -2128,6 +2134,12 @@ case 'validateBackupOptions':
   
   break;
   
+######################################
+#                                    #
+# Applies the backup/restore options #
+#                                    #
+######################################
+
 case 'applyBackupOptions':
   $backupOptions['source']      = isset($_POST['source']) ? urldecode(($_POST['source'])) : "";
   $backupOptions['destinationShare'] = isset($_POST['destinationShare']) ? urldecode(($_POST['destinationShare'])) : "";
@@ -2149,6 +2161,12 @@ case 'applyBackupOptions':
        
   break; 
   
+###########################################
+#                                         #
+# Checks the status of a backup / restore #
+#                                         #
+###########################################
+
 case 'checkBackup':
   if ( is_file($communityPaths['backupLog']) ) {
     $backupLines = "<font size='0'>".shell_exec("tail -n2 ".$communityPaths['backupLog'])."</font>";
@@ -2156,16 +2174,33 @@ case 'checkBackup':
   } else {
     $backupLines = "<br><br><br>";
   }
-  if ( is_file($communityPaths['backupProgress']) ) {
-    $backupLines .= "<script>$('#backupStatus').html('<font color=red>Running</font> Your docker containers will be automatically restarted at the conclusion of the backup');$('#Backup').prop('disabled',true);</script>";
+  if ( is_file($communityPaths['backupProgress']) || is_file($communityPaths['restoreProgress']) ) {
+    $backupLines .= "<script>$('#backupStatus').html('<font color=red>Running</font> Your docker containers will be automatically restarted at the conclusion of the backup');$('#restore').prop('disabled',true);$('#abort').prop('disabled',false);</script>";
   } else {
-    $backupLines .= "<script>$('#backupStatus').html('<font color=green>Not Running</font>');</script>";
+    $backupLines .= "<script>$('#backupStatus').html('<font color=green>Not Running</font>');$('#abort').prop('disabled',true);</script>";
+    if ( is_file($communityPaths['backupOptions']) ) {
+      $backupLines .= "<script>$('#restore').prop('disabled',false);</script>";
+    }
   }
   echo $backupLines;
   break;
-  
+
+############################################################################################
+#                                                                                          #
+# backupNow, restoreNow, abortBackup - executes scripts to start / stop backups / restores #
+#                                                                                          #
+############################################################################################
+
 case 'backupNow':
   shell_exec("/usr/local/emhttp/plugins/community.applications/scripts/backup.sh");
+  break;
+  
+case 'restoreNow':
+  shell_exec("/usr/local/emhttp/plugins/community.applications/scripts/restore.sh");
+  break;
+  
+case 'abortBackup':
+  shell_exec("/usr/local/emhttp/plugins/community.applications/scripts/killRsync.php");
   break;
 }
 

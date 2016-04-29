@@ -46,6 +46,7 @@ $communityPaths['dockerUpdateStatus']            = "/var/lib/docker/unraid-updat
 $communityPaths['autoUpdateSettings']            = "/boot/config/plugins/community.applications/AutoUpdate.json";
 $communityPaths['backupOptions']                 = "/boot/config/plugins/community.applications/BackupOptions.json";
 $communityPaths['backupProgress']                = $communityPaths['tempFiles']."/backupInProgress";
+$communityPaths['restoreProgress']               = $communityPaths['tempFiles']."/restoreInProgress";
 $communityPaths['backupLog']                     = $communityPaths['persistentDataStore']."/appdata_backup.log";
 $communityPaths['backupScript']                  = "/usr/local/emhttp/plugins/community.applications/scripts/backup.php";
 $communityPaths['addCronScript']                 = "/usr/local/emhttp/plugins/community.applications/scripts/addCron.php";

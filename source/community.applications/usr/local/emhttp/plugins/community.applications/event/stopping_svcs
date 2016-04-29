@@ -6,10 +6,23 @@ then
   logger "Terminating $PID"
   kill $PID
 fi
+
 if [[ -e /tmp/community.applications/tempFiles/backupInProgress ]]
 then
-  logger "Community Applications Backup / Restore of Appdata in progress"
+  logger "Community Applications Backup of Appdata in progress... Killing Process"
   PID=`cat /tmp/community.applications/tempFiles/backupInProgress`
   logger "Terminating $PID"
   kill $PID
 fi
+
+if [[ -e /tmp/community.applications/tempFiles/restoreInProgress ]]
+then
+  logger "Community Applications Restore of Appdata in progress... Killing Process"
+  PID=`cat /tmp/community.applications/tempFiles/restoreInProgress`
+  logger "Terminating $PID"
+  kill $PID
+
+fi
+/usr/local/emhttp/plugins/community.applications/scripts/killRsync.php
+rm -f /tmp/community.applications/tempFiles/restoreInProgress
+rm -f /tmp/community.applications/tempFiles/backupInProgress

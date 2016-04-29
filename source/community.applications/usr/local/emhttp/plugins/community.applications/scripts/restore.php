@@ -45,12 +45,13 @@ function getRsyncReturnValue($returnValue) {
 if ( is_file($communityPaths['backupProgress']) ) {
   exit;
 }
+
 if ( is_file($communityPaths['restoreProgress']) ) {
   exit;
 }
 @unlink($communityPaths['backupLog']);
 
-file_put_contents($communityPaths['backupProgress'],getmypid());
+file_put_contents($communityPaths['restoreProgress'],getmypid());
   
 $dockerClient = new DockerClient();
 $dockerRunning = $dockerClient->getDockerContainers();
@@ -61,12 +62,12 @@ if ( ! $backupOptions ) {
   exit;
 }
 logger('#######################################');
-logger("Community Applications appData Backup");
+logger("Community Applications appData Restore");
 logger("Applications will be unavailable during");
 logger("this process.  They will automatically");
 logger("be restarted upon completion.");
 logger('#######################################');
-notify("Community Applications","appData Backup","Backup of appData starting.  This may take awhile");
+notify("Community Applications","appData Restore","Restore of appData starting.  This may take awhile");
   
 if ( $backupOptions['stopScript'] ) {
   logger("executing custom stop script ".$backupOptions['stopScript']);
@@ -81,8 +82,8 @@ if ( is_array($dockerRunning) ) {
   }
 }
 if ( $backupOptions['runRsync'] == "true" ) {
-  logger("Backing up appData from ".$backupOptions['source']." to ".$backupOptions['destination']."/".$backupOptions['destinationShare']);
-  $command = '/usr/bin/rsync '.$backupOptions['rsyncOption'].' --log-file="'.$communityPaths['backupLog'].'" "'.$backupOptions['source'].'/" "'.$backupOptions['destination'].'/'.$backupOptions['destinationShare'].'" > /dev/null 2>&1';
+  logger("Restoring appData from ".$backupOptions['destination']."/".$backupOptions['destinationShare']." to ".$backupOptions['source']);
+  $command = '/usr/bin/rsync '.$backupOptions['rsyncOption'].' --log-file="'.$communityPaths['backupLog'].'" "'.$backupOptions['destination'].'/'.$backupOptions['destinationShare'].'/" "'.$backupOptions['source'].'" > /dev/null 2>&1';
   logger('Using command: '.$command);
   exec($command,$output,$returnValue);
 }
@@ -100,7 +101,7 @@ if ( $backupOptions['startScript'] ) {
   shell_exec($backupOptions['startScript']);
 }
 logger('#######################');
-logger("appData backup complete");
+logger("appData restore complete");
 logger('#######################');
 if ( $returnValue > 0 ) {
   $message = getRsyncReturnValue($returnValue);
@@ -109,11 +110,9 @@ if ( $returnValue > 0 ) {
 } else {
   $type = "normal";
 }
-notify("Community Applications","appData Backup","Backup of appData complete $status - Log is available on the flash drive at /config/plugins/community.applications/backup.log",$message,$type);
-#exec("cp ".$communityPaths['backupLog']." /boot/config/plugins/community.applications/backup.log");
-toDOS($communityPaths['backupLog'],"/boot/config/plugins/community.applications/backup.log");
-
-unlink($communityPaths['backupProgress']);
+notify("Community Applications","appData Restore","Restore of appData complete $status - Log is available on the flash drive at /config/plugins/community.applications/backup.log",$message,$type);
+exec("cp ".$communityPaths['backupLog']." /boot/config/plugins/community.applications/backup.log");
+unlink($communityPaths['restoreProgress']);
   
 ?>
   

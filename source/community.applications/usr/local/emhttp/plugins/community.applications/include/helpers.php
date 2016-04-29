@@ -475,7 +475,7 @@ function notify($event,$subject,$description,$message="",$type="normal") {
 #######################################################
 
 function toDOS($input,$output) {
-  shell_exec('/usr/bin/todos < "$input" > "$output"');
+  shell_exec('/usr/bin/todos < "'.$input.'" > "'.$output.'"');
 }
 
 ?>
