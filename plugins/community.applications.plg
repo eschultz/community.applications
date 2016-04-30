@@ -18,6 +18,7 @@
 - Added ability to set backup destinations to a subfolder
 - Enhanced script selection / share selection
 - Added ability to skip docker.img file on backups
+- Fix autoupdate of applications would not always only display installed plugins
 
 ###2016.04.28###
 - Added: Support for manual / scheduled backups of appData
