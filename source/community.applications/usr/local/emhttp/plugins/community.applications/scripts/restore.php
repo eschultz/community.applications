@@ -121,7 +121,7 @@ if ( $returnValue > 0 ) {
   $type = "normal";
 }
 toDOS($communityPaths['backupLog'],"/boot/config/plugins/community.applications/backup.log");
-notify("Community Applications","appData Backup","Backup of appData complete $status - Log is available on the flash drive at /config/plugins/community.applications/backup.log",$message,$type);
+notify("Community Applications","appData Backup","Restore of appData complete $status - Log is available on the flash drive at /config/plugins/community.applications/backup.log",$message,$type);
 
 unlink($communityPaths['restoreProgress']);
   

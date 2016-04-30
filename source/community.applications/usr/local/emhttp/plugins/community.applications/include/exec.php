@@ -2170,10 +2170,11 @@ case 'applyBackupOptions':
   $backupOptions['runRsync']    = isset($_POST['runRsync']) ? urldecode(($_POST['runRsync'])) : "";
   $backupOptions['dockerIMG']   = isset($_POST['dockerIMG']) ? urldecode(($_POST['dockerIMG'])) : "";
   
-  $backupOptions['destinationShare'] = str_replace("/mnt/user/","",$backupOptions['destinationShare']);
+  $backupOptions['destinationShare'] = str_replace("/mnt/user/","",$backupOptions['destinationShare']);  # make new options conform to old layout of json
   $backupOptions['destinationShare'] = rtrim($backupOptions['destinationShare'],'/');
-  writeJsonFile($communityPaths['backupOptions'],$backupOptions);
   
+  writeJsonFile($communityPaths['backupOptions'],$backupOptions);
+    
   exec($communityPaths['addCronScript']);
        
   break; 
@@ -2192,11 +2193,11 @@ case 'checkBackup':
     $backupLines = "<br><br><br>";
   }
   if ( is_file($communityPaths['backupProgress']) || is_file($communityPaths['restoreProgress']) ) {
-    $backupLines .= "<script>$('#backupStatus').html('<font color=red>Running</font> Your docker containers will be automatically restarted at the conclusion of the backup');$('#restore').prop('disabled',true);$('#abort').prop('disabled',false);</script>";
+    $backupLines .= "<script>$('#backupStatus').html('<font color=red>Running</font> Your docker containers will be automatically restarted at the conclusion of the backup/restore');$('#restore').prop('disabled',true);$('#abort').prop('disabled',false);$('#Backup').attr('data-running','true');$('#Backup').prop('disabled',true);</script>";
   } else {
-    $backupLines .= "<script>$('#backupStatus').html('<font color=green>Not Running</font>');$('#abort').prop('disabled',true);</script>";
+    $backupLines .= "<script>$('#backupStatus').html('<font color=green>Not Running</font>');$('#abort').prop('disabled',true);$('#Backup').attr('data-running','false');if ( appliedChanges == false ) { $('#Backup').prop('disabled',false);}</script>";
     if ( is_file($communityPaths['backupOptions']) ) {
-      $backupLines .= "<script>$('#restore').prop('disabled',false);</script>";
+    $backupLines .= "<script>if ( appliedChanges == false ) { $('#restore').prop('disabled',false); } else { $('#restore').prop('disabled',true); }</script>";
     }
   }
   echo $backupLines;
