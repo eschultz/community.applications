@@ -49,6 +49,7 @@ if ( is_file($communityPaths['restoreProgress']) ) {
   exit;
 }
 @unlink($communityPaths['backupLog']);
+$dockerSettings = @parse_ini_file($communityPaths['unRaidDockerSettings']);
 
 file_put_contents($communityPaths['backupProgress'],getmypid());
   
@@ -60,6 +61,11 @@ $backupOptions = readJsonFile($communityPaths['backupOptions']);
 if ( ! $backupOptions ) {
   exit;
 }
+
+if ( ! $backupOptions['dockerIMG'] ) {
+  $backupOptions['dockerIMG'] = "exclude";
+}
+
 logger('#######################################');
 logger("Community Applications appData Backup");
 logger("Applications will be unavailable during");
@@ -80,9 +86,14 @@ if ( is_array($dockerRunning) ) {
     }
   }
 }
+
+if ( $backupOptions['dockerIMG'] == "exclude" ) {
+  $dockerIMGFilter = '--exclude "'.str_replace($backupOptions['source']."/","",$dockerSettings['DOCKER_IMAGE_FILE']).'"';
+}
+
 if ( $backupOptions['runRsync'] == "true" ) {
   logger("Backing up appData from ".$backupOptions['source']." to ".$backupOptions['destination']."/".$backupOptions['destinationShare']);
-  $command = '/usr/bin/rsync '.$backupOptions['rsyncOption'].' --log-file="'.$communityPaths['backupLog'].'" "'.$backupOptions['source'].'/" "'.$backupOptions['destination'].'/'.$backupOptions['destinationShare'].'" > /dev/null 2>&1';
+  $command = '/usr/bin/rsync '.$backupOptions['rsyncOption'].' '.$dockerIMGFilter.' --log-file="'.$communityPaths['backupLog'].'" "'.$backupOptions['source'].'/" "'.$backupOptions['destination'].'/'.$backupOptions['destinationShare'].'" > /dev/null 2>&1';
   logger('Using command: '.$command);
   exec($command,$output,$returnValue);
 }
@@ -109,9 +120,8 @@ if ( $returnValue > 0 ) {
 } else {
   $type = "normal";
 }
-notify("Community Applications","appData Backup","Backup of appData complete $status - Log is available on the flash drive at /config/plugins/community.applications/backup.log",$message,$type);
-#exec("cp ".$communityPaths['backupLog']." /boot/config/plugins/community.applications/backup.log");
 toDOS($communityPaths['backupLog'],"/boot/config/plugins/community.applications/backup.log");
+notify("Community Applications","appData Backup","Backup of appData complete $status - Log is available on the flash drive at /config/plugins/community.applications/backup.log",$message,$type);
 
 unlink($communityPaths['backupProgress']);
   

@@ -61,6 +61,11 @@ $backupOptions = readJsonFile($communityPaths['backupOptions']);
 if ( ! $backupOptions ) {
   exit;
 }
+
+if ( ! $backupOptions['dockerIMG'] ) {
+  $backupOptions['dockerIMG'] = "exclude";
+}
+
 logger('#######################################');
 logger("Community Applications appData Restore");
 logger("Applications will be unavailable during");
@@ -81,9 +86,14 @@ if ( is_array($dockerRunning) ) {
     }
   }
 }
+
+if ( $backupOptions['dockerIMG'] == "exclude" ) {
+  $dockerIMGFilter = '--exclude "'.str_replace($backupOptions['source']."/","",$dockerSettings['DOCKER_IMAGE_FILE']).'"';
+}
+
 if ( $backupOptions['runRsync'] == "true" ) {
   logger("Restoring appData from ".$backupOptions['destination']."/".$backupOptions['destinationShare']." to ".$backupOptions['source']);
-  $command = '/usr/bin/rsync '.$backupOptions['rsyncOption'].' --log-file="'.$communityPaths['backupLog'].'" "'.$backupOptions['destination'].'/'.$backupOptions['destinationShare'].'/" "'.$backupOptions['source'].'" > /dev/null 2>&1';
+  $command = '/usr/bin/rsync '.$backupOptions['rsyncOption'].' '.$dockerIMGFilter.' --log-file="'.$communityPaths['backupLog'].'" "'.$backupOptions['destination'].'/'.$backupOptions['destinationShare'].'/" "'.$backupOptions['source'].'" > /dev/null 2>&1';
   logger('Using command: '.$command);
   exec($command,$output,$returnValue);
 }
@@ -110,8 +120,9 @@ if ( $returnValue > 0 ) {
 } else {
   $type = "normal";
 }
-notify("Community Applications","appData Restore","Restore of appData complete $status - Log is available on the flash drive at /config/plugins/community.applications/backup.log",$message,$type);
-exec("cp ".$communityPaths['backupLog']." /boot/config/plugins/community.applications/backup.log");
+toDOS($communityPaths['backupLog'],"/boot/config/plugins/community.applications/backup.log");
+notify("Community Applications","appData Backup","Backup of appData complete $status - Log is available on the flash drive at /config/plugins/community.applications/backup.log",$message,$type);
+
 unlink($communityPaths['restoreProgress']);
   
 ?>

@@ -2094,6 +2094,9 @@ case 'validateBackupOptions':
   $startScript = isset($_POST['startScript']) ? urldecode(($_POST['startScript'])) : "";
   $destinationShare = isset($_POST['destinationShare']) ? urldecode(($_POST['destinationShare'])) : "";
   
+  $destinationShare = str_replace("/mnt/user/","",$destinationShare);
+  $destinationShare = rtrim($destinationShare,'/');
+  
   if ( $source == "" ) {
     $errors .= "Source Must Be Specified<br>";
   }
@@ -2103,11 +2106,18 @@ case 'validateBackupOptions':
   
   if ( $source != "" && $source == $destination ) {
     $errors .= "Source and Destination Cannot Be The Same<br>";
+  } else {
+    $destDir = ltrim($destinationShare,'/');
+    $destDirPaths = explode('/',$destDir);
+    if ( basename($source) == $destDirPaths[0] ) {
+      $errors .= "Destination cannot be a subfolder from source<br>";
+    }
   }
   
   if ( basename($source) == $destinationShare ) {
     $errors .= "Source and Destination Cannot Be The Same Share";
   }
+  
 
   if ( $stopScript ) {
     if ( ! is_file($stopScript) ) {
@@ -2127,6 +2137,10 @@ case 'validateBackupOptions':
       }
     }
   }
+  
+
+  
+
   if ( ! $errors ) {
     $errors = "NONE";
   }
@@ -2153,8 +2167,11 @@ case 'applyBackupOptions':
   $backupOptions['cronHour']    = isset($_POST['cronHour']) ? urldecode(($_POST['cronHour'])) : "";
   $backupOptions['cronMinute']  = isset($_POST['cronMinute']) ? urldecode(($_POST['cronMinute'])) : "";
   $backupOptions['cronCustom']  = isset($_POST['cronCustom']) ? urldecode(($_POST['cronCustom'])) : "";
-  $backupOptions['runRsync']    = isset($_POST['runRsync']) ?urldecode(($_POST['runRsync'])) : "";
+  $backupOptions['runRsync']    = isset($_POST['runRsync']) ? urldecode(($_POST['runRsync'])) : "";
+  $backupOptions['dockerIMG']   = isset($_POST['dockerIMG']) ? urldecode(($_POST['dockerIMG'])) : "";
   
+  $backupOptions['destinationShare'] = str_replace("/mnt/user/","",$backupOptions['destinationShare']);
+  $backupOptions['destinationShare'] = rtrim($backupOptions['destinationShare'],'/');
   writeJsonFile($communityPaths['backupOptions'],$backupOptions);
   
   exec($communityPaths['addCronScript']);

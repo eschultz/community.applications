@@ -19,6 +19,13 @@ if ( ! $backupOptions['cronMonth'] )   {  $backupOptions['cronMonth'] = 2; }
 if ( ! $backupOptions['cronHour'] )    {  $backupOptions['cronHour'] = 3; }
 if ( ! $backupOptions['cronMinute'] )  {  $backupOptions['cronMinute'] = 0; }
 if ( ! $backupOptions['runRsync'] )    {  $backupOptions['runRsync'] = "true"; }
+if ( ! $backupOptions['dockerIMG'] )   {  $backupOptions['dockerIMG'] = "exclude"; }
+if ( ! $backupOptions['destinationShare'] ) { $backupOptions['destinationShare'] = "CommunityApplicationsAppdataBackup"; }
+
+# fix destinationShare for compatibility with initial release
+
+$backupOptions['destinationShare'] = "/mnt/user/".$backupOptions['destinationShare'].'/';
+
 $destinationShareList = array();
 $udList = array();
 $sharesList = array();
@@ -100,7 +107,7 @@ for ( $hour = 0; $hour < 24; $hour++ ) {
 }
 
 ?>
-
+<script src="/webGui/javascript/jquery.filetree.js"></script>
 <script>
 var URL = "/plugins/<?=$plugin?>/include/exec.php";
 var appliedChanges = false;
@@ -111,7 +118,8 @@ $(function() {
   setInterval(function() {
     checkBackup();
   }, 1000);
-
+  
+  $("#destinationShare").val("<?=$backupOptions['destinationShare']?>");
   $("#cronSetting").val("<?=$backupOptions['cronSetting']?>");
   $("#cronDay").val("<?=$backupOptions['cronDay']?>");
   $("#cronMonth").val("<?=$backupOptions['cronMonth']?>");
@@ -119,7 +127,15 @@ $(function() {
   $("#cronMinute").val("<?=$backupOptions['cronMinute']?>");
   $("#cronCustom").val("<?=$backupOptions['cronCustom']?>");
   $("#runRsync").val("<?=$backupOptions['runRsync']?>");
+  $("#dockerIMG").val("<?=$backupOptions['dockerIMG']?>");
+  $("#startScript").val("<?=$backupOptions['startScript']?>");
+  $("#stopScript").val("<?=$backupOptions['stopScript']?>");
   
+  
+  $("#destinationShare").fileTreeAttach();
+  $("#startScript").fileTreeAttach();
+  $("#stopScript").fileTreeAttach();
+
   validateOptions(true);
 });
 
@@ -174,6 +190,7 @@ function validateOptions(initialization) {
   var destinationShare = $("#destinationShare").val();
   var stopScript = $("#stopScript").val();
   var startScript = $("#startScript").val();
+  
   stopScript = stopScript.trim();
   startScript = startScript.trim();
   
@@ -199,7 +216,6 @@ function validateOptions(initialization) {
 }  
   
 function apply() {
-  appliedChanges = false;
   
   var source = $("#source").val();
   var destinationShare = $("#destinationShare").val();
@@ -214,14 +230,27 @@ function apply() {
   var cronMinute = $("#cronMinute").val();
   var cronCustom = $("#cronCustom").val();
   var runRsync = $("#runRsync").val();
+  var dockerIMG = $("#dockerIMG").val();
+
+  swal({
+    title: "Are You Sure?",
+    text: "Warning: All files within <font color='red'>" + destinationShare + "</font> will be overwritten / deleted during a backup process!",
+    html: true,
+    type: "warning",
+    showCancelButton: true,
+    closeOnConfirm: true
+    },
+    function() {
+      appliedChanges = false;
+
+      rsyncOption = rsyncOption.trim();
+      stopScript = stopScript.trim();
+      startScript = startScript.trim();
   
-  rsyncOption = rsyncOption.trim();
-  stopScript = stopScript.trim();
-  startScript = startScript.trim();
+      $.post(URL,{action:'applyBackupOptions',dockerIMG:dockerIMG,source:source,destinationShare:destinationShare,destination:destination,stopScript:stopScript,startScript:startScript,rsyncOption:rsyncOption,cronDay:cronDay,cronMonth:cronMonth,cronHour:cronHour,cronMinute:cronMinute,cronCustom:cronCustom,cronSetting:cronSetting,runRsync:runRsync});
   
-  $.post(URL,{action:'applyBackupOptions',source:source,destinationShare:destinationShare,destination:destination,stopScript:stopScript,startScript:startScript,rsyncOption:rsyncOption,cronDay:cronDay,cronMonth:cronMonth,cronHour:cronHour,cronMinute:cronMinute,cronCustom:cronCustom,cronSetting:cronSetting,runRsync:runRsync});
-  
-  validateOptions(true);
+      validateOptions(true);
+    });
 }  
 
 function checkBackup() {
@@ -264,6 +293,10 @@ function abort() {
 }
 
 </script>
+<style>
+.fileTree{width:305px;max-height:150px;overflow:scroll;position:absolute;z-index:100;display:none;}
+</style>
+<link type="text/css" rel="stylesheet" href="/webGui/styles/jquery.filetree.css">
 
 > For an explanation of these items, please see the online manual
 
@@ -275,20 +308,20 @@ function abort() {
   <td><select id='source' onchange='validateOptions();'><?=$sourceShares?></select></td>
 </tr>
 <tr>
-  <td><b>Destination Share:</b></td>
-  <td><select id='destinationShare' onchange='validateOptions();'><?=$destinationUserList?></select?></td>
-</tr>
-<tr>
   <td><b>Save To Disk #:</b></td>
   <td><select id='destination' onchange='validateOptions();'><?=$destinationShares?></select></td>
 </tr>
 <tr>
+  <td><b>Destination Share:</b></td>
+  <td><input type='text' id="destinationShare" name="shareFolder" value="/mnt/user" data-pickfilter="HIDE_FILES_FILTER" data-pickroot="/mnt/user/" data-pickfolders="true" onchange='validateOptions();'></td>
+</tr>
+<tr>
   <td><b>Path To Custom Stop Script:</b></td>
-  <td><input onchange='validateOptions();' id='stopScript' type='text'></input></td>
+  <td><input onchange='validateOptions();' id='stopScript' type='text' data-pickroot="/" data-pickfolders="true"></input></td>
 </tr>
 <tr>
   <td><b>Path To Custom Start Script:</b></td>
-  <td><input onchange='validateOptions();' id='startScript' type='text'></input></td>
+  <td><input onchange='validateOptions();' id='startScript' type='text' data-pickroot="/" data-pickfolders="true"></input></td>
 </tr>
 <tr>
   <td><b>Rsync Options:</b><br>*Don't change if you don't know what you're doing</td>
@@ -301,6 +334,13 @@ function abort() {
         <option value='false'>In replacement of</option>
       </select>
   </td>
+</tr>
+<tr>
+  <td><b>Include or exclude docker.img file:</b></td>
+  <td><select id='dockerIMG' onchange='validateOptions();'>
+    <option value='exclude'>Excluded</option>
+    <option value='include'>Included</option>
+  </select></td>
 </tr>
 <tr>
   <td><b>Scheduled Backup Frequency</b></td>

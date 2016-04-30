@@ -8,7 +8,7 @@ require_once("/usr/local/emhttp/plugins/dynamix.plugin.manager/include/PluginHel
 
 $plugin = "community.applications";
 
-$pluginsFolder = scandir("/boot/config/plugins");
+$pluginsFolder = scandir("/var/log/plugins");
 
 # get the settings already selected
 

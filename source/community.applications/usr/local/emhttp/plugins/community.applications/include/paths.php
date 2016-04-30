@@ -50,6 +50,7 @@ $communityPaths['restoreProgress']               = $communityPaths['tempFiles'].
 $communityPaths['backupLog']                     = $communityPaths['persistentDataStore']."/appdata_backup.log";
 $communityPaths['backupScript']                  = "/usr/local/emhttp/plugins/community.applications/scripts/backup.php";
 $communityPaths['addCronScript']                 = "/usr/local/emhttp/plugins/community.applications/scripts/addCron.php";
+$communityPaths['unRaidDockerSettings']          = "/boot/config/docker.cfg";
 
 $infoFile                                        = $communityPaths['community-templates-info'];
 $docker_repos                                    = $communityPaths['template-repos'];
