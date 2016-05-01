@@ -27,6 +27,7 @@ foreach ($pluginsFolder as $pluginFile) {
   if ( ! is_file("/boot/config/plugins/$pluginFile") ) {
     continue;
   }
+
   if ( pathinfo($pluginFile, PATHINFO_EXTENSION) == "plg" ) {
     if ( $updateSettings[$pluginFile] ) {
       $selected = "selected";

@@ -186,6 +186,8 @@ function validateOptions(initialization) {
   
   var excludeButton = "<input type='button' id='excludedFolders' name='excludedFolders' value='Add' data-pickfilter='HIDE_FILES_FILTER' data-pickmultiselect='true' data-pickroot='/mnt/user' data-pickfolders='true'>";
   
+  destinationShare = destinationShare.replace("/mnt/user/","");
+  $("#destinationShare").val(destinationShare);
   $('#excludedSpan').html(" ");
   $('#excludedSpan').html(excludeButton);
   $('#excludedFolders').fileTreeAttach();

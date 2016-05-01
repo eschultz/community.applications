@@ -117,6 +117,7 @@ if ( $returnValue > 0 ) {
   $message = getRsyncReturnValue($returnValue);
   $status = "- Errors occurred";
   $type = "warning";
+  logger("Rsync Errors Occurred: $message");
 } else {
   $type = "normal";
 }

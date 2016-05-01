@@ -1006,7 +1006,7 @@ Sort Direction:
 </table>
 </div>
 <span id='appWarning' hidden>
-<center><img src='/plugins/community.applications/images/Warning2.png' height='50px' width='50px'><br>
+<center><img src='https://raw.githubusercontent.com/Squidly271/community.applications/master/webImages/Warning2.png' height='50px' width='50px'><br>
 <font size='2' color='red'>Note: All Applications listed here are 3rd party additions to unRaid.<br>Neither the authors of Community Applications nor Limetech make any warranty as to the suitability of any applications listed herein</font>
 <br><input type='button' value='Dismiss Warning' onclick='dismissWarning();'></input></center></span>
 </center>

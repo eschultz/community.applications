@@ -84,7 +84,7 @@ if ( ! $template['IconWeb']  ) {
 $template['Description'] = ltrim($template['Description']);
 $category = str_replace("UNCATEGORIZED", "uncategorized", $template['Category']);
 
-$templateDescription = "\n<center><table><tr><td><figure style='margin:0px'><img id='icon' src='".$template['IconWeb']."' style='width:96px;height:96px'>";
+$templateDescription = "\n<center><table><tr><td><figure style='margin:0px'><img id='icon' src='".$template['IconWeb']."' style='width:96px;height:96px' onerror='this.src=&quot;/plugins/community.applications/images/question.png&quot;';>";
 
 if ( $template['Beta'] == "true" ) {
   $templateDescription .= "<figcaption><font size='1' color='red'><center><strong>(beta)</strong></center></font></figcaption>";
