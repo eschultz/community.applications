@@ -40,7 +40,9 @@ function getRsyncReturnValue($returnValue) {
   }
   return $return;
 }
-
+if ( ! is_file($communityPaths['backupOptions']) ) {
+  exit;
+}
 
 if ( is_file($communityPaths['backupProgress']) ) {
   exit;
@@ -62,9 +64,8 @@ if ( ! $backupOptions ) {
   exit;
 }
 
-if ( ! $backupOptions['dockerIMG'] ) {
-  $backupOptions['dockerIMG'] = "exclude";
-}
+if ( ! $backupOptions['dockerIMG'] )     { $backupOptions['dockerIMG'] = "exclude"; }
+if ( ! $backupOptions['notification'] ) { $backupOptions['notification'] = "always"; }
 
 logger('#######################################');
 logger("Community Applications appData Backup");
@@ -72,7 +73,9 @@ logger("Applications will be unavailable during");
 logger("this process.  They will automatically");
 logger("be restarted upon completion.");
 logger('#######################################');
-notify("Community Applications","appData Backup","Backup of appData starting.  This may take awhile");
+if ( $backupOptions['notification'] == "always" ) {
+  notify("Community Applications","appData Backup","Backup of appData starting.  This may take awhile");
+}
   
 if ( $backupOptions['stopScript'] ) {
   logger("executing custom stop script ".$backupOptions['stopScript']);
@@ -121,7 +124,10 @@ if ( $returnValue > 0 ) {
   $type = "normal";
 }
 toDOS($communityPaths['backupLog'],"/boot/config/plugins/community.applications/backup.log");
-notify("Community Applications","appData Backup","Backup of appData complete $status - Log is available on the flash drive at /config/plugins/community.applications/backup.log",$message,$type);
+
+if ( ($backupOptions['notification'] == "always") || ($backupOptions['notification'] == "completion") || ( ($backupOptions['notification'] == "errors") && ($type == "warning") )  ) {
+  notify("Community Applications","appData Backup","Backup of appData complete $status - Log is available on the flash drive at /config/plugins/community.applications/backup.log",$message,$type);
+}
 
 unlink($communityPaths['backupProgress']);
   

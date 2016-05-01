@@ -2169,6 +2169,7 @@ case 'applyBackupOptions':
   $backupOptions['cronCustom']  = isset($_POST['cronCustom']) ? urldecode(($_POST['cronCustom'])) : "";
   $backupOptions['runRsync']    = isset($_POST['runRsync']) ? urldecode(($_POST['runRsync'])) : "";
   $backupOptions['dockerIMG']   = isset($_POST['dockerIMG']) ? urldecode(($_POST['dockerIMG'])) : "";
+  $backupOptions['notification'] = isset($_POST['notification']) ? urldecode(($_POST['notification'])) : "";
   
   $backupOptions['destinationShare'] = str_replace("/mnt/user/","",$backupOptions['destinationShare']);  # make new options conform to old layout of json
   $backupOptions['destinationShare'] = rtrim($backupOptions['destinationShare'],'/');

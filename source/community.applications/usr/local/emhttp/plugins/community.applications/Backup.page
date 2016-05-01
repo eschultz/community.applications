@@ -21,6 +21,7 @@ if ( ! $backupOptions['cronMinute'] )  {  $backupOptions['cronMinute'] = 0; }
 if ( ! $backupOptions['runRsync'] )    {  $backupOptions['runRsync'] = "true"; }
 if ( ! $backupOptions['dockerIMG'] )   {  $backupOptions['dockerIMG'] = "exclude"; }
 if ( ! $backupOptions['destinationShare'] ) { $backupOptions['destinationShare'] = "CommunityApplicationsAppdataBackup"; }
+if ( ! $backupOptions['notification'] ) {  $backupOptions['notification'] = "always"; }
 
 # fix destinationShare for compatibility with initial release
 
@@ -121,7 +122,8 @@ $(function() {
   $("#dockerIMG").val("<?=$backupOptions['dockerIMG']?>");
   $("#startScript").val("<?=$backupOptions['startScript']?>");
   $("#stopScript").val("<?=$backupOptions['stopScript']?>");
-  
+  $("#notification").val("<?=$backupOptions['notification']?>");
+    
   
   $("#destinationShare").fileTreeAttach();
   $("#startScript").fileTreeAttach();
@@ -182,6 +184,12 @@ function validateOptions(initialization) {
   var stopScript = $("#stopScript").val();
   var startScript = $("#startScript").val();
   
+  var excludeButton = "<input type='button' id='excludedFolders' name='excludedFolders' value='Add' data-pickfilter='HIDE_FILES_FILTER' data-pickmultiselect='true' data-pickroot='/mnt/user' data-pickfolders='true'>";
+  
+  $('#excludedSpan').html(" ");
+  $('#excludedSpan').html(excludeButton);
+  $('#excludedFolders').fileTreeAttach();
+  
   stopScript = stopScript.trim();
   startScript = startScript.trim();
   
@@ -224,6 +232,7 @@ function apply() {
   var cronCustom = $("#cronCustom").val();
   var runRsync = $("#runRsync").val();
   var dockerIMG = $("#dockerIMG").val();
+  var notification = $("#notification").val();
 
   swal({
     title: "Are You Sure?",
@@ -240,7 +249,7 @@ function apply() {
       stopScript = stopScript.trim();
       startScript = startScript.trim();
   
-      $.post(URL,{action:'applyBackupOptions',dockerIMG:dockerIMG,source:source,destinationShare:destinationShare,destination:destination,stopScript:stopScript,startScript:startScript,rsyncOption:rsyncOption,cronDay:cronDay,cronMonth:cronMonth,cronHour:cronHour,cronMinute:cronMinute,cronCustom:cronCustom,cronSetting:cronSetting,runRsync:runRsync});
+      $.post(URL,{action:'applyBackupOptions',notification:notification,dockerIMG:dockerIMG,source:source,destinationShare:destinationShare,destination:destination,stopScript:stopScript,startScript:startScript,rsyncOption:rsyncOption,cronDay:cronDay,cronMonth:cronMonth,cronHour:cronHour,cronMinute:cronMinute,cronCustom:cronCustom,cronSetting:cronSetting,runRsync:runRsync});
   
       validateOptions(true);
     });
@@ -322,6 +331,20 @@ function abort() {
 <tr>
   <td><b>Destination Share:</b></td>
   <td><input type='text' id="destinationShare" name="shareFolder" value="/mnt/user" data-pickfilter="HIDE_FILES_FILTER" data-pickroot="/mnt/user/" data-pickfolders="true" onchange='validateOptions();'></td>
+</tr>
+<tr>
+  <td><b>Excluded Folders:</b></td>
+  <td><span id='excludedSpan'></span></td>
+ </tr>
+<tr>
+  <td><b>Notification Settings:</b></td>
+  <td><select id='notification' onchange='validateOptions();'>
+    <option value='disabled'>Disabled</option>
+    <option value='always'>Start And Stop</option>
+    <option value='completion'>Completion Only</option>
+    <option value='errors'>Errors Only</option>
+    </select>
+  </td>
 </tr>
 <tr>
   <td><b>Path To Custom Stop Script:</b></td>
