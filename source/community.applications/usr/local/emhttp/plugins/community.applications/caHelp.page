@@ -50,7 +50,25 @@ jQuery(document).ready(function() {
 
 <strong><font color="red">Note:</font> If any display abberations appear on unRaid's menu (ie: the Feedback, Help, Info, Log buttons are displaying over top of some of the menu tabs) then you should go to the unRaid's Display Settings and move the USERS tab to within Settings</strong>
 
-<font color="red" size="3">Overview</font>
+<font size='3' color='red'>Index</font>
+
+<a href='#overview'>OverView</a><br>
+<a href='#categories'>Categories</a><br>
+<a href='#viewModes'>ViewModes</a><br>
+<a href='#displayed'>Displayed Results</a><br>
+<a href='#searching'>Searching And Updating</a><br>
+<a href='#previous'>Installed / Previously Installed Applications</a><br>
+<a href='#monitor'>Resource Monitor</a><br>
+<a href='#dockerHub'>Advanced - dockerHub Integration</a><br>
+<a href='#private'>Private Repositories</a><br>
+<a href='#settings'>General Settings</a><br>
+<a href='#autoupdate'>Auto Update Settings</a><br>
+<a href='#backupSettings'>Backup Appdata Settings</a><br>
+<a href='#othersettings'>Other Notes</a><br>
+<a href='#credits'>Credits</a><br>
+
+
+<font color="red" size="3"><p id='overview'>Overview</p></font>
 
 Community Applications is a plugin designed to make finding, installing, and managing docker and plugin applications.  When using this plugin, there is no longer any need to use the <em>Repositories</em> section of the Docker Tab
 
@@ -61,7 +79,7 @@ All items within this plugin have tooltips enabled to further guide you in opera
 After installation, a new tab will appear on unRaid's main menu called "Apps".  Additionally, there will be a section within the Settings tab called Community Applications which has some extra utilities to customize the operation of this plugin.
 <hr>
 
-<font size="3" color="red">Categories</font>
+<font size="3" color="red"><p id='categories'>Categories</p></font>
 
 To begin with, at the top of the page are the Category navigation buttons.  Clicking these buttons will display the recommended applications within the appropriate category.  Some of the categories (Network Services, Media Applications, and Media Servers) also have "sub-categories" to choose from.
 
@@ -84,7 +102,7 @@ To begin with, at the top of the page are the Category navigation buttons.  Clic
 </span>
 <hr>
 
-<font size="3" color="red">View Modes</font>
+<font size="3" color="red"><p id='viewModes'>View Modes</p></font>
 
 
 These buttons change how the results are displayed.  Either displayed in a table, icons, or a combination of the two (Icon Details).  Additionally, you can sort the results by Name, Repository, Author, or Date Changed
@@ -109,7 +127,7 @@ Sort Direction:
 <input type='button' class='dockerView' id='dockerIcon' value='Icons' onclick='changeDockerView("dockerIcon");' style='margin:1px'></center></span>
 <hr>
 
-<font size="3" color="red">Displayed Results</font>
+<font size="3" color="red"><p id='displayed'>Displayed Results</p></font>
 
 After selecting a category, the applications will appear: (example from Icon Details Mode)
 <br><br><br><br>
@@ -138,7 +156,7 @@ The Plex Media Server enriches your life by organizing all your personal media, 
 <li>Selecting <input type='button' value='Install Plugin'> will install the application / utility if it is a <i>Plugin</i><br></li>
 <li>Selecting <input type='button' value='Settings'>will take you to a plugin's Setting page (note: Not all plugins have a settings page)</br></li>
 
-<font size="3" color="red">Searching and Updating</font>
+<font size="3" color="red"><p id='searching'>Searching and Updating</p></font>
 
 At the top right of the page is a search box.  Enter a search string here to search for either an application's name, author's name, repository name, or description<br><br>
 
@@ -146,7 +164,7 @@ The <input type='button' value='Update Applications'> button forces an update of
 
 <hr>
 
-<font size='3' color='red'>Installed / Previously Installed Applications</font>
+<font size='3' color='red'><p id='previous'>Installed / Previously Installed Applications</p></font>
 
 By selecting <input type='button' value='Installed Apps'></input> will display all applications which are currently installed, and allow you to edit them.
 A <img src='/plugins/dynamix.docker.manager/images/remove.png' width='20px'></img> will appear next to the application.  Selecting this will allow you to uninstall the application, and optionally delete the appdata folder for the application (See <b>Settings</b> section)<br><br>
@@ -155,13 +173,13 @@ By selecting <input type='button' value='Previous Apps'></input> will display al
 A <img src='/plugins/dynamix.docker.manager/images/remove.png' width='20px'></img> will appear next to the application.  Selecting this will remove (ie: delete the user template) from the list of previously installed applications<br><br>
 <hr>
 
-<font size='3' color='red'>Resource Monitor</font>
+<font size='3' color='red'><p id='monitor'>Resource Monitor</p></font>
 
 The resource monitor will display some statistics on the currently running docker applications (% CPU, % Memory, Network Utilization).  Additionally, it will also calculate the size of the various application's appData.
 
 It also features cAdvisor integration.  If the cAdvisor application is not currently installed, a direct link to install it will be present (highly recommended to install it).  Once installed, clicking on each application's icon will take you directly to cAdvisor's page for that application which will display even more useful information about the application.
 
-<font size="3" color="red">Advanced - dockerHub Integration</font>
+<font size="3" color="red"><p id='dockerHub'>Advanced - dockerHub Integration</p></font>
 
 
 There is a setting which you can enable which will allow you to search dockerHub for other applications beyond the ones which have had unRaid templates created for them.
@@ -183,17 +201,17 @@ Depending upon what search term is currently being used, Community Applications 
 
 <hr>
 
-<font size="3" color="red">Private Repositories</font>
+<font size="3" color="red"><p id='private'>Private Repositories</p></font>
 
 If you have access to a so-called private repository (or wish to create your own), there are two options for integrating it into CA
 
-<li>Create a folder called <strong>/boot/config/plugins/community.applications/repositoryName</strong><br>
+Create a folder called <strong>/boot/config/plugins/community.applications/repositoryName</strong><br>
 
 Within this folder, place any custom / private templates you might have.  (If using the dockerHub conversion section of this plugin, a folder will be automatically created here called <strong>dockerHub</strong><br>
 
 Or alternatively,
 
-<li>Create a GitHub repository, and then on your flash drive, create a file called <strong>/boot/config/plugins/community.applications/private.repositories.json</strong>
+Create a GitHub repository, and then on your flash drive, create a file called <strong>/boot/config/plugins/community.applications/private.repositories.json</strong>
 <br>This file has the following format:
 <blockquote>
 [<br>
@@ -209,42 +227,41 @@ In either case, the templates contained in the private repository will be flagge
 
 <strong>NOTE:</strong> Storing the private templates on the flash drive is the recommended way of creating a private repository</strong>
 <hr>
-<font size="3" color="red">Settings</font>
+<font size="3" color="red"><p id='settings'>General Settings</p></font>
 
 Within unRaid's Settings tab, there is a section called <em>Community Applications</em>.  A program called <em>General Settings</em> allows you to fine tune the operation of Community Applications as detailed below:
 
 
-<font color="red">Time to display applications as new / updated</font><br>
+<font color="purple">Time to display applications as new / updated</font><br>
 This option dictates the amount of time that a new or updated application will be flagged as new and displayed under the <strong>New / Updated</strong> category.  Defaults to 3 Months
 
-<font color="red">Initial View Mode</font><br>
+<font color="purple">Initial View Mode</font><br>
 This option sets the initial view mode when you first load the plugin.  Defaults to Icons
 
-<font color="red">Favourite Repository</font><br>
+<font color="purple">Favourite Repository</font><br>
 This option allows you to set a "favourite" repository.  If set, then applications from that repository will display before all others.  Defaults to None
 
-<font color="red">Icon Size</font><br>
+<font color="purple">Icon Size</font><br>
 This option only applies to view modes Icons and Icon Details.  It sets the displaying of the icons to be either large or small (Defaults to Large)
 
-<font color="red">Number of Columns</font><br>
+<font color="purple">Number of Columns</font><br>
 This option only applies to Icon mode.  It will set the number of columns of applications displayed per line.  Useful on mobile devices.  Defaults to 5
 
-<font color="red">Group Beta and Private Apps into Super Categories</font><br>
+<font color="purple">Group Beta and Private Apps into Super Categories</font><br>
 This option separates Private and Beta applications into their own sections on any displayed result
 
-<font color="red">Open Add / Edit / Settings in new Tab</font></br>
+<font color="purple">Open Add / Edit / Settings in new Tab</font></br>
 This option determines whether or not a new tab will open when you add or edit or go to an app's settings.  Defaults to the same tab.
 
-<font color="red">Hide Incompatible Applications</font><br>
+<font color="purple">Hide Incompatible Applications</font><br>
 If CA thinks that an application is incompatible with the version of unRaid that you are using, by default it will not display the application.
 
-<font color="red">Enable additional search results from dockerHub</font><br>
+<font color="purple">Enable additional search results from dockerHub</font><br>
 This option enables the plugin to perform additional searches from dockerHub when looking for an application.  See above (Advanced - dockerHub integration for more details) Default: No
 
 
 <hr>
-<font color="red" size="3">Auto Update Settings</font>
-
+<font color="red" size="3"><p id='autoupdate'>Auto Update Settings</p></font>
 Within the Community Applications section of <em>Settings</em> there is a program called "Auto Update Settings".  This program will allow your unRaid server to automatically update any or all of the plugin applications currently installed to the latest versions as they become available without any user intervention.
 
 To utilize this option, then you must first configure the dynamix UI to check for plugin settings.  This is done via <em>Settings - Notification Settings - Plugin Version Notification</em>  Set this value to be whatever you desire (I recommend at least once per day).  Community Applications will then automatically install any available updates.  Note that you should still keep the Notifcation method of Browser / Email / Agents enabled simply to let unRaid inform you of any updates to the OS itself.  However if you keep Browser notifications active, you will still have to acknowledge the alert even if the plugin has already been updated by Community Applications.
@@ -253,9 +270,56 @@ unRaid's syslog will have some additional entries as Community Applications inst
  
 <font color='red'><strong>Note:</strong></font> Community Applications will NOT automatically install any unRaid OS updates.
 
+<hr><p id='backup'></p>
+
+<p id='backupSettings'></p>
+<font color='red' size='3'>Backup Appdata Settings</font>
+
+Within the Community Applications section of <em>Settings</em> there is a program called "Backup Appdata Settings".  This module will allow you to either manually or on a schedule backup your application's appdata folders from a cache-only share to the parity protected array.
+
+The settings are as follows:
+
+<font color="purple">Appdata Share (Source)</font><br>
+This is the cache-only share where all of your docker appdata is stored (usually /mnt/cache/appdata).  Note that if your appdata folder is <em>not</em> listed here, then this module will not function for you.
+
+<font color="purple">Save to Disk#</font><br>
+This sets which disk on your array to save the backup to (see notes below)
+
+<font color="purple">Destination Share</font><br>
+This sets which share (and subfolder if chosen) to store the backup to (see notes below)
+
+<font color="purple">Excluded Folders</font><br>
+Use the excluded folder browser to select which folders within your appdata share to <em>not</em> include in the backup (ie: if you are also storing VM images within the appdata folder)
+
+<font color="purple">Notification Settings</font><br>
+This determines under what circumstances a notification (set up via Settings - Notification Settings) is sent:  (Disabled, Start And Stop, Completion Only, Errors Only)
+
+<font color="purple">Path To Custom Stop / Start Script</font>
+These two options allow you to run a custom script to run prior to the backup (and after the backup is completed) in order to perform any maintenance tasks, shut down plugins (if you want them backed up), etc
+
+<font color="purple">Rsync Options</font><br>
+This entry will allow you to add any custom options to the rsync command that the backup operation uses.  If you don't know what you're doing, don't touch this entry!
+
+<font color="purple">Run Scripts in place of or in addition to</font><br>
+Setting this to "in place of" effectively disabled the backup command, and allows the custom scripts to perform the actual backup.
+
+<font color="purple">Include or exclude docker.img file</font><br>
+If you docker.img file is stored within the appdata folder, this setting allows you to choose whether to include it or not in the backup.  I don't believe there is much reason to include the docker.img file as it is very easily recreated in case of a cache drive failure, but the choice is yours.  Note that depending upon the image size, including this file may add significant time to the backup process
+
+<font color="purple">Scheduled Backup Frequency</font><br>
+Set these options to determine how often to run a scheduled backup operation (or include a custom CRON entry to manually make the schedule yourself)
+
+NOTES:
+
+<b>All files within your chosen destination folder will be deleted during a backup process</b>
+
+Destinations have to be sent to a share <b>and</b> to a disk.  The reasons for this is due to symlinks (which is a subject unto itself), but the net result is that the only way to guarantee a successful backup / restore is to send the backup to a disk share.
+
+
 <hr>
 
-<font color="red" size="3">Technical Stuff</font>
+<p id='othersettings'></p>
+<font color="red" size="3">Other Notes</font>
 
 Community Applications (and its predecessor Community Repositories) introduced a number of additional XML tags in order to perform it's magic.  Any application / template author and/or maintainer should check out the list of schema additions here:  <a href='http://lime-technology.com/forum/index.php?topic=40299.0' target='_blank'>http://lime-technology.com/forum/index.php?topic=40299.0</a>
 
@@ -263,7 +327,7 @@ Depending upon which browser you are using, there may be a slight delay (~1-2 se
 
 
 <hr>
-<font color="red" size="3">Plugin Credits</font><br><br>
+<font color="red" size="3"><p id='credits'>Plugin Credits</p></font><br><br>
 <div style='width:400px;'>
 <?=$caCredits?>
 </div>

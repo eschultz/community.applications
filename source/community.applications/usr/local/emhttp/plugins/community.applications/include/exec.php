@@ -1838,15 +1838,6 @@ case 'remove_appdata':
 
   break;
 
-###########################################
-#                                         #
-# Accept the docker not installed warning #
-#                                         #
-###########################################
-
-case 'accept_docker_warning':
-  file_put_contents($communityPaths['accept_docker_warning'],"accepted");
-  break;
 
 ############################################################
 #                                                          #
@@ -2170,6 +2161,9 @@ case 'applyBackupOptions':
   $backupOptions['runRsync']    = isset($_POST['runRsync']) ? urldecode(($_POST['runRsync'])) : "";
   $backupOptions['dockerIMG']   = isset($_POST['dockerIMG']) ? urldecode(($_POST['dockerIMG'])) : "";
   $backupOptions['notification'] = isset($_POST['notification']) ? urldecode(($_POST['notification'])) : "";
+  $backupOptions['excluded']    = isset($_POST['excluded']) ? urldecode(($_POST['excluded'])) : "";
+  
+  $backupOptions['excluded'] = trim($backupOptions['excluded']);
   
   $backupOptions['destinationShare'] = str_replace("/mnt/user/","",$backupOptions['destinationShare']);  # make new options conform to old layout of json
   $backupOptions['destinationShare'] = rtrim($backupOptions['destinationShare'],'/');

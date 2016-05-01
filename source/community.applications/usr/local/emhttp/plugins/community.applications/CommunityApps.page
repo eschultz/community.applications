@@ -243,7 +243,7 @@ if ( "<?=$firstRun?>" == "true" ) {
   $("#appWarning").show();
 }
 
-if ( "<?=$dockerRunning?>" == "false" && "<?=$dockerWarningAccepted?>" == "true") {
+if ( ( "<?=$dockerRunning?>" == "false" ) && ( "<?=$dockerWarningAccepted?>" == "true" ) ) {
   swal({
     title: "Docker Not Enabled",
     text: "The vast majority of applications listed here will require docker to be enabled to be installed",

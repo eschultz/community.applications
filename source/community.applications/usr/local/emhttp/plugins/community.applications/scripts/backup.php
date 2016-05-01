@@ -65,7 +65,7 @@ if ( ! $backupOptions ) {
 }
 
 if ( ! $backupOptions['dockerIMG'] )     { $backupOptions['dockerIMG'] = "exclude"; }
-if ( ! $backupOptions['notification'] ) { $backupOptions['notification'] = "always"; }
+if ( ! $backupOptions['notification'] )  { $backupOptions['notification'] = "always"; }
 
 logger('#######################################');
 logger("Community Applications appData Backup");
@@ -94,9 +94,17 @@ if ( $backupOptions['dockerIMG'] == "exclude" ) {
   $dockerIMGFilter = '--exclude "'.str_replace($backupOptions['source']."/","",$dockerSettings['DOCKER_IMAGE_FILE']).'"';
 }
 
+if ( $backupOptions['excluded'] ) {
+  $exclusions = explode(",",$backupOptions['excluded']);
+  
+  foreach ($exclusions as $excluded) {
+    $rsyncExcluded .= '--exclude "'.$excluded.'" ';
+  }
+}
+
 if ( $backupOptions['runRsync'] == "true" ) {
   logger("Backing up appData from ".$backupOptions['source']." to ".$backupOptions['destination']."/".$backupOptions['destinationShare']);
-  $command = '/usr/bin/rsync '.$backupOptions['rsyncOption'].' '.$dockerIMGFilter.' --log-file="'.$communityPaths['backupLog'].'" "'.$backupOptions['source'].'/" "'.$backupOptions['destination'].'/'.$backupOptions['destinationShare'].'" > /dev/null 2>&1';
+  $command = '/usr/bin/rsync '.$backupOptions['rsyncOption'].' '.$dockerIMGFilter.' '.$rsyncExcluded.' --log-file="'.$communityPaths['backupLog'].'" "'.$backupOptions['source'].'/" "'.$backupOptions['destination'].'/'.$backupOptions['destinationShare'].'" > /dev/null 2>&1';
   logger('Using command: '.$command);
   exec($command,$output,$returnValue);
 }

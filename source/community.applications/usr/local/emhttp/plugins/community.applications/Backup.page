@@ -129,6 +129,14 @@ $(function() {
   $("#startScript").fileTreeAttach();
   $("#stopScript").fileTreeAttach();
 
+  var source = $("#source").val();
+  $("#excludedFoldersList").fileTree({
+    root: source,
+    multiSelect: true,
+    filter: "HIDE_FILES_FILTER",
+    folderEvent: "nothing"
+  });
+  
   validateOptions(true);
 });
 
@@ -150,6 +158,19 @@ function myAlert(description,textdescription,textimage,imagesize, outsideClick, 
     html: true
   });
 }
+
+function changeSource() {
+  $('#excludedFoldersList').html(" ");
+  var source = $("#source").val();
+  $("#excludedFoldersList").fileTree({
+    root: source,
+    multiSelect: true,
+    filter: "HIDE_FILES_FILTER",
+    folderEvent: "nothing"
+    });
+  validateOptions();
+}
+
 function validateOptions(initialization) {
   if (initialization != true ) {
     appliedChanges = true;
@@ -235,10 +256,20 @@ function apply() {
   var runRsync = $("#runRsync").val();
   var dockerIMG = $("#dockerIMG").val();
   var notification = $("#notification").val();
+  var excluded = $("#excluded").val();
 
+  excluded = excluded.trim();
+  
+  var popUpText = "Warning: All files within <font color='red'>" + destinationShare + "</font> ";
+  if ( excluded ) {
+    popUpText = popUpText.concat("(excluding the " + excluded + " folders)");
+  } else {
+    popUpText = popUpText.concat("(including all folders)");
+  }
+  popUpText = popUpText.concat(" will be overwritten / deleted during a backup process!");
   swal({
     title: "Are You Sure?",
-    text: "Warning: All files within <font color='red'>" + destinationShare + "</font> will be overwritten / deleted during a backup process!",
+    text: popUpText,
     html: true,
     type: "warning",
     showCancelButton: true,
@@ -251,12 +282,29 @@ function apply() {
       stopScript = stopScript.trim();
       startScript = startScript.trim();
   
-      $.post(URL,{action:'applyBackupOptions',notification:notification,dockerIMG:dockerIMG,source:source,destinationShare:destinationShare,destination:destination,stopScript:stopScript,startScript:startScript,rsyncOption:rsyncOption,cronDay:cronDay,cronMonth:cronMonth,cronHour:cronHour,cronMinute:cronMinute,cronCustom:cronCustom,cronSetting:cronSetting,runRsync:runRsync});
+      $.post(URL,{action:'applyBackupOptions',excluded:excluded,notification:notification,dockerIMG:dockerIMG,source:source,destinationShare:destinationShare,destination:destination,stopScript:stopScript,startScript:startScript,rsyncOption:rsyncOption,cronDay:cronDay,cronMonth:cronMonth,cronHour:cronHour,cronMinute:cronMinute,cronCustom:cronCustom,cronSetting:cronSetting,runRsync:runRsync});
   
       validateOptions(true);
     });
 }  
+function setExcluded() {
+				$el = $( "#excludedFoldersList input:checked" );
 
+				if( $el.length === 0 )
+				{
+					checked = "";
+				}
+				else {
+					var checked = $el
+						.map(function() {
+							return $(this).parent().find('a:first').text();
+						})
+						.get()
+						.join(',');
+						}
+    $("#excluded").val(checked);
+    validateOptions();
+ }
 function checkBackup() {
   $.post(URL,{action:'checkBackup'},function(data) {
     if (data) {
@@ -317,14 +365,14 @@ function abort() {
 </style>
 <link type="text/css" rel="stylesheet" href="/webGui/styles/jquery.filetree.css">
 
-> For an explanation of these items, please see the online manual
+> For help with this plugin, click here (a new tab will open with the help file)  <strong><font size="2"><a href="Settings/caHelp#backupSettings" target="_blank">HELP</a></font></strong>
 
 <font color='red'><center><span id='errors'></span></font><span id='error1'></span></center>
 <div style='width:75%;align:center;margin:auto'>
 <table>
 <tr>
   <td><b>Appdata Share (Source):</b><br>(If your appData share is not listed, this CA module is not for you)</td>
-  <td><select id='source' onchange='validateOptions();'><?=$sourceShares?></select></td>
+  <td><select id='source' onchange='changeSource();'><?=$sourceShares?></select></td>
 </tr>
 <tr>
   <td><b>Save To Disk #:</b></td>
@@ -336,7 +384,8 @@ function abort() {
 </tr>
 <tr>
   <td><b>Excluded Folders:</b></td>
-  <td><span id='excludedSpan'></span></td>
+  <td><input type='text' id='excluded' value='<?=$backupOptions['excluded']?>'></span></td>
+  <td><center><b>Excluded Folder Browser</b><br><input type='button' value='Exclude Selected' onclick='setExcluded();'><br></center><div id='excludedFoldersList' style='width:305px;max-height:150px;overflow:scroll;position:absolute;z-index:100;'></div><br><center></td>
  </tr>
 <tr>
   <td><b>Notification Settings:</b></td>
@@ -456,3 +505,6 @@ function abort() {
 <div style='border:1px;border-style:solid;border-color:red'><font size='2'>Backup / Restore Status: <span id='backupStatus'></span>
 <br>
 <span id='backupLines'><br><br><br></span></div>
+
+> <center>For support for this plugin, visit here: <a href="http://lime-technology.com/forum/index.php?topic=40262.0" target="_blank">http://lime-technology.com/forum/index.php?topic=40262.0</a></center>
+
