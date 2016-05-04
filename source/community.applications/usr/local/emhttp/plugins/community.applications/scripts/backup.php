@@ -6,6 +6,14 @@
 #                                                             #
 ###############################################################
 
+if ( $argv[1] == "restore" ) {
+  $restore = true;
+  $restoreMsg = "Restore";
+} else {
+  $restore = false;
+  $restoreMsg = "Backup";
+}
+
 require_once("/usr/local/emhttp/plugins/dynamix.docker.manager/include/DockerClient.php");
 require_once("/usr/local/emhttp/plugins/community.applications/include/paths.php");
 require_once("/usr/local/emhttp/plugins/community.applications/include/helpers.php");
@@ -53,7 +61,11 @@ if ( is_file($communityPaths['restoreProgress']) ) {
 @unlink($communityPaths['backupLog']);
 $dockerSettings = @parse_ini_file($communityPaths['unRaidDockerSettings']);
 
-file_put_contents($communityPaths['backupProgress'],getmypid());
+if ( $restore ) {
+  file_put_contents($communityPaths['restoreProgress'],getmypid());
+} else {
+  file_put_contents($communityPaths['backupProgress'],getmypid());
+}
   
 $dockerClient = new DockerClient();
 $dockerRunning = $dockerClient->getDockerContainers();
@@ -68,13 +80,13 @@ if ( ! $backupOptions['dockerIMG'] )     { $backupOptions['dockerIMG'] = "exclud
 if ( ! $backupOptions['notification'] )  { $backupOptions['notification'] = "always"; }
 
 logger('#######################################');
-logger("Community Applications appData Backup");
+logger("Community Applications appData $restoreMsg");
 logger("Applications will be unavailable during");
 logger("this process.  They will automatically");
 logger("be restarted upon completion.");
 logger('#######################################');
 if ( $backupOptions['notification'] == "always" ) {
-  notify("Community Applications","appData Backup","Backup of appData starting.  This may take awhile");
+  notify("Community Applications","appData $restoreMsg","$restoreMsg of appData starting.  This may take awhile");
 }
   
 if ( $backupOptions['stopScript'] ) {
@@ -89,7 +101,13 @@ if ( is_array($dockerRunning) ) {
     }
   }
 }
-
+if ( $restore ) {
+  $source = $backupOptions['destination']."/".$backupOptions['destinationShare']."/";
+  $destination = $backupOptions['source'];
+} else {
+  $source = $backupOptions['source']."/";
+  $destination = $backupOptions['destination']."/".$backupOptions['destinationShare'];
+}
 if ( $backupOptions['dockerIMG'] == "exclude" ) {
   $dockerIMGFilter = '--exclude "'.str_replace($backupOptions['source']."/","",$dockerSettings['DOCKER_IMAGE_FILE']).'"';
 }
@@ -103,10 +121,16 @@ if ( $backupOptions['excluded'] ) {
 }
 
 if ( $backupOptions['runRsync'] == "true" ) {
-  logger("Backing up appData from ".$backupOptions['source']." to ".$backupOptions['destination']."/".$backupOptions['destinationShare']);
-  $command = '/usr/bin/rsync '.$backupOptions['rsyncOption'].' '.$dockerIMGFilter.' '.$rsyncExcluded.' --log-file="'.$communityPaths['backupLog'].'" "'.$backupOptions['source'].'/" "'.$backupOptions['destination'].'/'.$backupOptions['destinationShare'].'" > /dev/null 2>&1';
+  if ( $restore ) {
+    $logLine = "Restoring ";
+  } else {
+    $logLine = "Backing up ";
+  }
+  logger("$logLine appData from $source to $destination");
+  $command = '/usr/bin/rsync '.$backupOptions['rsyncOption'].' '.$dockerIMGFilter.' '.$rsyncExcluded.' --log-file="'.$communityPaths['backupLog'].'" "'.$source.'" "'.$destination.'" > /dev/null 2>&1';
   logger('Using command: '.$command);
   exec($command,$output,$returnValue);
+  logger("$restoreMsg Complete");
 }
 
 if ( is_array($dockerRunning) ) {
@@ -122,23 +146,48 @@ if ( $backupOptions['startScript'] ) {
   shell_exec($backupOptions['startScript']);
 }
 logger('#######################');
-logger("appData backup complete");
+logger("appData $restoreMsg complete");
 logger('#######################');
 if ( $returnValue > 0 ) {
   $message = getRsyncReturnValue($returnValue);
   $status = "- Errors occurred";
   $type = "warning";
   logger("Rsync Errors Occurred: $message");
+  logger("Last 10 lines of rsync log:");
+  exec("tail -n10 ".$communityPaths['backupLog'],$rsyncLog);
+  foreach ($rsyncLog as $logLine) {
+    logger($logLine);
+  }
 } else {
   $type = "normal";
 }
-toDOS($communityPaths['backupLog'],"/boot/config/plugins/community.applications/backup.log");
-
-if ( ($backupOptions['notification'] == "always") || ($backupOptions['notification'] == "completion") || ( ($backupOptions['notification'] == "errors") && ($type == "warning") )  ) {
-  notify("Community Applications","appData Backup","Backup of appData complete $status - Log is available on the flash drive at /config/plugins/community.applications/backup.log",$message,$type);
+switch ($backupOptions['logBackup']) {
+  case 'yes':
+    toDOS($communityPaths['backupLog'],"/boot/config/plugins/community.applications/backup.log");
+    $logMessage = " - Log is available on the flash drive at /config/plugins/community.applications/backup.log";
+    break;
+  case 'append':
+    toDOS($communityPaths['backupLog'],"/boot/config/plugins/community.applications/backup.log",true);
+    $logMessage = " - Log is available on the flash drive at /config/plugins/community.applications/backup.log";
+    break;
+  default:
+    $logMessage = "";
+    logger("Rsync log to flash drive disabled");
+    break;
+  case 'no':
+    $logMessage = "";
+    logger("Rsync log to flash drive disabled");
+    break;
 }
 
-unlink($communityPaths['backupProgress']);
+
+if ( ($backupOptions['notification'] == "always") || ($backupOptions['notification'] == "completion") || ( ($backupOptions['notification'] == "errors") && ($type == "warning") )  ) {
+  notify("Community Applications","appData $restoreMsg","$restoreMsg of appData complete $status$logMessage",$message,$type);
+}
+if ( $restore ) {
+  unlink($communityPaths['restoreProgress']);
+} else {
+  unlink($communityPaths['backupProgress']);
+}
   
 ?>
-  

@@ -9,6 +9,10 @@ Icon="backup.png"
 #                                                             #
 ###############################################################
 
+function logger($string) {
+  shell_exec("logger '$string'");
+}
+
 $plugin = "community.applications";
 
 $backupOptions = json_decode(@file_get_contents("/boot/config/plugins/community.applications/BackupOptions.json"),true);
@@ -44,7 +48,9 @@ foreach ($sharesList as $addShare) {
   if ( ! is_dir("/mnt/cache/$addShare") ) {
     continue;
   }
+  logger("Found share $addShare on cache drive");
   if ( is_dir("/mnt/user0/$addShare") ) {
+    logger("Share $addShare is not exclusively stored on cache drive.  Skipping as potential source");
     continue;
   }
   if ( $backupOptions['source'] == "/mnt/cache/$addShare" ) {
@@ -85,8 +91,6 @@ foreach ($udList as $udShare) {
   $destinationShares .= "<option value='/mnt/disks/$udShare' $selected>$udShare (via Unassigned Devices)</option>";
 }
 
-
-
 for ( $minute = 0; $minute < 60; $minute++ ) {
   $cronMinute .= "<option value='$minute'>$minute</option>";
 }
@@ -101,7 +105,7 @@ for ( $hour = 0; $hour < 24; $hour++ ) {
 ?>
 <script src="/webGui/javascript/jquery.filetree.js"></script>
 <script>
-var URL = "/plugins/<?=$plugin?>/include/exec.php";
+var URL = "/plugins/<?=$plugin?>/include/backupExec.php";
 var appliedChanges = false;
 
 $(function() {
@@ -123,7 +127,6 @@ $(function() {
   $("#startScript").val("<?=$backupOptions['startScript']?>");
   $("#stopScript").val("<?=$backupOptions['stopScript']?>");
   $("#notification").val("<?=$backupOptions['notification']?>");
-    
   
   $("#destinationShare").fileTreeAttach();
   $("#startScript").fileTreeAttach();
@@ -257,6 +260,7 @@ function apply() {
   var dockerIMG = $("#dockerIMG").val();
   var notification = $("#notification").val();
   var excluded = $("#excluded").val();
+  var logBackup = $("#logBackup").val();
 
   excluded = excluded.trim();
   
@@ -282,7 +286,7 @@ function apply() {
       stopScript = stopScript.trim();
       startScript = startScript.trim();
   
-      $.post(URL,{action:'applyBackupOptions',excluded:excluded,notification:notification,dockerIMG:dockerIMG,source:source,destinationShare:destinationShare,destination:destination,stopScript:stopScript,startScript:startScript,rsyncOption:rsyncOption,cronDay:cronDay,cronMonth:cronMonth,cronHour:cronHour,cronMinute:cronMinute,cronCustom:cronCustom,cronSetting:cronSetting,runRsync:runRsync});
+      $.post(URL,{action:'applyBackupOptions',logBackup:logBackup,excluded:excluded,notification:notification,dockerIMG:dockerIMG,source:source,destinationShare:destinationShare,destination:destination,stopScript:stopScript,startScript:startScript,rsyncOption:rsyncOption,cronDay:cronDay,cronMonth:cronMonth,cronHour:cronHour,cronMinute:cronMinute,cronCustom:cronCustom,cronSetting:cronSetting,runRsync:runRsync});
   
       validateOptions(true);
     });
@@ -406,7 +410,7 @@ function abort() {
   <td><input onchange='validateOptions();' id='startScript' type='text' data-pickroot="/" data-pickfolders="true"></input></td>
 </tr>
 <tr>
-  <td><b>Rsync Options:</b><br>*Don't change if you don't know what you're doing</td>
+  <td><b>Rsync Options:</b><br><font size='0'>Don't change if you don't know what you're doing</font></td>
   <td><input id='rsyncOption' type='text' value='<?=$backupOptions['rsyncOption']?>' onchange='validateOptions();'></td>
 </tr>
 <tr>
@@ -418,10 +422,18 @@ function abort() {
   </td>
 </tr>
 <tr>
-  <td><b>Include or exclude docker.img file:</b></td>
+  <td><b>Include or exclude docker.img file:</b><br><font size='0'>Includes / Excludes docker.img IF it is stored within the appdata folder</font></td>
   <td><select id='dockerIMG' onchange='validateOptions();'>
     <option value='exclude'>Excluded</option>
     <option value='include'>Included</option>
+  </select></td>
+</tr>
+<tr>
+  <td><b>Save Log File to flash?<b></td>
+  <td><select id='logBackup' onchange='validateOptions();'>
+    <option value='no'>No</option>
+    <option value='yes'>Yes</option>
+    <option value='append'>Yes (and append file)</option>
   </select></td>
 </tr>
 <tr>
