@@ -23,6 +23,7 @@ function notify($event,$subject,$description,$message="",$type="normal") {
 $appList = json_decode(@file_get_contents("/boot/config/plugins/community.applications/AutoUpdate.json"),true);
 if ( ! $appList ) {
   $appList['community.applications.plg'] = "true";
+  $appList['fix.common.problems'] = "true";
 }
 
 $pluginsInstalled = scandir("/boot/config/plugins");

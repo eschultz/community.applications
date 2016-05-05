@@ -16,6 +16,7 @@ $updateSettings = json_decode(@file_get_contents("/boot/config/plugins/community
 
 if ( ! $updateSettings ) {
   $updateSettings['community.applications.plg'] = "true";
+  $updateSettings['fix.common.problems.plg'] = "true";
 }
 
 if ( $updateSettings['Global'] == "true" ) {
@@ -36,7 +37,7 @@ foreach ($pluginsFolder as $pluginFile) {
     }
     $displayOptions .= "<tr><td>$pluginFile</td>";
     $displayOptions .= "<td><img src='/".icon(plugin("name","/boot/config/plugins/$pluginFile"))."' width='48px'></td>";
-    $displayOptions .= "<td>".Markdown(file_get_contents("/usr/local/emhttp/plugins/".plugin("name","/boot/config/plugins/$pluginFile")."/README.md"))."</td><td>";
+    $displayOptions .= "<td>".Markdown(@file_get_contents("/usr/local/emhttp/plugins/".plugin("name","/boot/config/plugins/$pluginFile")."/README.md"))."</td><td>";
     $displayOptions .= "<select class='plugins' id='$pluginFile' onchange='changeApply();'>";
     $displayOptions .= "<option>Don't Auto Update</option>";
     $displayOptions .= "<option value='$pluginFile' $selected>AutoUpdate</option>";
