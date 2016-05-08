@@ -457,7 +457,7 @@ mkdir -p /boot/config/plugins/community.applications
 cp /usr/local/emhttp/plugins/community.applications/scripts/updateApplications.sh /etc/cron.daily/updateApplications.sh
 /usr/local/emhttp/plugins/community.applications/scripts/removeCron.php
 /usr/local/emhttp/plugins/community.applications/scripts/addCron.php
-if [[ ! -f /boot/config/plugins/community.applications/AutoUpdate.json ]]; then cp /usr/local/emhttp/plugins/community.applications/scripts/AutoUpdate.sh /boot/config/plugins/community.applications/AutoUpdate.json; fi
+if [[ ! -e /boot/config/plugins/community.applications/AutoUpdate.json ]]; then cp /usr/local/emhttp/plugins/community.applications/scripts/AutoUpdate.sh /boot/config/plugins/community.applications/AutoUpdate.json; fi
 echo ""
 echo "----------------------------------------------------"
 echo " &name; has been installed."
