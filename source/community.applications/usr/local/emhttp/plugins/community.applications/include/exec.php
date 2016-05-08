@@ -2064,7 +2064,7 @@ case 'autoUpdatePlugins':
   $plugins = explode("*",$pluginList);
   if ( is_array($plugins) ) {
     foreach ($plugins as $plg) {
-      if (is_file("/boot/config/plugins/$plg") ) {
+      if (is_file("/var/log/plugins/$plg") ) {
         $updateArray[$plg] = "true";
       }
     }
