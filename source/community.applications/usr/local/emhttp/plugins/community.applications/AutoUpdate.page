@@ -25,7 +25,7 @@ if ( $updateSettings['Global'] == "true" ) {
 
 $displayOptions = "<table class='tablesorter'><thead><th>&nbsp;</th><th></th><th></th><th></th></thead><tbody>";
 foreach ($pluginsFolder as $pluginFile) {
-  if ( ! is_file("/boot/config/plugins/$pluginFile") ) {
+  if ( ( ! is_file("/boot/config/plugins/$pluginFile") ) && ( $pluginFile != "dynamix.plg" ) ) {
     continue;
   }
 
@@ -36,8 +36,8 @@ foreach ($pluginsFolder as $pluginFile) {
       $selected = "";
     }
     $displayOptions .= "<tr><td>$pluginFile</td>";
-    $displayOptions .= "<td><img src='/".icon(plugin("name","/boot/config/plugins/$pluginFile"))."' width='48px'></td>";
-    $displayOptions .= "<td>".Markdown(@file_get_contents("/usr/local/emhttp/plugins/".plugin("name","/boot/config/plugins/$pluginFile")."/README.md"))."</td><td>";
+    $displayOptions .= "<td><img src='/".icon(plugin("name","/var/log/plugins/$pluginFile"))."' width='48px'></td>";
+    $displayOptions .= "<td>".Markdown(@file_get_contents("/usr/local/emhttp/plugins/".plugin("name","/var/log/plugins/$pluginFile")."/README.md"))."</td><td>";
     $displayOptions .= "<select class='plugins' id='$pluginFile' onchange='changeApply();'>";
     $displayOptions .= "<option>Don't Auto Update</option>";
     $displayOptions .= "<option value='$pluginFile' $selected>AutoUpdate</option>";
