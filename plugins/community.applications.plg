@@ -453,6 +453,7 @@ echo "Creating Directories"
 mkdir -p /var/lib/docker/unraid/templates-community-apps
 mkdir -p /var/lib/docker/unraid/community.applications.datastore
 mkdir -p /tmp/community.applications/tempFiles
+mkdir -p /boot/config/plugins/community.applications
 cp /usr/local/emhttp/plugins/community.applications/scripts/updateApplications.sh /etc/cron.daily/updateApplications.sh
 /usr/local/emhttp/plugins/community.applications/scripts/removeCron.php
 /usr/local/emhttp/plugins/community.applications/scripts/addCron.php
