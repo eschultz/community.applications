@@ -97,6 +97,7 @@ case 'applyBackupOptions':
   $backupOptions['notification'] = isset($_POST['notification']) ? urldecode(($_POST['notification'])) : "";
   $backupOptions['excluded']    = isset($_POST['excluded']) ? urldecode(($_POST['excluded'])) : "";
   $backupOptions['logBackup']   = isset($_POST['logBackup']) ? urldecode(($_POST['logBackup'])) : "";
+  $backupOptions['datedBackup'] = isset($_POST['datedBackup']) ? urldecode(($_POST['datedBackup'])) : "";
   
   $backupOptions['excluded'] = trim($backupOptions['excluded']);
   
@@ -144,10 +145,25 @@ case 'backupNow':
   break;
   
 case 'restoreNow':
-  shell_exec("/usr/local/emhttp/plugins/community.applications/scripts/restore.sh");
+  $backupOptions['availableDates'] = isset($_POST['availableDates']) ? urldecode(($_POST['availableDates'])) : "";
+  shell_exec("/usr/local/emhttp/plugins/community.applications/scripts/restore.sh ".$backupOptions['availableDates']);
   break;
   
 case 'abortBackup':
   shell_exec("/usr/local/emhttp/plugins/community.applications/scripts/killRsync.php");
   break;
+  
+case 'getDates':
+  $backupOptions['destinationShare'] = isset($_POST['destinationShare']) ? urldecode(($_POST['destinationShare'])) : "";
+  $backupOptions['destination'] = isset($_POST['destination']) ? urldecode(($_POST['destination'])) : "";
+  $availableDates = array_diff(scandir($backupOptions['destination']."/".$backupOptions['destinationShare']),array(".",".."));
+
+  $output = "<select id='date'>";
+  foreach ($availableDates as $date) {
+    $output .= "<option value='$date'>$date</option>";
+  }
+  $output .= "</select>";
+  echo $output;
+  break;
+  
 }

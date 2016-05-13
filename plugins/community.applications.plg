@@ -2,8 +2,8 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.applications">
 <!ENTITY author    "Andrew Zawadzki">
-<!ENTITY version   "2016.05.08">
-<!ENTITY md5       "0377c7e8c63ebb6df579dba65cd08c7a">
+<!ENTITY version   "2016.05.12">
+<!ENTITY md5       "58b469f4df14f6b97413d0605e53dd70">
 <!ENTITY launch    "Apps">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/community.applications">
@@ -13,8 +13,12 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
+###2016.05.12###
+- Add in dated backup of appdata
+
 ###2016.05.08###
 - Fixed some bugs with AutoUpdate displays
+
 ###2016.05.05###
 - Enhanced: Backup - better logging into syslog
 - Added: Configurable logging options
@@ -457,6 +461,8 @@ mkdir -p /boot/config/plugins/community.applications
 cp /usr/local/emhttp/plugins/community.applications/scripts/updateApplications.sh /etc/cron.daily/updateApplications.sh
 /usr/local/emhttp/plugins/community.applications/scripts/removeCron.php
 /usr/local/emhttp/plugins/community.applications/scripts/addCron.php
+if [[ ! -e /boot/config/plugins/community.applications/AutoUpdate.json ]]; then cp /usr/local/emhttp/plugins/community.applications/scripts/AutoUpdate.json /boot/config/plugins/community.applications/AutoUpdate.json; fi
+
 echo ""
 echo "----------------------------------------------------"
 echo " &name; has been installed."

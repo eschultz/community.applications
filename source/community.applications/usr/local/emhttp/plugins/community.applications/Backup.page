@@ -26,6 +26,7 @@ if ( ! $backupOptions['runRsync'] )    {  $backupOptions['runRsync'] = "true"; }
 if ( ! $backupOptions['dockerIMG'] )   {  $backupOptions['dockerIMG'] = "exclude"; }
 if ( ! $backupOptions['destinationShare'] ) { $backupOptions['destinationShare'] = "CommunityApplicationsAppdataBackup"; }
 if ( ! $backupOptions['notification'] ) {  $backupOptions['notification'] = "always"; }
+if ( ! $backupOptions['datedBackup'] ) { $backupOptions['datedBackup'] = "no"; }
 
 # fix destinationShare for compatibility with initial release
 
@@ -115,6 +116,7 @@ $(function() {
     checkBackup();
   }, 1000);
   
+  $("#datedBackup").val("<?=$backupOptions['datedBackup']?>");
   $("#destinationShare").val("<?=$backupOptions['destinationShare']?>");
   $("#cronSetting").val("<?=$backupOptions['cronSetting']?>");
   $("#cronDay").val("<?=$backupOptions['cronDay']?>");
@@ -207,6 +209,7 @@ function validateOptions(initialization) {
   var destinationShare = $("#destinationShare").val();
   var stopScript = $("#stopScript").val();
   var startScript = $("#startScript").val();
+  var datedBackup = $("#datedBackup").val();
   
   var excludeButton = "<input type='button' id='excludedFolders' name='excludedFolders' value='Add' data-pickfilter='HIDE_FILES_FILTER' data-pickmultiselect='true' data-pickroot='/mnt/user' data-pickfolders='true'>";
   
@@ -215,6 +218,18 @@ function validateOptions(initialization) {
   $('#excludedSpan').html(" ");
   $('#excludedSpan').html(excludeButton);
   $('#excludedFolders').fileTreeAttach();
+  
+  if ( datedBackup == "yes" ) {
+    $.post(URL,{action:'getDates',destinationShare:destinationShare,destination:destination}, function(data) {
+      if (data) {
+        $("#availableDates").html();
+        $("#availableDates").html(data);
+        $("#availableDates").show();
+      }
+    });
+  } else {
+    $("#availableDates").hide();
+  }
   
   stopScript = stopScript.trim();
   startScript = startScript.trim();
@@ -261,6 +276,7 @@ function apply() {
   var notification = $("#notification").val();
   var excluded = $("#excluded").val();
   var logBackup = $("#logBackup").val();
+  var datedBackup = $("#datedBackup").val();
 
   excluded = excluded.trim();
   
@@ -286,7 +302,7 @@ function apply() {
       stopScript = stopScript.trim();
       startScript = startScript.trim();
   
-      $.post(URL,{action:'applyBackupOptions',logBackup:logBackup,excluded:excluded,notification:notification,dockerIMG:dockerIMG,source:source,destinationShare:destinationShare,destination:destination,stopScript:stopScript,startScript:startScript,rsyncOption:rsyncOption,cronDay:cronDay,cronMonth:cronMonth,cronHour:cronHour,cronMinute:cronMinute,cronCustom:cronCustom,cronSetting:cronSetting,runRsync:runRsync});
+      $.post(URL,{action:'applyBackupOptions',datedBackup:datedBackup,logBackup:logBackup,excluded:excluded,notification:notification,dockerIMG:dockerIMG,source:source,destinationShare:destinationShare,destination:destination,stopScript:stopScript,startScript:startScript,rsyncOption:rsyncOption,cronDay:cronDay,cronMonth:cronMonth,cronHour:cronHour,cronMinute:cronMinute,cronCustom:cronCustom,cronSetting:cronSetting,runRsync:runRsync});
   
       validateOptions(true);
     });
@@ -320,17 +336,24 @@ function checkBackup() {
 function restoreBackup() {
   var source = $('#destinationShare').val()+ " ("+$('#destination').val() + ")";
   var destination = $('#source').val();
+  var datedBackup = $("#datedBackup").val();
+  
+  if ( datedBackup == "yes" ) {
+    var availableDates = $("#date").val();
+  } else {
+    var availableDates = "";
+  }
   
   swal({
     title: "Are you sure?",
-    text: "This will restore your appdata folder from <b><em><font color='red'>" + source + "</em></b></font> to <em><b><font color='red'>" + destination,
+    text: "This will restore your appdata folder from <b><em><font color='red'>" + source + "</em></b></font> to <em><b><font color='red'>" + destination + "/" + availableDates,
     showCancelButton: true,
     html: true,
     type: "warning",
     closeOnConfirm: true
     },
     function() {
-      $.post(URL,{action:'restoreNow'});
+      $.post(URL,{action:'restoreNow',availableDates:availableDates});
     });
 }
 function backupNow() {
@@ -448,6 +471,13 @@ function abort() {
   </td>
 </tr>
 <tr>
+  <td><b>Put backups into separate dated sub folders?</b></td>
+  <td><select id='datedBackup' onchange='validateOptions();'>
+    <option value='no'>No</option>
+    <option value='yes'>Yes</option>
+  </td>
+</tr>
+<tr>
   <td><b>Day of Week:</b></td>
   <td><select id='cronDay' onchange='validateOptions();'>
         <option value='0'>Sunday</option>
@@ -511,7 +541,7 @@ function abort() {
 </tr>
 </table>
 <font size='3' color='red'><b>NOTE:</b></font> <b>All files</b> within your chosen destination share will be deleted when the backup runs.  Only select a share created <b>SPECIFICALLY<b> for appdata backup purposes<br>
-
+<span style='float:right; display:none;' id='availableDates'></span><br><br>
 <input type='button' value='Apply' id='Apply' onclick='apply();'><input type='button' value='Backup Now' id='Backup' onclick='backupNow();'><span style='float:right'><input type='button' value='Restore' id='restore' onclick='restoreBackup();'><input type='button' value='Abort' id='abort' onclick='abort();' disabled'></span>
 </div><br>
 <div style='border:1px;border-style:solid;border-color:red'><font size='2'>Backup / Restore Status: <span id='backupStatus'></span>

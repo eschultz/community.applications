@@ -26,12 +26,13 @@ if ( ! $appList ) {
   $appList['fix.common.problems.plg'] = "true";
 }
 
-$pluginsInstalled = scandir("/boot/config/plugins");
+$pluginsInstalled = array_diff(scandir("/var/log/plugins"),array(".",".."));
 exec("logger Community Applications Auto Update Running");
 foreach ($pluginsInstalled  as $plugin) {
   if ( ! is_file("/boot/config/plugins/$plugin") ) {
     continue;
   }
+  if ( $plugin == "unRAIDServer.plg" ) { continue; }
   if ( checkPluginUpdate($plugin) ) {
     if ( $appList['Global'] == "true" || $appList[$plugin] ) {
       exec("logger Auto Updating $plugin");

@@ -79,6 +79,16 @@ if ( ! $backupOptions ) {
 if ( ! $backupOptions['dockerIMG'] )     { $backupOptions['dockerIMG'] = "exclude"; }
 if ( ! $backupOptions['notification'] )  { $backupOptions['notification'] = "always"; }
 
+if ( $restore ) {
+  if ( $backupOptions['datedBackup'] == "yes" ) {
+    $backupOptions['destinationShare'] = $backupOptions['destinationShare']."/".$argv[2];
+  }
+} else {
+  if (  $backupOptions['datedBackup'] == "yes" ) {
+    $backupOptions['destinationShare'] = $backupOptions['destinationShare']."/".exec("date +%F@%H.%M");
+  }
+}
+
 logger('#######################################');
 logger("Community Applications appData $restoreMsg");
 logger("Applications will be unavailable during");
