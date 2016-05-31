@@ -71,6 +71,8 @@ $dockerClient = new DockerClient();
 $dockerRunning = $dockerClient->getDockerContainers();
 
 $backupOptions = readJsonFile($communityPaths['backupOptions']);
+$basePathBackup = $backupOptions['destination']."/".$backupOptions['destinationShare'];
+
   
 if ( ! $backupOptions ) {
   exit;
@@ -78,6 +80,7 @@ if ( ! $backupOptions ) {
 
 if ( ! $backupOptions['dockerIMG'] )     { $backupOptions['dockerIMG'] = "exclude"; }
 if ( ! $backupOptions['notification'] )  { $backupOptions['notification'] = "always"; }
+if ( $backupOptions['deleteOldBackup'] == 0 ) { $backupOptions['deleteOldBackup'] = ""; }
 
 if ( $restore ) {
   if ( $backupOptions['datedBackup'] == "yes" ) {
@@ -194,10 +197,33 @@ switch ($backupOptions['logBackup']) {
 if ( ($backupOptions['notification'] == "always") || ($backupOptions['notification'] == "completion") || ( ($backupOptions['notification'] == "errors") && ($type == "warning") )  ) {
   notify("Community Applications","appData $restoreMsg","$restoreMsg of appData complete $status$logMessage",$message,$type);
 }
+
+
+if ( ! $restore && ($backupOptions['datedBackup'] == 'yes') ) {
+  if ( $backupOptions['deleteOldBackup'] ) {
+    if ( $returnValue > 0 ) {
+      logger("rsync returned errors.  Not deleting old backup sets of appdata");
+    } else {
+      $currentDate = date_create(now);
+      $dirContents = array_diff(scandir($basePathBackup),array(".",".."));
+      foreach ($dirContents as $dir) {
+        $folderDate = date_create_from_format("Y-m-d@G.i",$dir);
+        if ( ! $folderDate ) { continue; }
+        $interval = date_diff($currentDate,$folderDate);
+        $age = $interval->format("%R%a");
+        if ( $age <= (0 - $backupOptions['deleteOldBackup']) ) {
+          logger("Deleting $basePathBackup/$dir");
+          exec('rm -rf '.escapeshellarg($basePathBackup).'/'.$dir);
+        }   
+      }
+    }
+  }
+}
+
 if ( $restore ) {
   unlink($communityPaths['restoreProgress']);
 } else {
   unlink($communityPaths['backupProgress']);
 }
-  
+
 ?>

@@ -27,6 +27,7 @@ if ( ! $backupOptions['dockerIMG'] )   {  $backupOptions['dockerIMG'] = "exclude
 if ( ! $backupOptions['destinationShare'] ) { $backupOptions['destinationShare'] = "CommunityApplicationsAppdataBackup"; }
 if ( ! $backupOptions['notification'] ) {  $backupOptions['notification'] = "always"; }
 if ( ! $backupOptions['datedBackup'] ) { $backupOptions['datedBackup'] = "no"; }
+if ( ! $backupOptions['deleteOldBackup'] ) { $backupOption['deleteOldBackup'] = "no"; }
 
 # fix destinationShare for compatibility with initial release
 
@@ -116,6 +117,7 @@ $(function() {
     checkBackup();
   }, 1000);
   
+  $("#deleteOldBackup").val("<?=$backupOptions['deleteOldBackup']?>");
   $("#datedBackup").val("<?=$backupOptions['datedBackup']?>");
   $("#destinationShare").val("<?=$backupOptions['destinationShare']?>");
   $("#cronSetting").val("<?=$backupOptions['cronSetting']?>");
@@ -180,7 +182,7 @@ function validateOptions(initialization) {
   if (initialization != true ) {
     appliedChanges = true;
   }
-
+  
   var cronSetting = $("#cronSetting").val();
   switch (cronSetting) {
     case 'daily':
@@ -210,6 +212,10 @@ function validateOptions(initialization) {
   var stopScript = $("#stopScript").val();
   var startScript = $("#startScript").val();
   var datedBackup = $("#datedBackup").val();
+  var deleteOldBackup = $("#deleteOldBackup").val();
+  if ( deleteOldBackup == 0 ) {
+    $("#deleteOldBackup").val("");
+  }
   
   var excludeButton = "<input type='button' id='excludedFolders' name='excludedFolders' value='Add' data-pickfilter='HIDE_FILES_FILTER' data-pickmultiselect='true' data-pickroot='/mnt/user' data-pickfolders='true'>";
   
@@ -220,6 +226,7 @@ function validateOptions(initialization) {
   $('#excludedFolders').fileTreeAttach();
   
   if ( datedBackup == "yes" ) {
+    $("#deleteOldBackup").prop("disabled",false);
     $.post(URL,{action:'getDates',destinationShare:destinationShare,destination:destination}, function(data) {
       if (data) {
         $("#availableDates").html();
@@ -228,6 +235,7 @@ function validateOptions(initialization) {
       }
     });
   } else {
+    $("#deleteOldBackup").prop("disabled",true);
     $("#availableDates").hide();
   }
   
@@ -277,7 +285,8 @@ function apply() {
   var excluded = $("#excluded").val();
   var logBackup = $("#logBackup").val();
   var datedBackup = $("#datedBackup").val();
-
+  var deleteOldBackup = $("#deleteOldBackup").val();
+  
   excluded = excluded.trim();
   
   var popUpText = "Warning: All files within <font color='red'>" + destinationShare + "</font> ";
@@ -302,7 +311,7 @@ function apply() {
       stopScript = stopScript.trim();
       startScript = startScript.trim();
   
-      $.post(URL,{action:'applyBackupOptions',datedBackup:datedBackup,logBackup:logBackup,excluded:excluded,notification:notification,dockerIMG:dockerIMG,source:source,destinationShare:destinationShare,destination:destination,stopScript:stopScript,startScript:startScript,rsyncOption:rsyncOption,cronDay:cronDay,cronMonth:cronMonth,cronHour:cronHour,cronMinute:cronMinute,cronCustom:cronCustom,cronSetting:cronSetting,runRsync:runRsync});
+      $.post(URL,{action:'applyBackupOptions',deleteOldBackup:deleteOldBackup,datedBackup:datedBackup,logBackup:logBackup,excluded:excluded,notification:notification,dockerIMG:dockerIMG,source:source,destinationShare:destinationShare,destination:destination,stopScript:stopScript,startScript:startScript,rsyncOption:rsyncOption,cronDay:cronDay,cronMonth:cronMonth,cronHour:cronHour,cronMinute:cronMinute,cronCustom:cronCustom,cronSetting:cronSetting,runRsync:runRsync});
   
       validateOptions(true);
     });
@@ -477,6 +486,10 @@ function abort() {
     <option value='yes'>Yes</option>
   </td>
 </tr>
+<tr>
+  <td><b>Delete backups after how many days?</b></td>
+  <td><input id='deleteOldBackup' type='number' val='' placeholder='Never Delete' onchange='validateOptions();'></td>
+</tr>  
 <tr>
   <td><b>Day of Week:</b></td>
   <td><select id='cronDay' onchange='validateOptions();'>
