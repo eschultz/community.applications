@@ -2,8 +2,8 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.applications">
 <!ENTITY author    "Andrew Zawadzki">
-<!ENTITY version   "2016.05.12">
-<!ENTITY md5       "58b469f4df14f6b97413d0605e53dd70">
+<!ENTITY version   "2016.05.30">
+<!ENTITY md5       "9a5050262ebdb49b9639654a152797eb">
 <!ENTITY launch    "Apps">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/community.applications">
@@ -13,6 +13,9 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
+###2016.05.30###
+- Add in automatic deletion of old dated backup sets
+
 ###2016.05.12###
 - Add in dated backup of appdata
 
