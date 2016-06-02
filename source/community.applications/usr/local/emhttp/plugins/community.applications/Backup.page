@@ -27,7 +27,8 @@ if ( ! $backupOptions['dockerIMG'] )   {  $backupOptions['dockerIMG'] = "exclude
 if ( ! $backupOptions['destinationShare'] ) { $backupOptions['destinationShare'] = "CommunityApplicationsAppdataBackup"; }
 if ( ! $backupOptions['notification'] ) {  $backupOptions['notification'] = "always"; }
 if ( ! $backupOptions['datedBackup'] ) { $backupOptions['datedBackup'] = "no"; }
-if ( ! $backupOptions['deleteOldBackup'] ) { $backupOption['deleteOldBackup'] = "no"; }
+if ( ! $backupOptions['deleteOldBackup'] ) { $backupOptions['deleteOldBackup'] = "no"; }
+if ( ! $backupOptions['fasterRsync'] )  { $backupOptions['fasterRsync'] = "no"; }
 
 # fix destinationShare for compatibility with initial release
 
@@ -117,6 +118,7 @@ $(function() {
     checkBackup();
   }, 1000);
   
+  $("#fasterRsync").val("<?=$backupOptions['fasterRsync']?>");
   $("#deleteOldBackup").val("<?=$backupOptions['deleteOldBackup']?>");
   $("#datedBackup").val("<?=$backupOptions['datedBackup']?>");
   $("#destinationShare").val("<?=$backupOptions['destinationShare']?>");
@@ -227,6 +229,7 @@ function validateOptions(initialization) {
   
   if ( datedBackup == "yes" ) {
     $("#deleteOldBackup").prop("disabled",false);
+    $("#fasterRsync").prop("disabled",false);
     $.post(URL,{action:'getDates',destinationShare:destinationShare,destination:destination}, function(data) {
       if (data) {
         $("#availableDates").html();
@@ -237,6 +240,7 @@ function validateOptions(initialization) {
   } else {
     $("#deleteOldBackup").prop("disabled",true);
     $("#availableDates").hide();
+    $("#fasterRsync").prop("disabled",true);
   }
   
   stopScript = stopScript.trim();
@@ -286,6 +290,7 @@ function apply() {
   var logBackup = $("#logBackup").val();
   var datedBackup = $("#datedBackup").val();
   var deleteOldBackup = $("#deleteOldBackup").val();
+  var fasterRsync = $("#fasterRsync").val();
   
   excluded = excluded.trim();
   
@@ -311,7 +316,7 @@ function apply() {
       stopScript = stopScript.trim();
       startScript = startScript.trim();
   
-      $.post(URL,{action:'applyBackupOptions',deleteOldBackup:deleteOldBackup,datedBackup:datedBackup,logBackup:logBackup,excluded:excluded,notification:notification,dockerIMG:dockerIMG,source:source,destinationShare:destinationShare,destination:destination,stopScript:stopScript,startScript:startScript,rsyncOption:rsyncOption,cronDay:cronDay,cronMonth:cronMonth,cronHour:cronHour,cronMinute:cronMinute,cronCustom:cronCustom,cronSetting:cronSetting,runRsync:runRsync});
+      $.post(URL,{action:'applyBackupOptions',fasterRsync:fasterRsync,deleteOldBackup:deleteOldBackup,datedBackup:datedBackup,logBackup:logBackup,excluded:excluded,notification:notification,dockerIMG:dockerIMG,source:source,destinationShare:destinationShare,destination:destination,stopScript:stopScript,startScript:startScript,rsyncOption:rsyncOption,cronDay:cronDay,cronMonth:cronMonth,cronHour:cronHour,cronMinute:cronMinute,cronCustom:cronCustom,cronSetting:cronSetting,runRsync:runRsync});
   
       validateOptions(true);
     });
@@ -489,7 +494,15 @@ function abort() {
 <tr>
   <td><b>Delete backups after how many days?</b></td>
   <td><input id='deleteOldBackup' type='number' val='' placeholder='Never Delete' onchange='validateOptions();'></td>
-</tr>  
+</tr>
+<tr>
+  <td><b>Attempt faster rsync's (see manual)</b></td>
+  <td><select id='fasterRsync' onchange='validateOptions();'>
+    <option value='no'>No (default)</option>
+    <option value='yes'>Yes</option>
+    </select>
+  </td>
+</tr>
 <tr>
   <td><b>Day of Week:</b></td>
   <td><select id='cronDay' onchange='validateOptions();'>

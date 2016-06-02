@@ -99,6 +99,7 @@ case 'applyBackupOptions':
   $backupOptions['logBackup']   = isset($_POST['logBackup']) ? urldecode(($_POST['logBackup'])) : "";
   $backupOptions['datedBackup'] = isset($_POST['datedBackup']) ? urldecode(($_POST['datedBackup'])) : "";
   $backupOptions['deleteOldBackup'] = isset($_POST['deleteOldBackup']) ? urldecode(($_POST['deleteOldBackup'])) : "";
+  $backupOptions['fasterRsync'] = isset($_POST['fasterRsync']) ? urldecode(($_POST['fasterRsync'])) : "";
   
   $backupOptions['excluded'] = trim($backupOptions['excluded']);
   

@@ -309,6 +309,15 @@ If you docker.img file is stored within the appdata folder, this setting allows 
 <font color="purple">Scheduled Backup Frequency</font><br>
 Set these options to determine how often to run a scheduled backup operation (or include a custom CRON entry to manually make the schedule yourself)
 
+<font color="purple">Put backups into separate dated subfolders?</font><br>
+Setting this will create a separate folder (date and time) each time you run the backup.
+
+<font color="purple">Delete backups after how many days?</font><br>
+This is available when creating separate folders for each backup.  It will automatically delete backups that are older than the number of days you specify.  After a successful backup, then the old backups will be deleted.   In the event of a failed backup, no old backup sets will be deleted.
+
+<font color="purple">Attempt faster rsyncs?</font><br>
+This option is available when creating separate foldersfor each backup.  When it is set to "no (default)", the backup (rsync) command will have to copy ALL of the files over.  If you set it to "yes", then prior to copying, one of the backups which are slated to be deleted will be renamed to be the same date and time as the backup that is about to run.  This will allow the rsync command to only have to copy the files which are changed over.  This can result in significantly faster backup times.  The downside is that in the event of the backup failing (for whatever reason), you will have lost the previously made backup.
+
 NOTES:
 
 <b>All files within your chosen destination folder will be deleted during a backup process</b>

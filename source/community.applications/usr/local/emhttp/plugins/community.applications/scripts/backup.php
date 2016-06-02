@@ -87,8 +87,25 @@ if ( $restore ) {
     $backupOptions['destinationShare'] = $backupOptions['destinationShare']."/".$argv[2];
   }
 } else {
-  if (  $backupOptions['datedBackup'] == "yes" ) {
-    $backupOptions['destinationShare'] = $backupOptions['destinationShare']."/".exec("date +%F@%H.%M");
+  if ( $backupOptions['datedBackup'] == "yes" ) {
+    $newFolderDated = exec("date +%F@%H.%M");
+    $backupOptions['destinationShare'] = $backupOptions['destinationShare']."/".$newFolderDated;
+
+    if ( $backupOptions['fasterRsync'] == "yes" ) {
+      $currentDate = date_create(now);
+      $dirContents = array_diff(scandir($basePathBackup),array(".",".."));
+      foreach ($dirContents as $dir) {
+        $folderDate = date_create_from_format("Y-m-d@G.i",$dir);
+        if ( ! $folderDate ) { continue; }
+        $interval = date_diff($currentDate,$folderDate);
+        $age = $interval->format("%R%a");
+        if ( $age <= (0 - $backupOptions['deleteOldBackup']) ) {
+          logger("Renaming $basePathBackup/$dir to $basePathBackup/$newFolderDated");
+          exec("mv ".escapeshellarg($basePathBackup)."/".$dir." ".escapeshellarg($basePathBackup)."/".$newFolderDated);
+          break;
+        }   
+      }
+    }
   }
 }
 
@@ -213,6 +230,7 @@ if ( ! $restore && ($backupOptions['datedBackup'] == 'yes') ) {
         $age = $interval->format("%R%a");
         if ( $age <= (0 - $backupOptions['deleteOldBackup']) ) {
           logger("Deleting $basePathBackup/$dir");
+          exec("echo Deleting $basePathBackup/$dir >> ".$communityPaths['backupLog']."\n");
           exec('rm -rf '.escapeshellarg($basePathBackup).'/'.$dir);
         }   
       }
