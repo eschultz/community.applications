@@ -274,8 +274,7 @@ function fixTemplates($template) {
   if ( ( stripos($template['RepoName'],' beta') > 0 )  ) {
     $template['Beta'] = "true";
   }
-  $template['Support'] = filter_var($template['Support'], FILTER_VALIDATE_URL);
-  $template['Project'] = filter_var($template['Project'], FILTER_VALIDATE_URL);
+
 
   
   # support v6.2 redefining deprecating the <Beta> tag and moving it to a category
