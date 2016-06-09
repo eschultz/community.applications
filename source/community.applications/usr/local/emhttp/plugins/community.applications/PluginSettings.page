@@ -36,7 +36,13 @@ if ( ! is_dir("/tmp/community.applications/tempFiles") ) {
 
 $Repositories = "/tmp/community.applications/tempFiles/Repositories.json";
 download_url("https://raw.githubusercontent.com/Squidly271/Community-Applications-Moderators/master/Repositories.json",$Repositories);
-$Repos = json_decode(file_get_contents($Repositories),true);
+$Repos = json_decode(@file_get_contents($Repositories),true);
+
+if ( ! $Repos ) {
+  $Repos = array();
+}
+
+$repoName = array();
 
 foreach ($Repos as $Repo) {
   $repoName[] = $Repo['name'];
