@@ -186,7 +186,17 @@ function mySort($a, $b) {
 ###############################################
 
 function searchArray($array,$key,$value) {
-  $result = array_search($value, array_column($array, $key));
+  if ( function_exists("array_column") && function_exists("array_search") ) {   # faster to use built in if it works
+    $result = array_search($value, array_column($array, $key));   
+  } else {
+    $result = false;
+    for ($i = 0; $i <= max(array_keys($array)); $i++) {
+      if ( $array[$i][$key] == $value ) {
+        $result = $i;
+        break;
+      }
+    }
+  }
   
   return $result;
 }
@@ -275,6 +285,8 @@ function fixTemplates($template) {
     $template['Beta'] = "true";
   }
 
+  $template['Support'] = validURL($template['Support']);
+  $template['Project'] = validURL($template['Project']);
 
   
   # support v6.2 redefining deprecating the <Beta> tag and moving it to a category
@@ -484,4 +496,17 @@ function toDOS($input,$output,$append = false) {
   }
 }
 
+#######################################################
+#                                                     #
+# Function to check for a valid URL                   #
+#                                                     #
+#######################################################
+
+function validURL($URL) {
+  if ( function_exists("filter_var") ) {  # function only works on unRaid 6.1.8+
+    return filter_var($URL, FILTER_VALIDATE_URL);
+  } else {
+    return $URL;
+  }
+}
 ?>
