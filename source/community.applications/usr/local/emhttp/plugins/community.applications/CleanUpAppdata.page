@@ -1,0 +1,70 @@
+Menu="CA"
+Title="Cleanup Appdata"
+Icon="cleanup.png"
+---
+<?
+?>
+<script>
+var URL = "/plugins/community.applications/include/exec.php";
+
+$(function() {
+  loadAppdata();
+});
+
+function loadAppdata() {
+  $.post(URL,{action:'getOrphanAppdata'},function(data) {
+    if (data) {
+      $("#settings").html(data);
+    }
+  });
+  $("#deleteButton").prop("disabled",true);
+}
+
+function selectAll() {
+  $('.appdata').each(function() {
+    $(this).prop("checked",true);
+  });
+  $("#deleteButton").prop("disabled",false);
+}
+
+function deleteAppdata() {
+  var paths = "";
+  var separator = "";
+  $('.appdata').each(function() {
+    if ( $(this).prop("checked") ) {
+      if ( paths ) {
+        separator = "*";
+      }
+      paths = paths + separator + $(this).val();
+    }
+  });
+
+  var displayPaths = paths.replace(/\*/g,", ");
+  swal({
+    title: "Are You Sure?",
+    text: "Are you sure you want to delete these folders? <b><font color='red'>" + displayPaths+"</font></b>",
+    type: "warning",
+    html: true,
+    closeOnConfirm: false,
+    showCancelButton: true,
+    confirmButtonText: "Delete",
+    showLoaderOnConfirm: true
+  }, function() {
+    swal("Deleting Folders","Depending upon the size of the folders, this may take a few minutes" + paths,"info");
+    $.post(URL,{action:'deleteAppdata',paths:paths},function(data) {
+      if (data) {
+        swal("Deleted","","success");
+        loadAppdata();
+      }
+    });
+  });
+  
+}
+</script>
+
+The following appdata paths have been determined (based upon your previously installed applications) to be no longer in use.  Select which ones you would like to be deleted<br><br>
+
+<input type='button' onclick='selectAll();' value='Select All' id='selectAll'><br><br>
+<span id='settings'></span>
+
+<input type='button' id='deleteButton' onclick='deleteAppdata();' value='Delete Selected' disabled><input type='button' onclick='done();' value='Done'>
