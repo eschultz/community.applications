@@ -64,8 +64,10 @@ jQuery(document).ready(function() {
 <a href='#settings'>General Settings</a><br>
 <a href='#autoupdate'>Auto Update Settings</a><br>
 <a href='#backupSettings'>Backup Appdata Settings</a><br>
+<a href='#deleteAppdata'>Cleanup Appdata</a><br>
 <a href='#othersettings'>Other Notes</a><br>
 <a href='#credits'>Credits</a><br>
+<a href='#beer'>Buy Me A Beer</a><br>
 
 
 <font color="red" size="3"><p id='overview'>Overview</p></font>
@@ -326,6 +328,12 @@ Destinations have to be sent to a share <b>and</b> to a disk.  The reasons for t
 
 
 <hr>
+<p id='deleteAppdata'></p>
+<font color='red' size='3'>Cleanup Appdata</font>
+
+If you have been using docker for a while, and installing and uninstalling various applications, your appdata share probably has a bunch of old folders and files which are no longer needed, and hard to delete due to their permission settings.  The Cleanup Appdata modules (Settings -> Community Applications section) will determine which appdata folders (based upon your previously installed docker applications) are no longer needed and then prompt you to delete them.
+This module will NOT touch any appdata folder which may be used for VMs, plugins, etc
+<hr>
 
 <p id='othersettings'></p>
 <font color="red" size="3">Other Notes</font>
@@ -342,6 +350,15 @@ Depending upon which browser you are using, there may be a slight delay (~1-2 se
 </div>
 
 <em>Community Applications</em> Copyright 2015-2016, Andrew Zawadzki
+<hr>
+<p id='beer'></p>
+Beer costs money...  If you like CA (or any of my other plugins) feel free to contribute
+<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+<input type="hidden" name="cmd" value="_s-xclick">
+<input type="hidden" name="hosted_button_id" value="7M7CBCVU732XG">
+<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
+</form>
 
 
 <strong>For any support issues with this plugin, go to <a href='http://lime-technology.com/forum/index.php?topic=40262.0' target='_blank'>Plugin Support Page</a>
