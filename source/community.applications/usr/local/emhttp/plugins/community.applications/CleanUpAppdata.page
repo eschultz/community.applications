@@ -3,15 +3,24 @@ Title="Cleanup Appdata"
 Icon="cleanup.png"
 ---
 <?
+$dockerRunning = is_dir("/var/lib/docker/tmp") ? "true" : "false";
 ?>
 <script>
 var URL = "/plugins/community.applications/include/exec.php";
 
 $(function() {
+  if ( "<?=$dockerRunning?>" == "false" ) {
+    swal({
+      title: "Docker Not Running",
+      text: "Because the docker service is not currently running, this module will prompt you to delete the appdata for any/all docker applications which are installed.",
+      type: "warning"
+    });
+  }
   loadAppdata();
 });
 
 function loadAppdata() {
+  $("#settings").html("<img src='/plugins/community.applications/images/spinner2.gif' width='48px'> Finding orphaned appdata");
   $.post(URL,{action:'getOrphanAppdata'},function(data) {
     if (data) {
       $("#settings").html(data);
@@ -63,6 +72,7 @@ function deleteAppdata() {
 </script>
 
 The following appdata paths have been determined (based upon your previously installed applications) to be no longer in use.  Select which ones you would like to be deleted<br><br>
+Note that this module looks at all of your previously installed docker applications to determine which appdata folders are abandoned.  If you have deleted the previously installed list (either through Community Applications or manually), then it will not display those result.  IE:  If there is not a record for the folder within the previously installed apps, then you will not be prompted to delete the folder.<br><br>
 
 <input type='button' onclick='selectAll();' value='Select All' id='selectAll'><br><br>
 <span id='settings'></span>
