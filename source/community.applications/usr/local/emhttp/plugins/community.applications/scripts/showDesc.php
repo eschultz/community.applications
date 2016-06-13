@@ -54,6 +54,19 @@ if ( $templateIndex === false ) {
 
 $repoIndex = searchArray($repos,"name",$template['RepoName']);
 $webPageURL = $repos[$repoIndex]['web'];
+$donatelink = $repos[$repoIndex]['donatelink'];
+$donateimg = $repos[$repoIndex]['donateimg'];
+$donatetext = $repos[$repoIndex]['donatetext'];
+
+if ( $template['DonateLink'] ) {
+  $donatelink = $template['DonateLink'];
+}
+if ( $template['DonateImg'] ) {
+  $donateimg = $template['DonateImg'];
+}
+if ( $template['DonateText'] ) {
+  $donatetext = $template['DonateText'];
+}
 
 $name = $template['Name'];
 
@@ -104,7 +117,7 @@ $templateDescription .= "</td></tr>";
 
 if ( $template['Private'] == "true" ) {
     $templateDescription .= "<tr><td></td><td><font color=red>Private Repository</font></td></tr>";
-  }
+}
 $templateDescription .= "<tr><td><strong>Categories: </strong></td><td>".$category."</td></tr>";
 
 if ( $template['Plugin'] ) {
@@ -174,7 +187,11 @@ if ( $webPageURL ) {
 }
 
 $templateDescription .= "</tr></table>\n<span id='script'></span>";
-  
+
+if ( ($donatelink) && ($donateimg) ) {
+  $templateDescription .= "<br><br><center><font size='0'>$donatetext</font><br><a href='$donatelink' target='_blank'><img src='$donateimg' style='max-height:25px;'></a><br><font size='0'>The above link is set by the author of the template, not the author of Community Applications</font></center>";
+}
+
 $templateDescription .= "
   <script>
     document.getElementById('wait').innerHTML = '';

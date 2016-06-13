@@ -28,7 +28,22 @@ require_once 'webGui/include/Markdown.php';
     $template = $file[$templateIndex];
     $repoIndex = searchArray($repos,"name",$template['RepoName']);
     $webPageURL = $repos[$repoIndex]['web'];
+    
+    $donatelink = $repos[$repoIndex]['donatelink'];
+    $donateimg = $repos[$repoIndex]['donateimg'];
+    $donatetext = $repos[$repoIndex]['donatetext'];
+
+    if ( $template['DonateLink'] ) {
+      $donatelink = $template['DonateLink'];
+    }
+    if ( $template['DonateImg'] ) {
+      $donateimg = $template['DonateImg'];
+    }
+    if ( $template['DonateText'] ) {
+      $donatetext = $template['DonateText'];
+    }
   }
+  
   if ( $template['Plugin'] )
   {
     $appInformation = Markdown($template['Changes']);
@@ -52,6 +67,8 @@ require_once 'webGui/include/Markdown.php';
   }
 
   $appInformation .= "</tr></table>\n";
-
+  if ( ($donatelink) && ($donateimg) ) {
+    $appInformation .= "<br><br><center><font size='0'>$donatetext</font><br><a href='$donatelink' target='_blank'><img src='$donateimg' style='max-height:25px;'></a><br><font size='0'>The above link is set by the author of the template, not the author of Community Applications</font></center>";
+  }
   echo $appInformation;
 ?>

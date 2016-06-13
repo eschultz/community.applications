@@ -2,8 +2,8 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.applications">
 <!ENTITY author    "Andrew Zawadzki">
-<!ENTITY version   "2016.06.11a">
-<!ENTITY md5       "d8e2b606df586e155276b1b213eb8761">
+<!ENTITY version   "2016.06.12">
+<!ENTITY md5       "ca3894c81a8654298ddc61d2c559bd33">
 <!ENTITY launch    "Apps">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/community.applications">
@@ -13,7 +13,10 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
-###2016.06.11##
+###2016.06.12###
+- Miscellaneous enhancements and fixes
+
+###2016.06.11###
 - Added: New module to delete orphaned appdata folders
 - Better appdata determination if running unRaid 6.2+
 

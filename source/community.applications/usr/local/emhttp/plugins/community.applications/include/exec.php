@@ -252,6 +252,13 @@ function DownloadApplicationFeed() {
     $o['Support']       = $file['Support'];
     $o['IconWeb']       = $file['Icon'];
     $o['Path']          = $communityPaths['templates-community']."/".$i.".xml";
+    $o['DonateText']    = $file['DonateText'];
+    $o['DonateLink']    = $file['DonateLink'];
+    if ( $file['DonateImage'] ) {
+      $o['DonateImg'] = $file['DonateImage'];
+    } else {
+      $o['DonateImg']     = $file['DonateImg'];
+    }
     if ( $o['Plugin'] ) {
       $o['Author']        = $o['PluginAuthor'];
       $o['Repository']    = $o['PluginURL'];

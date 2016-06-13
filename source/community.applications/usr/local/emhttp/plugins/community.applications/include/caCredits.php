@@ -33,19 +33,10 @@ $caCredits = "
         <td><strong>CHBMB</strong></td>
         <td>Additional Testing</td>
       </tr>
-      <tr>
-        <td><img src='http://lime-technology.com/forum/index.php?action=dlattach;attach=26324;type=avatar' width='48px' height='48px'></td>
-        <td><strong>eschutlz</strong></td>
-        <td>Security Consultant</td>
-      </tr>
-      <tr>
-        <td><img src='http://rymimg.com/lk/f/a/24cda6e4f96346a414050b9de27971e3/1118001.jpg' width='48px' height='48px'></td>
-        <td><strong>Stompin' Tom Connors</strong></td>
-        <td>Entertainment</td>
-      </tr>
     </table></center>
     <br>
     <center><em><font size='1'>Copyright 2015-2016 Andrew Zawadzki</font></em></center>
+    <center><a href='https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7M7CBCVU732XG' target='_blank'><img src='https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif'></a></center>
     <br><center><a href='http://lime-technology.com/forum/index.php?topic=40262.0' target='_blank'>Plugin Support Thread</a></center>
   ";
   $caCredits = str_replace("\n","",$caCredits);

@@ -295,6 +295,8 @@ function fixTemplates($template) {
 
   $template['Support'] = validURL($template['Support']);
   $template['Project'] = validURL($template['Project']);
+  $template['DonateLink'] = validURL($template['DonateLink']);
+  $template['DonateImg'] = validURL($template['DonateImg']);
 
   
   # support v6.2 redefining deprecating the <Beta> tag and moving it to a category
@@ -440,7 +442,14 @@ function readXmlFile($xmlfile) {
   $o['Support']     = ($doc->getElementsByTagName( "Support" )->length ) ? $doc->getElementsByTagName( "Support" )->item(0)->nodeValue : $Repo['forum'];
   $o['Support']     = $o['Support'];
   $o['IconWeb']     = stripslashes($doc->getElementsByTagName( "Icon" )->item(0)->nodeValue);
-
+  $o['DonateText']  = $doc->getElementsByTagName("DonateText")->item(0)->nodeValue;
+  $o['DonateLink']  = $doc->getElementsByTagName( "DonateLink")->item(0)->nodeValue;
+  if ( $doc->getElementsByTagName("DonateImage")->item(0)->nodeValue ) {
+    $o['DonateImg'] = $doc->getElementsByTagName( "DonateImage")->item(0)->nodeValue;
+  } else {
+    $o['DonateImg']   = $doc->getElementsByTagName( "DonateImg")->item(0)->nodeValue;
+  }
+  
   return $o;
 }
 
