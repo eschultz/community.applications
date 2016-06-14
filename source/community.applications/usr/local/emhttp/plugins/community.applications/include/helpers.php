@@ -297,7 +297,8 @@ function fixTemplates($template) {
   $template['Project'] = validURL($template['Project']);
   $template['DonateLink'] = validURL($template['DonateLink']);
   $template['DonateImg'] = validURL($template['DonateImg']);
-
+  $template['DonateText'] = str_replace("'","&#39;",$template['DonateText']);
+  $template['DonateText'] = str_replace('"','&quot;',$template['DonateText']);
   
   # support v6.2 redefining deprecating the <Beta> tag and moving it to a category
   if ( stripos($template['Category'],":Beta") ) {

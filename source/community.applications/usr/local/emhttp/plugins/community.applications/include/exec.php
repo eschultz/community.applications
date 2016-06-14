@@ -163,6 +163,16 @@ function DownloadCommunityTemplates() {
         if (!$o['Support']) {
           $o['Support'] = $o['Announcement'];
         }
+
+        if ( ! $o['DonateText'] ) {
+          $o['DonateText'] = $Repo['donatetext'];
+        }
+        if ( ! $o['DonateLink'] ) {
+          $o['DonateLink'] = $Repo['donatelink'];
+        }
+        if ( ! $o['DonateImg'] ) {
+          $o['DonateImg'] = $Repo['donateimg'];
+        }
         fixSecurity($o);
         $o = fixTemplates($o);
         $o['Compatible'] = versionCheck($o);
@@ -196,7 +206,10 @@ function DownloadApplicationFeed() {
   } else {
     $moderation = array();
   }
-
+  $Repositories = readJsonFile($communityPaths['Repositories']);
+  if ( ! $Repositories ) {
+    $Repositories = array();
+  }
   $downloadURL = randomFile();
 
   if ($download = download_url($communityPaths['application-feed'],$downloadURL) ){
@@ -252,13 +265,7 @@ function DownloadApplicationFeed() {
     $o['Support']       = $file['Support'];
     $o['IconWeb']       = $file['Icon'];
     $o['Path']          = $communityPaths['templates-community']."/".$i.".xml";
-    $o['DonateText']    = $file['DonateText'];
-    $o['DonateLink']    = $file['DonateLink'];
-    if ( $file['DonateImage'] ) {
-      $o['DonateImg'] = $file['DonateImage'];
-    } else {
-      $o['DonateImg']     = $file['DonateImg'];
-    }
+
     if ( $o['Plugin'] ) {
       $o['Author']        = $o['PluginAuthor'];
       $o['Repository']    = $o['PluginURL'];
@@ -266,7 +273,25 @@ function DownloadApplicationFeed() {
       $o['SortAuthor']    = $o['Author'];
       $o['SortName']      = $o['Name'];
     }
-
+    $RepoIndex = searchArray($Repositories,"name",$o['RepoName']);
+    if ( $RepoIndex != false ) {
+      $o['DonateText'] = $Repositories[$RepoIndex]['donatetext'];
+      $o['DonateImg'] = $Repositories[$RepoIndex]['donateimg'];
+      $o['DonateLink'] = $Repositories[$RepoIndex]['donatelink'];
+    }
+    if ( $file['DonateText'] ) {
+      $o['DonateText']    = $file['DonateText'];
+    }
+    if ( $file['DonateLink'] ) {
+      $o['DonateLink']    = $file['DonateLink'];
+    }
+    if ( ($file['DonateImg']) || ($file['DonateImage']) ) {
+      if ( $file['DonateImage'] ) {
+        $o['DonateImg'] = $file['DonateImage'];
+      } else {
+        $o['DonateImg']     = $file['DonateImg'];
+      }
+    }
     # Apply various fixes to the templates for CA use
     fixSecurity($o);
     $o = fixTemplates($o);
@@ -660,6 +685,9 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
         if ( $template['Project'] ) {
           $t .= "<a target='_blank' title='Click to go the the Project Home Page' href='".$template['Project']."'><font color=red>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Project Home Page</font></a>";
         }
+        if ( $template['DonateLink'] ) {
+          $t .= "<br><font size='0'><a href='".$template['DonateLink']."' target='_blank' title='".$template['DonateText']."'>Donate To Author</a></font>";
+        }
         $t .= "</center></font>";
         $t .= "</td>";
       }
@@ -751,6 +779,15 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
         }  else {
             $t .= "<br><center><font color='red'><b>Update Available.  Click <a href='Docker'>Here</a> to install</b></font></center>";
         }
+      }
+      $t .= "</b></strong><center>";
+      $t .= ($template['Support']) ? "<a href='".$template['Support']."' target='_blank' title='Click to go to the support thread'><font color=red>Support Thread</font></a>" : "";
+
+      if ( $template['Project'] ) {
+        $t .= "<a target='_blank' title='Click to go the the Project Home Page' href='".$template['Project']."'><font color=red>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Project Home Page</font></a>";
+      }
+      if ( $template['DonateLink'] ) {
+        $t .= "<font size='0'><a href='".$template['DonateLink']."' target='_blank'  title='".addslashes($template['DonateText'])."'>&nbsp;&nbsp;&nbsp;&nbsp;Donate To Author</a></font>";
       }
 
       $t .= "</td>";
@@ -1215,7 +1252,9 @@ case 'force_update':
 
   $tmpFileName = randomFile();
 
-  download_url($communityPaths['repositoriesURL'],$tmpFileName);
+  download_url($communityPaths['community-templates-url'],$tmpFileName);
+  $Repositories = readJsonFile($tmpFileName);
+  writeJsonFile($communityPaths['Repositories'],$Repositories);
 
   $repositoriesLogo = readJsonFile($tmpFileName);
   if ( ! is_array($repositoriesLogo) ) {
@@ -2141,6 +2180,39 @@ case 'getOrphanAppdata':
     }
   }
   $availableVolumes = $temp;
+
+  # remove from list any folders which are equivalent 
+  $tempArray = $availableVolumes;
+  foreach ( $availableVolumes as $volume ) {
+    $flag = false;
+    foreach ( $availableVolumes as $testVolume ) {
+      if ( $testVolume['HostDir'] == $volume['HostDir'] ) {
+        continue; # ie: its the same index in the array;
+      }
+     $cacheFolder = str_replace("/mnt/user/","/mnt/cache/",$volume['HostDir']);
+     $userFolder = str_replace("/mnt/cache/","/mnt/user/",$volume['HostDir']);
+      if ( startswith($testVolume['HostDir'],$cacheFolder) || startsWith($testVolume['HostDir'],$userFolder) ) {
+        $flag = true;
+        break;
+      }
+    }
+    if ( $flag ) {
+      unset($tempArray[$volume['HostDir']]);
+    }
+  }
+  $availableVolumes = $tempArray;
+  
+  foreach ($tempArray as $testVolume) {
+    foreach ($installedDocker['Volumes'] as $volume) {
+      $folders = explode(":",$volume);
+      $cacheFolder = str_replace("/mnt/user/","/mnt/cache/",$folders[0]);
+      $userFolder = str_replace("/mnt/cache/","/mnt/user/",$folders[0]);
+      if ( startswith($cacheFolder,$testVolume['HostDir']) || startsWith($userFolder,$testVolume['HostDir']) ) {
+        unset($availableVolumes[$testVolume['HostDir']]);
+      }
+    }
+  }
+  
   if ( empty($availableVolumes) ) {
     echo "No orphaned appdata folders found <script>$('#selectAll').prop('disabled',true);</script>";
   } else {

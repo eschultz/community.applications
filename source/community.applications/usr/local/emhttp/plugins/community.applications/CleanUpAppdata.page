@@ -51,7 +51,7 @@ function deleteAppdata() {
   var displayPaths = paths.replace(/\*/g,", ");
   swal({
     title: "Are You Sure?",
-    text: "Are you sure you want to delete these folders? <b><font color='red'>" + displayPaths+"</font></b>",
+    text: "Are you sure you want to delete these folders? <strong>Read this carefully as there is no recovery in the event of a mistake</strong><br><b><font color='red'>" + displayPaths+"</font></b>",
     type: "warning",
     html: true,
     closeOnConfirm: false,

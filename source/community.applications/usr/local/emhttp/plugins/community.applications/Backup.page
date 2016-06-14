@@ -53,8 +53,11 @@ foreach ($sharesList as $addShare) {
   }
   logger("Found share $addShare on cache drive");
   if ( is_dir("/mnt/user0/$addShare") ) {
-    logger("Share $addShare is not exclusively stored on cache drive.  Skipping as potential source");
-    continue;
+    $dirContents = array_diff(scandir("/mnt/user0/$addShare"),array(".",".."));
+    if ( ! empty($dirContents) ) {
+      logger("Share $addShare is not exclusively stored on cache drive.  Skipping as potential source");
+      continue;
+    }
   }
   if ( $backupOptions['source'] == "/mnt/cache/$addShare" ) {
     $selected = "selected";
@@ -377,7 +380,7 @@ function backupNow() {
   
   swal({
     title: "Backup Appdata",
-    text: "This will backup your apdata folder from <font color='red'><em>"+source+"</em></font> to <font color='red'><em>"+destination+" ("+destinationDisk+")",
+    text: "This will backup your appdata folder from <font color='red'><em>"+source+"</em></font> to <font color='red'><em>"+destination+" ("+destinationDisk+")",
     showCancelButton: true,
     closeOnConfirm: true,
     type: "warning",

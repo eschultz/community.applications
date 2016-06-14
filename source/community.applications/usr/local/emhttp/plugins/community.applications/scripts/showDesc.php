@@ -35,7 +35,10 @@ if ( $communitySettings['dockerRunning'] ) {
 $appNumber =  urldecode($_GET['appNumber']);
 
 $file = readJsonFile($communityPaths['community-templates-info']);
-$repos = readJsonFile($communityPaths['community-templates-url']);
+$repos = readJsonFile($communityPaths['Repositories']);
+if ( ! $repos ) {
+  $repos = array();
+}
 $displayed = readJsonFile($communityPaths['community-templates-displayed']);
 
 $templateIndex = searchArray($displayed['community'],"ID",$appNumber);
@@ -54,19 +57,11 @@ if ( $templateIndex === false ) {
 
 $repoIndex = searchArray($repos,"name",$template['RepoName']);
 $webPageURL = $repos[$repoIndex]['web'];
-$donatelink = $repos[$repoIndex]['donatelink'];
-$donateimg = $repos[$repoIndex]['donateimg'];
-$donatetext = $repos[$repoIndex]['donatetext'];
 
-if ( $template['DonateLink'] ) {
-  $donatelink = $template['DonateLink'];
-}
-if ( $template['DonateImg'] ) {
-  $donateimg = $template['DonateImg'];
-}
-if ( $template['DonateText'] ) {
-  $donatetext = $template['DonateText'];
-}
+$donatelink = $template['DonateLink'];
+$donateimg = $template['DonateImg'];
+$donatetext = $template['DonateText'];
+
 
 $name = $template['Name'];
 
@@ -189,9 +184,11 @@ if ( $webPageURL ) {
 $templateDescription .= "</tr></table>\n<span id='script'></span>";
 
 if ( ($donatelink) && ($donateimg) ) {
-  $templateDescription .= "<br><br><center><font size='0'>$donatetext</font><br><a href='$donatelink' target='_blank'><img src='$donateimg' style='max-height:25px;'></a><br><font size='0'>The above link is set by the author of the template, not the author of Community Applications</font></center>";
+  $templateDescription .= "<br><center><font size='0'>$donatetext</font><br><a href='$donatelink' target='_blank'><img src='$donateimg' style='max-height:25px;'></a>";
+  if ( $template['RepoName'] != "Squid's plugin Repository" ) {
+    $templateDescription .= "<br><font size='0'>The above link is set by the author of the template, not the author of Community Applications</font></center>";
+  }
 }
-
 $templateDescription .= "
   <script>
     document.getElementById('wait').innerHTML = '';
