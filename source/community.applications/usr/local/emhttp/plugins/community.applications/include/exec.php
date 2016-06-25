@@ -1719,6 +1719,7 @@ case 'previous_apps':
         $o = readXmlFile("/boot/config/plugins/dockerMan/templates-user/$xmlfile");
         $o['MyPath'] = "/boot/config/plugins/dockerMan/templates-user/$xmlfile";        
         $o['UnknownCompatible'] = true;
+        $o['Removable'] = true;
 # is the container running?
 
         $flag = false;

@@ -222,9 +222,11 @@ function validateOptions(initialization) {
     $("#deleteOldBackup").val("");
   }
   
+
   var excludeButton = "<input type='button' id='excludedFolders' name='excludedFolders' value='Add' data-pickfilter='HIDE_FILES_FILTER' data-pickmultiselect='true' data-pickroot='/mnt/user' data-pickfolders='true'>";
   
   destinationShare = destinationShare.replace("/mnt/user/","");
+ 
   $("#destinationShare").val(destinationShare);
   $('#excludedSpan').html(" ");
   $('#excludedSpan').html(excludeButton);
@@ -419,12 +421,12 @@ function abort() {
   <td><select id='source' onchange='changeSource();'><?=$sourceShares?></select></td>
 </tr>
 <tr>
-  <td><b>Save To Disk #:</b></td>
+  <td><b>Save To Disk #:</b><br>Backups and restores may not complete without error<br>when using an Unassigned Devices Mount Point</b></td>
   <td><select id='destination' onchange='validateOptions();'><?=$destinationShares?></select></td>
 </tr>
 <tr>
-  <td><b>Destination Share:</b></td>
-  <td><input type='text' id="destinationShare" name="shareFolder" value="/mnt/user" data-pickfilter="HIDE_FILES_FILTER" data-pickroot="/mnt/user/" data-pickfolders="true" onchange='validateOptions();'></td>
+  <td><b>Destination Share:</b><br>If using an Unassigned Devices mount as save to Disk #,<br> manually type in the destination folder here</td>
+  <td><input type='text' id="destinationShare" name="shareFolder" value="/mnt/user" data-pickfilter="HIDE_FILES_FILTER" data-pickroot="/mnt/user" data-pickfolders="true" onchange='validateOptions();'></td>
 </tr>
 <tr>
   <td><b>Excluded Folders:</b></td>
