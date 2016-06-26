@@ -353,7 +353,6 @@ function checkBackup() {
 }
 
 function restoreBackup() {
-  var source = $('#destinationShare').val()+ " ("+$('#destination').val() + ")";
   var destination = $('#source').val();
   var datedBackup = $("#datedBackup").val();
   
@@ -362,10 +361,11 @@ function restoreBackup() {
   } else {
     var availableDates = "";
   }
-  
+  var source = $('#destinationShare').val()+ availableDates + " ("+$('#destination').val() + ")";
+
   swal({
     title: "Are you sure?",
-    text: "This will restore your appdata folder from <b><em><font color='red'>" + source + "</em></b></font> to <em><b><font color='red'>" + destination + "/" + availableDates,
+    text: "This will restore your appdata folder from <b><em><font color='red'>" + source + "</em></b></font> to <em><b><font color='red'>" + destination,
     showCancelButton: true,
     html: true,
     type: "warning",

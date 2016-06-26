@@ -137,6 +137,12 @@ if ( $restore ) {
 } else {
   $source = $backupOptions['source']."/";
   $destination = $backupOptions['destination']."/".$backupOptions['destinationShare'];
+  $usbDestination = $source."Community_Applications_USB_Backup";
+  logger("Backing up USB Flash drive config folder to $usbDestination");
+  exec("rm -rf '$usbDestination'");
+  exec("mkdir -p '$usbDestination'");
+  exec("cp /boot/* '$usbDestination' -R -v");
+  unlink($usbDestination."/config/super.dat");
 }
 if ( $backupOptions['dockerIMG'] == "exclude" ) {
   $dockerIMGFilter = '--exclude "'.str_replace($backupOptions['source']."/","",$dockerSettings['DOCKER_IMAGE_FILE']).'"';

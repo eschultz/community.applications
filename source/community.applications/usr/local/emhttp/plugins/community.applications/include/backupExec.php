@@ -158,8 +158,10 @@ case 'abortBackup':
 case 'getDates':
   $backupOptions['destinationShare'] = isset($_POST['destinationShare']) ? urldecode(($_POST['destinationShare'])) : "";
   $backupOptions['destination'] = isset($_POST['destination']) ? urldecode(($_POST['destination'])) : "";
-  $availableDates = array_diff(scandir($backupOptions['destination']."/".$backupOptions['destinationShare']),array(".",".."));
-
+  $availableDates = @array_diff(@scandir($backupOptions['destination']."/".$backupOptions['destinationShare']),array(".",".."));
+  if ( ! is_array($availableDates) ) {
+    $availableDates = array();
+  }
   $output = "<select id='date'>";
   foreach ($availableDates as $date) {
     $output .= "<option value='$date'>$date</option>";
