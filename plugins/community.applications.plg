@@ -2,8 +2,8 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.applications">
 <!ENTITY author    "Andrew Zawadzki">
-<!ENTITY version   "2016.06.26">
-<!ENTITY md5       "c6cf2d58f231a04f7bec9c6cf77d462a">
+<!ENTITY version   "2016.06.26a">
+<!ENTITY md5       "5faa4fea48185f0f91338b4b036fcbdd">
 <!ENTITY launch    "Apps">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/community.applications">
@@ -14,6 +14,7 @@
 
 <CHANGES>
 ###2016.06.26###
+- Backup options not displaying the set value for save log to flash
 - Fix improper displaying of source and destination on popup (restore)
 - Suppress errors displayed when selecting a UD mount for backup purposes
 - Added in backup of flash drive (sans super.dat) to docker appdata prior to backing up to array

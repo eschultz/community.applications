@@ -136,6 +136,7 @@ $(function() {
   $("#startScript").val("<?=$backupOptions['startScript']?>");
   $("#stopScript").val("<?=$backupOptions['stopScript']?>");
   $("#notification").val("<?=$backupOptions['notification']?>");
+  $("#logBackup").val("<?=$backupOptions['logBackup']?>");
   
   $("#destinationShare").fileTreeAttach();
   $("#startScript").fileTreeAttach();
