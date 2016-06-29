@@ -142,7 +142,13 @@ if ( $restore ) {
   exec("rm -rf '$usbDestination'");
   exec("mkdir -p '$usbDestination'");
   exec("cp /boot/* '$usbDestination' -R -v");
-  unlink($usbDestination."/config/super.dat");
+  $availableDisks = parse_ini_file("/var/local/emhttp/disks.ini",true);
+  $txt .= "Current Disk Assignments:\r\n";
+  foreach ($availableDisks as $Disk) {
+    $txt .= "Disk: ".$Disk['name']."  Device: ".$Disk['id']."  Status: ".$Disk['status']."\r\n";
+  }
+  file_put_contents("$usbDestination/config/DISK ASSIGNMENTS.txt",$txt);
+  exec("mv '$usbDestination/config/super.dat' '$usbDestination/config/super.dat.CA_BACKUP'");
 }
 if ( $backupOptions['dockerIMG'] == "exclude" ) {
   $dockerIMGFilter = '--exclude "'.str_replace($backupOptions['source']."/","",$dockerSettings['DOCKER_IMAGE_FILE']).'"';

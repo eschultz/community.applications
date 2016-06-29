@@ -2,8 +2,8 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.applications">
 <!ENTITY author    "Andrew Zawadzki">
-<!ENTITY version   "2016.06.26a">
-<!ENTITY md5       "5faa4fea48185f0f91338b4b036fcbdd">
+<!ENTITY version   "2016.06.29">
+<!ENTITY md5       "2920f8636bf3f6719cc1bb8edc2fc0cf">
 <!ENTITY launch    "Apps">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/community.applications">
@@ -13,6 +13,9 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
+###2016.06.29###
+- Backup Disk Assignments and super.dat (renamed) as part of USB backup
+
 ###2016.06.26###
 - Backup options not displaying the set value for save log to flash
 - Fix improper displaying of source and destination on popup (restore)
