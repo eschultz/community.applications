@@ -141,13 +141,14 @@ if ( $restore ) {
   logger("Backing up USB Flash drive config folder to $usbDestination");
   exec("rm -rf '$usbDestination'");
   exec("mkdir -p '$usbDestination'");
-  exec("cp /boot/* '$usbDestination' -R -v");
   $availableDisks = parse_ini_file("/var/local/emhttp/disks.ini",true);
-  $txt .= "Current Disk Assignments:\r\n";
+  $txt .= "Disk Assignments as of ".date(DATE_RSS)."\r\n";
   foreach ($availableDisks as $Disk) {
     $txt .= "Disk: ".$Disk['name']."  Device: ".$Disk['id']."  Status: ".$Disk['status']."\r\n";
   }
-  file_put_contents("$usbDestination/config/DISK ASSIGNMENTS.txt",$txt);
+  file_put_contents("/boot/config/DISK_ASSIGNMENTS.txt",$txt);
+  exec("cp /boot/* '$usbDestination' -R -v");
+
   exec("mv '$usbDestination/config/super.dat' '$usbDestination/config/super.dat.CA_BACKUP'");
 }
 if ( $backupOptions['dockerIMG'] == "exclude" ) {

@@ -2,8 +2,8 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.applications">
 <!ENTITY author    "Andrew Zawadzki">
-<!ENTITY version   "2016.06.29">
-<!ENTITY md5       "2920f8636bf3f6719cc1bb8edc2fc0cf">
+<!ENTITY version   "2016.06.29a">
+<!ENTITY md5       "4fe301dbbb34643b359de0d8bb1e2108">
 <!ENTITY launch    "Apps">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/community.applications">
@@ -13,6 +13,9 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
+###2016.06.29a###
+- Because RobJ wants perfection :)
+
 ###2016.06.29###
 - Backup Disk Assignments and super.dat (renamed) as part of USB backup
 
