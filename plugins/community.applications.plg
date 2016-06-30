@@ -13,9 +13,6 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
-###2016.06.29a###
-- Because RobJ wants perfection :)
-
 ###2016.06.29###
 - Backup Disk Assignments and super.dat (renamed) as part of USB backup
 
