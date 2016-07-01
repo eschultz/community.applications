@@ -406,6 +406,7 @@ function readXmlFile($xmlfile) {
   $o['Name']        = stripslashes($doc->getElementsByTagName( "Name" )->item(0)->nodeValue);
   $o['DockerHubName'] = strtolower($o['Name']);
   $o['Beta']        = strtolower(stripslashes($doc->getElementsByTagName( "Beta" )->item(0)->nodeValue));
+  $o['BaseImage']   = $doc->getElementsByTagName( "BaseImage ")->item(0)->nodeValue;
   $o['Changes']     = $doc->getElementsByTagName( "Changes" )->item(0)->nodeValue;
   $o['Date']        = $doc->getElementsByTagName( "Date" ) ->item(0)->nodeValue;
   $o['Project']     = $doc->getElementsByTagName( "Project" ) ->item(0)->nodeValue;

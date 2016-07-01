@@ -293,6 +293,10 @@ This sets which share (and subfolder if chosen) to store the backup to (see note
 <font color="purple">Excluded Folders</font><br>
 Use the excluded folder browser to select which folders within your appdata share to <em>not</em> include in the backup (ie: if you are also storing VM images within the appdata folder)
 
+<font color='purple'>Backup USB Flash Drive</font><br>
+This will backup up your USB flash drive.  Settings are (Same folder as appdata, separate folder, don't backup).  An additional file is automatically added to the config folder of the backup (and on the flash drive) called DISK ASSIGNMENTS.txt)  This contains all of the drive assignments (Parity, cache, disk1, etc) current as of the backup time.  /boot/config/super.dat is renamed just in case of a hardware change happening inbetween backups (ie: the parity disk at the backup was exchanged and the original placed into the array) which can cause data loss.<br>
+Also, note that in the case of the destination being placed on the array (pretty much guaranteed in the case of same folder as appdata), then in the event of a complete flash failure, you cannot gain access to any of the backed up settings until you assign all of the disks back.  For the ultimate in protection, use the unassigned devices plugin and set the destination to be a SMB share from your desktop computer.
+
 <font color="purple">Notification Settings</font><br>
 This determines under what circumstances a notification (set up via Settings - Notification Settings) is sent:  (Disabled, Start And Stop, Completion Only, Errors Only)
 
@@ -322,7 +326,7 @@ This option is available when creating separate foldersfor each backup.  When it
 
 NOTES:
 
-<b>All files within your chosen destination folder will be deleted during a backup process</b>
+<font size='3'><b>All files within your chosen destination folder will be deleted during a backup process</b></font>
 
 Destinations have to be sent to a share <b>and</b> to a disk.  The reasons for this is due to symlinks (which is a subject unto itself), but the net result is that the only way to guarantee a successful backup / restore is to send the backup to a disk share.
 

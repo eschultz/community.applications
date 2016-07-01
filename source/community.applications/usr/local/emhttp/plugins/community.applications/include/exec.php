@@ -246,6 +246,7 @@ function DownloadApplicationFeed() {
     $o['Project']       = $file['Project'];
     $o['ID']            = $i;
     $o['Base']          = $file['Base'];
+    $o['BaseImage']     = $file['BaseImage'];
     $o['SortAuthor']    = $o['Author'];
     $o['SortName']      = $o['Name'];
     $o['Licence']       = $file['License']; # Support Both Spellings

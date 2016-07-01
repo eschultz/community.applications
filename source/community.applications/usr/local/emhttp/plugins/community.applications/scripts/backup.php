@@ -71,6 +71,9 @@ $dockerClient = new DockerClient();
 $dockerRunning = $dockerClient->getDockerContainers();
 
 $backupOptions = readJsonFile($communityPaths['backupOptions']);
+
+if ( ! $backupOptions['backupFlash'] ) { $backupOptions['backupFlash'] = "appdata"; }
+
 $basePathBackup = $backupOptions['destination']."/".$backupOptions['destinationShare'];
 
   
@@ -137,19 +140,26 @@ if ( $restore ) {
 } else {
   $source = $backupOptions['source']."/";
   $destination = $backupOptions['destination']."/".$backupOptions['destinationShare'];
-  $usbDestination = $source."Community_Applications_USB_Backup";
-  logger("Backing up USB Flash drive config folder to $usbDestination");
-  exec("rm -rf '$usbDestination'");
-  exec("mkdir -p '$usbDestination'");
-  $availableDisks = parse_ini_file("/var/local/emhttp/disks.ini",true);
-  $txt .= "Disk Assignments as of ".date(DATE_RSS)."\r\n";
-  foreach ($availableDisks as $Disk) {
-    $txt .= "Disk: ".$Disk['name']."  Device: ".$Disk['id']."  Status: ".$Disk['status']."\r\n";
+  if ( $backupOptions['backupFlash'] == "appdata" ) {
+    $usbDestination = $source."Community_Applications_USB_Backup";
+  } else {
+    $usbDestination = $backupOptions['usbDestination'];
   }
-  file_put_contents("/boot/config/DISK_ASSIGNMENTS.txt",$txt);
-  exec("cp /boot/* '$usbDestination' -R -v");
+  if ( $backupOptions['backupFlash'] != "no" ) {
+    logger("Deleting Old USB Backup");
+    exec("rm -rf '$usbDestination'");
+    logger("Backing up USB Flash drive config folder to $usbDestination");
+    exec("mkdir -p '$usbDestination'");
+    $availableDisks = parse_ini_file("/var/local/emhttp/disks.ini",true);
+    $txt .= "Disk Assignments as of ".date(DATE_RSS)."\r\n";
+    foreach ($availableDisks as $Disk) {
+      $txt .= "Disk: ".$Disk['name']."  Device: ".$Disk['id']."  Status: ".$Disk['status']."\r\n";
+    }
+    file_put_contents("/boot/config/DISK_ASSIGNMENTS.txt",$txt);
+    exec("cp /boot/* '$usbDestination' -R -v");
 
-  exec("mv '$usbDestination/config/super.dat' '$usbDestination/config/super.dat.CA_BACKUP'");
+    exec("mv '$usbDestination/config/super.dat' '$usbDestination/config/super.dat.CA_BACKUP'");
+  }
 }
 if ( $backupOptions['dockerIMG'] == "exclude" ) {
   $dockerIMGFilter = '--exclude "'.str_replace($backupOptions['source']."/","",$dockerSettings['DOCKER_IMAGE_FILE']).'"';

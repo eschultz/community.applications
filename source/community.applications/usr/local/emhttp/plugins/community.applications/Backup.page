@@ -29,6 +29,7 @@ if ( ! $backupOptions['notification'] ) {  $backupOptions['notification'] = "alw
 if ( ! $backupOptions['datedBackup'] ) { $backupOptions['datedBackup'] = "no"; }
 if ( ! $backupOptions['deleteOldBackup'] ) { $backupOptions['deleteOldBackup'] = "no"; }
 if ( ! $backupOptions['fasterRsync'] )  { $backupOptions['fasterRsync'] = "no"; }
+if ( ! $backupOptions['backupFlash'] ) { $backupOptions['backupFlash'] = "appdata"; }
 
 # fix destinationShare for compatibility with initial release
 
@@ -137,10 +138,13 @@ $(function() {
   $("#stopScript").val("<?=$backupOptions['stopScript']?>");
   $("#notification").val("<?=$backupOptions['notification']?>");
   $("#logBackup").val("<?=$backupOptions['logBackup']?>");
+  $("#backupFlash").val("<?=$backupOptions['backupFlash']?>");
+  $("#usbDestination").val("<?=$backupOptions['usbDestination']?>");
   
   $("#destinationShare").fileTreeAttach();
   $("#startScript").fileTreeAttach();
   $("#stopScript").fileTreeAttach();
+  $("#usbDestination").fileTreeAttach();
 
   var source = $("#source").val();
   $("#excludedFoldersList").fileTree({
@@ -212,6 +216,8 @@ function validateOptions(initialization) {
       break;
   }
   
+  var backupFlash = $("#backupFlash").val();
+  var usbDestination = $("#usbDestination").val();
   var source = $("#source").val();
   var destination = $("#destination").val();
   var destinationShare = $("#destinationShare").val();
@@ -222,7 +228,11 @@ function validateOptions(initialization) {
   if ( deleteOldBackup == 0 ) {
     $("#deleteOldBackup").val("");
   }
-  
+  if ( backupFlash == "separate" ) {
+    $("#usbDestination").prop("disabled",false);
+  } else {
+    $("#usbDestination").prop("disabled",true);
+  }
 
   var excludeButton = "<input type='button' id='excludedFolders' name='excludedFolders' value='Add' data-pickfilter='HIDE_FILES_FILTER' data-pickmultiselect='true' data-pickroot='/mnt/user' data-pickfolders='true'>";
   
@@ -252,7 +262,7 @@ function validateOptions(initialization) {
   stopScript = stopScript.trim();
   startScript = startScript.trim();
   
-  $.post(URL,{action:'validateBackupOptions',source:source,destinationShare:destinationShare,destination:destination,stopScript:stopScript,startScript:startScript}, function (data) {
+  $.post(URL,{action:'validateBackupOptions',usbDestination:usbDestination,backupFlash:backupFlash,source:source,destinationShare:destinationShare,destination:destination,stopScript:stopScript,startScript:startScript}, function (data) {
     if (data) {
       data = data.trim();
       if ( data == "NONE" ) {
@@ -277,6 +287,8 @@ function validateOptions(initialization) {
   
 function apply() {
   
+  var backupFlash = $("#backupFlash").val();
+  var usbDestination = $("#usbDestination").val();
   var source = $("#source").val();
   var destinationShare = $("#destinationShare").val();
   var destination = $("#destination").val();
@@ -300,12 +312,19 @@ function apply() {
   
   excluded = excluded.trim();
   
+  if ( backupFlash == "separate" ) {
+    var usbText = " and <font color='red'>"+usbDestination+"</font> (Flash Drive Destination) ";
+  } else {
+    var usbText = "";
+  }
+  
   var popUpText = "Warning: All files within <font color='red'>" + destinationShare + "</font> ";
   if ( excluded ) {
     popUpText = popUpText.concat("(excluding the " + excluded + " folders)");
   } else {
     popUpText = popUpText.concat("(including all folders)");
   }
+  popUpText = popUpText.concat(usbText);
   popUpText = popUpText.concat(" will be overwritten / deleted during a backup process!");
   swal({
     title: "Are You Sure?",
@@ -322,7 +341,7 @@ function apply() {
       stopScript = stopScript.trim();
       startScript = startScript.trim();
   
-      $.post(URL,{action:'applyBackupOptions',fasterRsync:fasterRsync,deleteOldBackup:deleteOldBackup,datedBackup:datedBackup,logBackup:logBackup,excluded:excluded,notification:notification,dockerIMG:dockerIMG,source:source,destinationShare:destinationShare,destination:destination,stopScript:stopScript,startScript:startScript,rsyncOption:rsyncOption,cronDay:cronDay,cronMonth:cronMonth,cronHour:cronHour,cronMinute:cronMinute,cronCustom:cronCustom,cronSetting:cronSetting,runRsync:runRsync});
+      $.post(URL,{action:'applyBackupOptions',usbDestination:usbDestination,backupFlash:backupFlash,fasterRsync:fasterRsync,deleteOldBackup:deleteOldBackup,datedBackup:datedBackup,logBackup:logBackup,excluded:excluded,notification:notification,dockerIMG:dockerIMG,source:source,destinationShare:destinationShare,destination:destination,stopScript:stopScript,startScript:startScript,rsyncOption:rsyncOption,cronDay:cronDay,cronMonth:cronMonth,cronHour:cronHour,cronMinute:cronMinute,cronCustom:cronCustom,cronSetting:cronSetting,runRsync:runRsync});
   
       validateOptions(true);
     });
@@ -434,6 +453,19 @@ function abort() {
   <td><input type='text' id='excluded' value='<?=$backupOptions['excluded']?>'></span></td>
   <td><center><b>Excluded Folder Browser</b><br><input type='button' value='Exclude Selected' onclick='setExcluded();'><br></center><div id='excludedFoldersList' style='width:305px;max-height:150px;overflow:scroll;position:absolute;z-index:100;'></div><br><center></td>
  </tr>
+<tr>
+  <td><b>Backup USB Flash Drive:</b></td>
+  <td><select id='backupFlash' onchange='validateOptions();'>
+    <option value='appdata'>Same Destination as Appdata</option>
+    <option value='separate'>Separate Destination</option>
+    <option value='no'>Don't Backup</option>
+    </select>
+  </td>
+</tr>
+<tr>
+  <td><b>USB Backup Destination:<b><br>See Manual</td>
+  <td><input type='text' id="usbDestination" name="usb destination" value="" placeholder='select a destination' data-pickfilter="HIDE_FILES_FILTER" data-pickroot="/mnt/" data-pickfolders="true" onchange='validateOptions();'></td>
+</tr>
 <tr>
   <td><b>Notification Settings:</b></td>
   <td><select id='notification' onchange='validateOptions();'>
@@ -572,7 +604,7 @@ function abort() {
   <td><input type='text' id='cronCustom' onchange='validateOptions();'></input></td>
 </tr>
 </table>
-<font size='3' color='red'><b>NOTE:</b></font> <b>All files</b> within your chosen destination share will be deleted when the backup runs.  Only select a share created <b>SPECIFICALLY<b> for appdata backup purposes<br>
+<font size='3' color='red'><b>NOTE: All files</b> within your chosen destinations will be deleted when the backup runs.  Only select a share created <b>SPECIFICALLY<b> for appdata (and USB) backup purposes</font><br>
 <span style='float:right; display:none;' id='availableDates'></span><br><br>
 <input type='button' value='Apply' id='Apply' onclick='apply();'><input type='button' value='Backup Now' id='Backup' onclick='backupNow();'><span style='float:right'><input type='button' value='Restore' id='restore' onclick='restoreBackup();'><input type='button' value='Abort' id='abort' onclick='abort();' disabled></span>
 </div><br>

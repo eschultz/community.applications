@@ -22,6 +22,8 @@ case 'validateBackupOptions':
   $stopScript = isset($_POST['stopScript']) ? urldecode(($_POST['stopScript'])) : "";
   $startScript = isset($_POST['startScript']) ? urldecode(($_POST['startScript'])) : "";
   $destinationShare = isset($_POST['destinationShare']) ? urldecode(($_POST['destinationShare'])) : "";
+  $backupFlash = isset($_POST['backupFlash']) ? urldecode(($_POST['backupFlash'])) : "";
+  $usbDestination = isset($_POST['usbDestination']) ?urldecode(($_POST['usbDestination'])) : "";
   
   $destinationShare = str_replace("/mnt/user/","",$destinationShare);
   $destinationShare = rtrim($destinationShare,'/');
@@ -44,7 +46,7 @@ case 'validateBackupOptions':
   }
   
   if ( basename($source) == $destinationShare ) {
-    $errors .= "Source and Destination Cannot Be The Same Share";
+    $errors .= "Source and Destination Cannot Be The Same Share<br>";
   }
   
   if ( $stopScript ) {
@@ -58,7 +60,7 @@ case 'validateBackupOptions':
   }
   if ( $startScript ) {
     if ( ! is_file($startScript) ) {
-      $errors .= "No Script at $startScript";
+      $errors .= "No Script at $startScript<br>";
     } else {
         if ( ! is_executable($startScript) ) {
         $errors .= "Start Script $startScript is not executable<br>";
@@ -66,6 +68,29 @@ case 'validateBackupOptions':
     }
   }
   
+  if ( $backupFlash == "separate" ) {
+    if ( ! $usbDestination ) {
+      $errors .= "Destination for the USB Backup Must Be Specified<br>";
+    } else {
+      $origUSBDestination = $usbDestination;
+      $availableDisks = parse_ini_file("/var/local/emhttp/disks.ini",true);
+      foreach ($availableDisks as $disk) {
+        $usbDestination = str_replace("/mnt/".$disk['name']."/","",$usbDestination);
+      }
+      $usbDestination = str_replace("/mnt/user0/","",$usbDestination);
+      $usbDestination = str_replace("/mnt/user/","",$usbDestination);
+      
+      if ( $usbDestination == "" ) {
+        $errors .= "USB Destination cannot be the root directory of /mnt/user or of a disk<br>";
+      }
+      if ( ! is_dir($origUSBDestination) ) {
+        $errors .= "USB Destination Not A Valid Directory<br>";
+      }
+    }
+  }
+  if ( startsWith($usbDestination,$destinationShare) ) {
+    $errors .= "USB Destination cannot be a sub-folder of Appdata destination<br>";
+  }
   if ( ! $errors ) {
     $errors = "NONE";
   }
@@ -100,6 +125,8 @@ case 'applyBackupOptions':
   $backupOptions['datedBackup'] = isset($_POST['datedBackup']) ? urldecode(($_POST['datedBackup'])) : "";
   $backupOptions['deleteOldBackup'] = isset($_POST['deleteOldBackup']) ? urldecode(($_POST['deleteOldBackup'])) : "";
   $backupOptions['fasterRsync'] = isset($_POST['fasterRsync']) ? urldecode(($_POST['fasterRsync'])) : "";
+  $backupOptions['backupFlash'] = isset($_POST['backupFlash']) ? urldecode(($_POST['backupFlash'])) : "";
+  $backupOptions['usbDestination'] = isset($_POST['usbDestination']) ?urldecode(($_POST['usbDestination'])) : "";
   
   $backupOptions['excluded'] = trim($backupOptions['excluded']);
   

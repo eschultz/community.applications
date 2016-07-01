@@ -118,9 +118,11 @@ $templateDescription .= "<tr><td><strong>Categories: </strong></td><td>".$catego
 if ( $template['Plugin'] ) {
   $template['Base'] = "<font color='red'>unRaid Plugin</font>";
 }
-
+if ( strtolower($template['Base']) == "unknown" ) {
+  $template['Base'] = $template['BaseImage'];
+}
 if ( ! $template['Base'] ) {
-  $template['Base'] = "unknown";
+  $template['Base'] = "Could Not Determine";
 }
 
 $templateDescription .= "<tr><td nowrap><strong>Base OS: </strong></td><td>".$template['Base']."</td></tr>";
