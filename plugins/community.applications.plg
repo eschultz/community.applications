@@ -2,8 +2,8 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.applications">
 <!ENTITY author    "Andrew Zawadzki">
-<!ENTITY version   "2016.07.01">
-<!ENTITY md5       "465af6d925c9c14a7c57b31cc5f6abc5">
+<!ENTITY version   "2016.07.01a">
+<!ENTITY md5       "7a27458a4a180178cec5e25bcac6efa0">
 <!ENTITY launch    "Apps">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/community.applications">

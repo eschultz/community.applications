@@ -72,14 +72,16 @@ $dockerRunning = $dockerClient->getDockerContainers();
 
 $backupOptions = readJsonFile($communityPaths['backupOptions']);
 
+if ( ! $backupOptions ) {
+  exit;
+}
+
 if ( ! $backupOptions['backupFlash'] ) { $backupOptions['backupFlash'] = "appdata"; }
 
 $basePathBackup = $backupOptions['destination']."/".$backupOptions['destinationShare'];
 
   
-if ( ! $backupOptions ) {
-  exit;
-}
+
 
 if ( ! $backupOptions['dockerIMG'] )     { $backupOptions['dockerIMG'] = "exclude"; }
 if ( ! $backupOptions['notification'] )  { $backupOptions['notification'] = "always"; }
