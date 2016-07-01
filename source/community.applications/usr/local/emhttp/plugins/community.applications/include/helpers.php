@@ -274,11 +274,12 @@ function fixTemplates($template) {
   if ( $template['Category'] == "" ) {
     $template['Category'] = "Uncategorized";
   }
+
   if ( !is_string($template['Overview']) ) {
     unset($template['Overview']);
   }
   if ( ! is_string($template['Category']) ) {
-    $template['Category'] = "";
+    $template['Category'] = "Uncategorized";
   }
   
   if ( strlen($template['Overview']) > 0 ) {
