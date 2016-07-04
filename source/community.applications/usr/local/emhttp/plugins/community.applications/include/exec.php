@@ -2162,6 +2162,9 @@ case 'getOrphanAppdata':
   # remove from the list the folders used by installed docker apps
   
   foreach ($info as $installedDocker) {
+    if ( ! is_array($installedDocker['Volumes']) ) {
+      continue;
+    }
      foreach ($installedDocker['Volumes'] as $volume) {
        $folders = explode(":",$volume);
        $cacheFolder = str_replace("/mnt/user/","/mnt/cache/",$folders[0]);

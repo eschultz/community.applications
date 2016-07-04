@@ -2,8 +2,8 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.applications">
 <!ENTITY author    "Andrew Zawadzki">
-<!ENTITY version   "2016.07.01a">
-<!ENTITY md5       "7a27458a4a180178cec5e25bcac6efa0">
+<!ENTITY version   "2016.07.04">
+<!ENTITY md5       "c8524532231aed2cbad532f17b26818a">
 <!ENTITY launch    "Apps">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/community.applications">
@@ -13,7 +13,10 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
-###2016-07.01###
+###2016.07.04###
+- Fixed cleanup appdata if an installed app doesn't have any volume mappings
+
+###2016.07.01###
 - Support Separate Destinations for Flash Drive Backup
 
 ###2016.06.29###
