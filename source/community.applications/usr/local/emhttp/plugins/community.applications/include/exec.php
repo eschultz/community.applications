@@ -2208,6 +2208,9 @@ case 'getOrphanAppdata':
   $availableVolumes = $tempArray;
   
   foreach ($tempArray as $testVolume) {
+    if ( ! $installedDocker['Volumes'] ) {
+      continue;
+    }
     foreach ($installedDocker['Volumes'] as $volume) {
       $folders = explode(":",$volume);
       $cacheFolder = str_replace("/mnt/user/","/mnt/cache/",$folders[0]);
