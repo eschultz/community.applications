@@ -2,8 +2,8 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.applications">
 <!ENTITY author    "Andrew Zawadzki">
-<!ENTITY version   "2016.07.04a">
-<!ENTITY md5       "b2b25dfe372ccae4213dc135f6df38fe">
+<!ENTITY version   "2016.07.08">
+<!ENTITY md5       "708461b44c4eda9b767a1281f7446cec">
 <!ENTITY launch    "Apps">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/community.applications">
@@ -13,6 +13,9 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
+###2016.07.08###
+- Bug fix on dockerHub searches vs recommended applications
+
 ###2016.07.04###
 - Fixed cleanup appdata if an installed app doesn't have any volume mappings
 

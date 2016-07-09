@@ -948,7 +948,7 @@ function displaySearchResults($pageNumber,$viewMode) {
         $result['Description'] = $template['Description'];
         $result['Description'] = str_replace("'","&#39;",$result['Description']);
         $result['Description'] = str_replace('"',"&quot;",$result['Description']);
-        $recommended = true;
+ #       $recommended = true;
       }
     }
 
