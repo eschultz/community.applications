@@ -2,8 +2,8 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.applications">
 <!ENTITY author    "Andrew Zawadzki">
-<!ENTITY version   "2016.07.08">
-<!ENTITY md5       "708461b44c4eda9b767a1281f7446cec">
+<!ENTITY version   "2016.07.16">
+<!ENTITY md5       "48c713d47d42a7d6a33710d611bf157e">
 <!ENTITY launch    "Apps">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/community.applications">
@@ -13,6 +13,9 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
+###2016.07.16###
+- Better logging for CA Backup
+
 ###2016.07.08###
 - Bug fix on dockerHub searches vs recommended applications
 

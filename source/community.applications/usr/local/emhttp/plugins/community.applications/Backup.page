@@ -10,7 +10,7 @@ Icon="backup.png"
 ###############################################################
 
 function logger($string) {
-  shell_exec("logger '$string'");
+  shell_exec("logger 'CA Backup: $string'");
 }
 
 $plugin = "community.applications";
@@ -34,6 +34,8 @@ if ( ! $backupOptions['backupFlash'] ) { $backupOptions['backupFlash'] = "appdat
 # fix destinationShare for compatibility with initial release
 
 $backupOptions['destinationShare'] = "/mnt/user/".$backupOptions['destinationShare'].'/';
+
+logger("Searching for valid source shares");
 
 $destinationShareList = array();
 $udList = array();
@@ -64,7 +66,12 @@ foreach ($sharesList as $addShare) {
     $selected = "selected";
   }    
   $sourceShares .= "<option value='/mnt/cache/$addShare' $selected>$addShare</option>";
+  $flag = true;
 }
+if ( ! $flag ) {
+  logger("No shares found exclusively stored on the cache drive");
+}
+
 foreach ($udList as $udShare) {
   $selected = "";
   if ( ! is_dir("/mnt/disks/$udShare") ) {
