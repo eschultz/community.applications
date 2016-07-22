@@ -1,0 +1,35 @@
+Menu="BackupMain:3"
+Title="Backup / Restore Status"
+---
+
+<script>
+
+var URL = "/plugins/community.applications/include/backupExec.php";
+
+
+$(function() {
+  setInterval(function() {
+    checkBackup();
+  }, 1000);
+});
+
+function checkBackup() {
+  $.post(URL,{action:'checkBackup'},function(data) {
+    if (data) {
+      $("#backupLines").html(data);
+    }
+  });
+}
+
+</script>
+
+<div style='border:1px;border-style:solid;border-color:red;height:250px;overflow:hidden' ><font size='2'>Backup / Restore Status: <span id='backupStatus'></span>
+<br>
+<span id='backupLines'><br><br><br></span></div>
+
+<input type='button' value='Abort' id='abort' onclick='abort();' disabled>
+
+<div class='tabbedOnly'>
+<center>For support for this plugin, visit here: <a href="http://lime-technology.com/forum/index.php?topic=40262.0" target="_blank">http://lime-technology.com/forum/index.php?topic=40262.0</a></center>
+
+</div>

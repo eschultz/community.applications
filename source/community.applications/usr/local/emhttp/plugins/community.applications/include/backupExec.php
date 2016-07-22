@@ -147,18 +147,43 @@ case 'applyBackupOptions':
 
 case 'checkBackup':
   if ( is_file($communityPaths['backupLog']) ) {
-    $backupLines = "<font size='0'>".shell_exec("tail -n2 ".$communityPaths['backupLog'])."</font>";
+    $backupLines = "<font size='0'>".shell_exec("tail -n10 ".$communityPaths['backupLog'])."</font>";
     $backupLines = str_replace("\n","<br>",$backupLines);
   } else {
     $backupLines = "<br><br><br>";
   }
   if ( is_file($communityPaths['backupProgress']) || is_file($communityPaths['restoreProgress']) ) {
-    $backupLines .= "<script>$('#backupStatus').html('<font color=red>Running</font> Your docker containers will be automatically restarted at the conclusion of the backup/restore');$('#restore').prop('disabled',true);$('#abort').prop('disabled',false);$('#Backup').attr('data-running','true');$('#Backup').prop('disabled',true);</script>";
+    $backupLines .= "
+      <script>$('#backupStatus').html('<font color=red>Running</font> Your docker containers will be automatically restarted at the conclusion of the backup/restore');
+      $('#restore').prop('disabled',true);
+      $('#abort').prop('disabled',false);
+      $('#Backup').attr('data-running','true');
+      $('#Backup').prop('disabled',true);
+      $('#deleteOldBackupSet').prop('disabled',true);
+      </script>";
   } else {
-    $backupLines .= "<script>$('#backupStatus').html('<font color=green>Not Running</font>');$('#abort').prop('disabled',true);$('#Backup').attr('data-running','false');if ( appliedChanges == false ) { $('#Backup').prop('disabled',false);}</script>";
-    if ( is_file($communityPaths['backupOptions']) ) {
-    $backupLines .= "<script>if ( appliedChanges == false ) { $('#restore').prop('disabled',false); } else { $('#restore').prop('disabled',true); }</script>";
+    $backupLines .= "
+    <script>
+    $('#backupStatus').html('<font color=green>Not Running</font>');
+    $('#abort').prop('disabled',true);
+    $('#deleteOldBackupSet').prop('disabled',false);
+    $('#Backup').attr('data-running','false');
+    if ( appliedChanges == false ) {
+      $('#Backup').prop('disabled',false);
     }
+    </script>";
+    if ( is_file($communityPaths['backupOptions']) ) {
+      $backupLines .= "
+      <script>if ( appliedChanges == false ) {
+        $('#restore').prop('disabled',false);
+      } else { 
+        $('#restore').prop('disabled',true);
+      }
+      </script>";
+    }
+  }
+  if ( is_file($communityPaths['deleteProgress']) ) {
+    $backupLines .= "<script>$('#deleteOldBackupSet').prop('disabled',true);</script>";
   }
   echo $backupLines;
   break;
@@ -176,6 +201,12 @@ case 'backupNow':
 case 'restoreNow':
   $backupOptions['availableDates'] = isset($_POST['availableDates']) ? urldecode(($_POST['availableDates'])) : "";
   shell_exec("/usr/local/emhttp/plugins/community.applications/scripts/restore.sh ".$backupOptions['availableDates']);
+  break;
+  
+case 'deleteOldBackupSets':
+  $backupOptions = readJsonFile($communityPaths['backupOptions']);
+  $deleteFolder = escapeshellarg("/mnt/user/".$backupOptions['destinationShare']);
+  shell_exec("/usr/local/emhttp/plugins/community.applications/scripts/deleteOldBackupSets.sh $deleteFolder");
   break;
   
 case 'abortBackup':
@@ -196,5 +227,9 @@ case 'getDates':
   $output .= "</select>";
   echo $output;
   break;
-  
+
+case 'getBackupShare':
+  $backupOptions = readJsonFile($communityPaths['backupOptions']);
+  echo "/mnt/user/".$backupOptions['destinationShare'];
+  break;
 }

@@ -1,0 +1,35 @@
+Menu="BackupMain:4"
+Title="Miscellaneous"
+---
+
+<script>
+function deleteOldBackup() {
+  $.post(URL,{action:'getBackupShare'},function(data) {
+    if (data) {
+      swal({
+        title: "Delete Old Backup Sets?",
+        text: "This will delete all files contained within <strong><font color='red'>"+data+"</font></strong>.  There is no recovery from this and cannot be aborted.  Are you really sure?",
+        showConfirmButton: true,
+        showCancelButton: true,
+        type: 'warning',
+        html: true
+      },function() {
+        $.post(URL,{action:'deleteOldBackupSets'});
+      });
+    }
+  });
+}
+</script>
+
+<table>
+<tr>
+  <td>This script will delete ALL of your old backup sets.  This is useful when transitioning from non-dated backup sets to dated backup sets and vice-versa</td>
+  <td><input type='button' value='Delete Old Backups' onclick='deleteOldBackup();' id='deleteOldBackupSet' disabled></td>
+</tr>
+</table>
+
+<div class='tabbedOnly'>
+<center>For support for this plugin, visit here: <a href="http://lime-technology.com/forum/index.php?topic=40262.0" target="_blank">http://lime-technology.com/forum/index.php?topic=40262.0</a></center>
+
+
+</div>

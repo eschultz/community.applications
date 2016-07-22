@@ -53,9 +53,11 @@ if ( ! is_file($communityPaths['backupOptions']) ) {
 }
 
 if ( is_file($communityPaths['backupProgress']) ) {
+  logger("Backup already in progress.  Aborting");
   exit;
 }
 if ( is_file($communityPaths['restoreProgress']) ) {
+  logger("Restore in progress. Aborting");
   exit;
 }
 @unlink($communityPaths['backupLog']);
@@ -126,12 +128,14 @@ if ( $backupOptions['notification'] == "always" ) {
   
 if ( $backupOptions['stopScript'] ) {
   logger("executing custom stop script ".$backupOptions['stopScript']);
+  file_put_contents($communityPaths['backupLog'],"Executing custom stop script",FILE_APPEND);
   shell_exec($backupOptions['stopScript']);
 }
 if ( is_array($dockerRunning) ) {
   foreach ($dockerRunning as $docker) {
     if ($docker['Running']) {
       logger("Stopping ".$docker['Name']);
+      file_put_contents($communityPaths['backupLog'],"Stopping ".$docker['Name']."\n",FILE_APPEND);
       shell_exec("docker stop ".$docker['Name']);
     }
   }
@@ -151,6 +155,7 @@ if ( $restore ) {
     logger("Deleting Old USB Backup");
     exec("rm -rf '$usbDestination'");
     logger("Backing up USB Flash drive config folder to $usbDestination");
+    file_put_contents($communityPaths['backupLog'],"Backing up USB Flash Drive\n",FILE_APPEND);
     exec("mkdir -p '$usbDestination'");
     $availableDisks = parse_ini_file("/var/local/emhttp/disks.ini",true);
     $txt .= "Disk Assignments as of ".date(DATE_RSS)."\r\n";
@@ -175,6 +180,7 @@ if ( $backupOptions['excluded'] ) {
   }
 }
 
+
 if ( $backupOptions['runRsync'] == "true" ) {
   if ( $restore ) {
     $logLine = "Restoring ";
@@ -184,6 +190,8 @@ if ( $backupOptions['runRsync'] == "true" ) {
   logger("$logLine appData from $source to $destination");
   $command = '/usr/bin/rsync '.$backupOptions['rsyncOption'].' '.$dockerIMGFilter.' '.$rsyncExcluded.' --log-file="'.$communityPaths['backupLog'].'" "'.$source.'" "'.$destination.'" > /dev/null 2>&1';
   logger('Using command: '.$command);
+  file_put_contents($communityPaths['backupLog'],"Executing rsync: $command",FILE_APPEND);
+  exec("mkdir -p ".escapeshellarg($destination));
   exec($command,$output,$returnValue);
   logger("$restoreMsg Complete");
 }
@@ -192,19 +200,23 @@ if ( is_array($dockerRunning) ) {
   foreach ($dockerRunning as $docker) {
     if ($docker['Running']) {
       logger("Restarting ".$docker['Name']);
+      file_put_contents($communityPaths['backupLog'],"Restarting ".$docker['Name']."\n",FILE_APPEND);
       shell_exec("docker start ".$docker['Name']);
     }
   }
 }
 if ( $backupOptions['startScript'] ) {
   logger("Executing custom start script ".$backupOptions['startScript']);
+  file_put_contents($communityPaths['backupLog'],"Executing custom start script\n",FILE_APPEND);
   shell_exec($backupOptions['startScript']);
 }
 logger('#######################');
 logger("appData $restoreMsg complete");
 logger('#######################');
+
+$message = getRsyncReturnValue($returnValue);
+
 if ( $returnValue > 0 ) {
-  $message = getRsyncReturnValue($returnValue);
   $status = "- Errors occurred";
   $type = "warning";
   logger("Rsync Errors Occurred: $message");
@@ -216,6 +228,9 @@ if ( $returnValue > 0 ) {
 } else {
   $type = "normal";
 }
+
+file_put_contents($communityPaths['backupLog'],"Backup/Restore Complete.  Rsync Status: $message\n",FILE_APPEND);
+
 switch ($backupOptions['logBackup']) {
   case 'yes':
     toDOS($communityPaths['backupLog'],"/boot/config/plugins/community.applications/backup.log");
@@ -255,6 +270,7 @@ if ( ! $restore && ($backupOptions['datedBackup'] == 'yes') ) {
         $age = $interval->format("%R%a");
         if ( $age <= (0 - $backupOptions['deleteOldBackup']) ) {
           logger("Deleting $basePathBackup/$dir");
+          file_put_contents($communityPaths['backupLog'],"Deleting Dated Backup set: $basePathBackup/$dir\n");
           exec("echo Deleting $basePathBackup/$dir >> ".$communityPaths['backupLog']."\n");
           exec('rm -rf '.escapeshellarg($basePathBackup).'/'.$dir);
         }   

@@ -1,5 +1,5 @@
-Menu="CA"
-Title="Backup Appdata"
+Menu="BackupMain:1"
+Title="Backup / Settings"
 Icon="backup.png"
 ---
 <?
@@ -123,12 +123,13 @@ var URL = "/plugins/<?=$plugin?>/include/backupExec.php";
 var appliedChanges = false;
 
 $(function() {
+
+  <?if (! $tabbed):?>
+  $(".tabbedOnly").hide();
+  <?endif;?>
   myAlert("Appdata Backup","When a Backup is running (<em>either manually or a scheduled backup</em>), your docker applications will be <b><font color='red'>stopped</font></b> and then <b><font color='red'>restarted</font></b> at the conclusion of the backup","","",false,"",true,"warning");
   
-  setInterval(function() {
-    checkBackup();
-  }, 1000);
-  
+
   $("#fasterRsync").val("<?=$backupOptions['fasterRsync']?>");
   $("#deleteOldBackup").val("<?=$backupOptions['deleteOldBackup']?>");
   $("#datedBackup").val("<?=$backupOptions['datedBackup']?>");
@@ -371,13 +372,7 @@ function setExcluded() {
     $("#excluded").val(checked);
     validateOptions();
  }
-function checkBackup() {
-  $.post(URL,{action:'checkBackup'},function(data) {
-    if (data) {
-      $("#backupLines").html(data);
-    }
-  });
-}
+
 
 function restoreBackup() {
   var destination = $('#source').val();
@@ -444,7 +439,7 @@ function abort() {
 <div style='width:75%;align:center;margin:auto'>
 <table>
 <tr>
-  <td><b>Appdata Share (Source):</b><br>(If your appData share is not listed, this CA module is not for you)</td>
+  <td><b>Appdata Share (Source):</b><br>(If your appData share is not listed, consider installing this <a href='http://lime-technology.com/forum/index.php?topic=49992.0' target='_blank'>plugin</a> in conjunction with <a href='http://lime-technology.com/forum/index.php?topic=50416.msg484239#msg484239' target='_blank'>this</a></td>
   <td><select id='source' onchange='changeSource();'><?=$sourceShares?></select></td>
 </tr>
 <tr>
@@ -612,12 +607,10 @@ function abort() {
 </tr>
 </table>
 <font size='3' color='red'><b>NOTE: All files</b> within your chosen destinations will be deleted when the backup runs.  Only select a share created <b>SPECIFICALLY<b> for appdata (and USB) backup purposes</font><br>
-<span style='float:right; display:none;' id='availableDates'></span><br><br>
-<input type='button' value='Apply' id='Apply' onclick='apply();'><input type='button' value='Backup Now' id='Backup' onclick='backupNow();'><span style='float:right'><input type='button' value='Restore' id='restore' onclick='restoreBackup();'><input type='button' value='Abort' id='abort' onclick='abort();' disabled></span>
+
+<input type='button' value='Apply' id='Apply' onclick='apply();'><input type='button' value='Backup Now' id='Backup' onclick='backupNow();'><span style='float:right'></span>
 </div><br>
-<div style='border:1px;border-style:solid;border-color:red'><font size='2'>Backup / Restore Status: <span id='backupStatus'></span>
-<br>
-<span id='backupLines'><br><br><br></span></div>
+
 
 <center>For support for this plugin, visit here: <a href="http://lime-technology.com/forum/index.php?topic=40262.0" target="_blank">http://lime-technology.com/forum/index.php?topic=40262.0</a></center>
 
