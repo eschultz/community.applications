@@ -1,6 +1,5 @@
 Menu="BackupMain:1"
 Title="Backup / Settings"
-Icon="backup.png"
 ---
 <?
 ###############################################################
@@ -254,16 +253,8 @@ function validateOptions(initialization) {
   if ( datedBackup == "yes" ) {
     $("#deleteOldBackup").prop("disabled",false);
     $("#fasterRsync").prop("disabled",false);
-    $.post(URL,{action:'getDates',destinationShare:destinationShare,destination:destination}, function(data) {
-      if (data) {
-        $("#availableDates").html();
-        $("#availableDates").html(data);
-        $("#availableDates").show();
-      }
-    });
   } else {
     $("#deleteOldBackup").prop("disabled",true);
-    $("#availableDates").hide();
     $("#fasterRsync").prop("disabled",true);
   }
   
@@ -350,8 +341,9 @@ function apply() {
       startScript = startScript.trim();
   
       $.post(URL,{action:'applyBackupOptions',usbDestination:usbDestination,backupFlash:backupFlash,fasterRsync:fasterRsync,deleteOldBackup:deleteOldBackup,datedBackup:datedBackup,logBackup:logBackup,excluded:excluded,notification:notification,dockerIMG:dockerIMG,source:source,destinationShare:destinationShare,destination:destination,stopScript:stopScript,startScript:startScript,rsyncOption:rsyncOption,cronDay:cronDay,cronMonth:cronMonth,cronHour:cronHour,cronMinute:cronMinute,cronCustom:cronCustom,cronSetting:cronSetting,runRsync:runRsync});
-  
+
       validateOptions(true);
+      changeRestoreOptions();
     });
 }  
 function setExcluded() {
@@ -374,29 +366,6 @@ function setExcluded() {
  }
 
 
-function restoreBackup() {
-  var destination = $('#source').val();
-  var datedBackup = $("#datedBackup").val();
-  
-  if ( datedBackup == "yes" ) {
-    var availableDates = $("#date").val();
-  } else {
-    var availableDates = "";
-  }
-  var source = $('#destinationShare').val()+ availableDates + " ("+$('#destination').val() + ")";
-
-  swal({
-    title: "Are you sure?",
-    text: "This will restore your appdata folder from <b><em><font color='red'>" + source + "</em></b></font> to <em><b><font color='red'>" + destination,
-    showCancelButton: true,
-    html: true,
-    type: "warning",
-    closeOnConfirm: true
-    },
-    function() {
-      $.post(URL,{action:'restoreNow',availableDates:availableDates});
-    });
-}
 function backupNow() {
   var source = $('#source').val();
   var destination = $("#destinationShare").val();;
@@ -608,7 +577,7 @@ function abort() {
 </table>
 <font size='3' color='red'><b>NOTE: All files</b> within your chosen destinations will be deleted when the backup runs.  Only select a share created <b>SPECIFICALLY<b> for appdata (and USB) backup purposes</font><br>
 
-<input type='button' value='Apply' id='Apply' onclick='apply();'><input type='button' value='Backup Now' id='Backup' onclick='backupNow();'><span style='float:right'></span>
+<input type='button' value='Apply' id='Apply' onclick='apply();'><input type='button' value='Backup Now' id='Backup' onclick='backupNow();'><span class='statusLines'></span>
 </div><br>
 
 

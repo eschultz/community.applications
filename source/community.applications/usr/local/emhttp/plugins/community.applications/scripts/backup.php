@@ -260,6 +260,11 @@ if ( ! $restore && ($backupOptions['datedBackup'] == 'yes') ) {
   if ( $backupOptions['deleteOldBackup'] ) {
     if ( $returnValue > 0 ) {
       logger("rsync returned errors.  Not deleting old backup sets of appdata");
+      file_put_contents($communityPaths['backupLog'],"rsync returned errors.  Not deleting old backup sets of appdata\n",FILE_APPEND);
+      logger("Renaming $destination to $destination-error\n");
+      file_put_contents($communityPaths['backupLog'],"Renaming $destination to $destination-error",FILE_APPEND);
+      
+      exec("mv ".escapeshellarg("$destination")." ".escapeshellarg("$destination-error"));
     } else {
       $currentDate = date_create(now);
       $dirContents = array_diff(scandir($basePathBackup),array(".",".."));
@@ -277,6 +282,19 @@ if ( ! $restore && ($backupOptions['datedBackup'] == 'yes') ) {
       }
     }
   }
+}
+
+if ( $restore) {
+  $temp = explode("/",$destination);
+  $shareName = $temp[2];
+
+  $shareCfg = @file_get_contents("/boot/config/shares/$shareName.cfg");
+  if ( ! $shareCfg ) {
+    $shareCfg = file_get_contents($communityPaths['defaultShareConfig']);
+  }
+  $shareCfg = str_replace('shareUseCache="no"','shareUseCache="only"',$shareCfg);
+  file_put_contents($communityPaths['backupLog'],"Setting $shareName share to be cache-only\n");
+  file_put_contents("/boot/config/shares/$shareName.cfg",$shareCfg);
 }
 
 if ( $restore ) {

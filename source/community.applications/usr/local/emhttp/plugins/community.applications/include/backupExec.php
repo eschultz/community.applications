@@ -8,6 +8,23 @@
 require_once("/usr/local/emhttp/plugins/community.applications/include/paths.php");
 require_once("/usr/local/emhttp/plugins/community.applications/include/helpers.php");
 
+function getDates() {
+  global $communityPaths;
+  
+  $backupOptions = readJsonFile($communityPaths['backupOptions']);
+
+  $availableDates = @array_diff(@scandir($backupOptions['destination']."/".$backupOptions['destinationShare']),array(".",".."));
+  if ( ! is_array($availableDates) ) {
+    return "No Backup Sets Found";
+  }
+  $output = '<select id="date">';
+  foreach ($availableDates as $date) {
+    $output .= '<option value="'.$date.'">'.$date.'</option>';
+  }
+  $output .= "</select>";
+  return $output;
+}
+
 switch ($_POST['action']) {
 
 ##############################################################
@@ -155,6 +172,7 @@ case 'checkBackup':
   if ( is_file($communityPaths['backupProgress']) || is_file($communityPaths['restoreProgress']) ) {
     $backupLines .= "
       <script>$('#backupStatus').html('<font color=red>Running</font> Your docker containers will be automatically restarted at the conclusion of the backup/restore');
+      $('.statusLines').html('<font color=red>Backup / Restore Running');
       $('#restore').prop('disabled',true);
       $('#abort').prop('disabled',false);
       $('#Backup').attr('data-running','true');
@@ -165,6 +183,7 @@ case 'checkBackup':
     $backupLines .= "
     <script>
     $('#backupStatus').html('<font color=green>Not Running</font>');
+    $('.statusLines').html('');
     $('#abort').prop('disabled',true);
     $('#deleteOldBackupSet').prop('disabled',false);
     $('#Backup').attr('data-running','false');
@@ -183,7 +202,12 @@ case 'checkBackup':
     }
   }
   if ( is_file($communityPaths['deleteProgress']) ) {
-    $backupLines .= "<script>$('#deleteOldBackupSet').prop('disabled',true);</script>";
+    $backupLines .= "<script>$('#deleteOldBackupSet').prop('disabled',true);
+    $('#backupStatus').html('<font color=red>Deleting Old Backup Sets</font>');
+    $('.statusLines').html('<font color=red>Deleting Old Backup Sets</font');
+    $('#restore').prop('disabled',true);
+    $('#Backup').prop('disabled',true);
+    </script>";
   }
   echo $backupLines;
   break;
@@ -212,24 +236,41 @@ case 'deleteOldBackupSets':
 case 'abortBackup':
   shell_exec("/usr/local/emhttp/plugins/community.applications/scripts/killRsync.php");
   break;
-  
-case 'getDates':
-  $backupOptions['destinationShare'] = isset($_POST['destinationShare']) ? urldecode(($_POST['destinationShare'])) : "";
-  $backupOptions['destination'] = isset($_POST['destination']) ? urldecode(($_POST['destination'])) : "";
-  $availableDates = @array_diff(@scandir($backupOptions['destination']."/".$backupOptions['destinationShare']),array(".",".."));
-  if ( ! is_array($availableDates) ) {
-    $availableDates = array();
-  }
-  $output = "<select id='date'>";
-  foreach ($availableDates as $date) {
-    $output .= "<option value='$date'>$date</option>";
-  }
-  $output .= "</select>";
-  echo $output;
-  break;
 
 case 'getBackupShare':
   $backupOptions = readJsonFile($communityPaths['backupOptions']);
   echo "/mnt/user/".$backupOptions['destinationShare'];
+  break;
+  
+case 'restoreSettings':
+  $backupOptions = readJsonFile($communityPaths['backupOptions']);
+  $o = "<script>";
+  if ( ! is_dir("/mnt/cache") ) {
+    $o .= "
+      $('#restoreErrors').html('No cache drive is installed / formatted.  You must install and format the cache drive prior to restoring a backup set');
+    ";
+  } else {
+    if ( ! $backupOptions ) {
+      $o .= "
+        $('#restoreErrors').html('No backup settings have already been defined.  You must set those settings before you are able to restore any backups');
+      ";
+    } else {
+      $o .= "
+        $('#restoreSource').html('".$backupOptions['destination']."/".$backupOptions['destinationShare']."');
+        $('#restoreDestination').html('".$backupOptions['source']."');
+      ";
+    }
+    if ( $backupOptions['datedBackup'] == "yes" ) {
+      $o .= "
+        $('#availableDates').html('".getDates()."');
+      ";
+    } else {
+      $o .= "
+        $('#availableDates').html('Dated Backups Not Enabled');
+      ";
+    }
+  }
+  $o .= "</script>";
+  echo $o;
   break;
 }

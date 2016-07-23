@@ -49,6 +49,7 @@ $communityPaths['backupProgress']                = $communityPaths['tempFiles'].
 $communityPaths['restoreProgress']               = $communityPaths['tempFiles']."/restoreInProgress";
 $communityPaths['deleteProgress']                = $communityPaths['tempFiles']."/deleteInProgress";
 $communityPaths['backupLog']                     = $communityPaths['persistentDataStore']."/appdata_backup.log";
+$communityPaths['defaultShareConfig']            = "/usr/local/emhttp/plugins/community.applications/scripts/defaultShare.cfg";
 $communityPaths['backupScript']                  = "/usr/local/emhttp/plugins/community.applications/scripts/backup.php";
 $communityPaths['addCronScript']                 = "/usr/local/emhttp/plugins/community.applications/scripts/addCron.php";
 $communityPaths['unRaidDockerSettings']          = "/boot/config/docker.cfg";

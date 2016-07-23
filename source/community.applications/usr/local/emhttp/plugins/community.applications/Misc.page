@@ -24,7 +24,7 @@ function deleteOldBackup() {
 <table>
 <tr>
   <td>This script will delete ALL of your old backup sets.  This is useful when transitioning from non-dated backup sets to dated backup sets and vice-versa</td>
-  <td><input type='button' value='Delete Old Backups' onclick='deleteOldBackup();' id='deleteOldBackupSet' disabled></td>
+  <td><input type='button' value='Delete Old Backups' onclick='deleteOldBackup();' id='deleteOldBackupSet' disabled></td><td><span class='statusLines'></span>
 </tr>
 </table>
 
