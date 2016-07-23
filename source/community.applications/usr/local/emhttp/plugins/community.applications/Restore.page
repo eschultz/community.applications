@@ -49,13 +49,13 @@ function restoreBackup() {
 
 <list>
 <li>Replace your cache drive if necessary</li>
+<li>Recreate your docker.img file if necessary (ideally, this should be performed regardless)</li>
 <li>Select a backup set (if using dated backup sets) and hit 'Restore'</li>
 <li>Sit back and have a coffee</li>
-<li>Recreate your docker.img file if necessary</li>
-<li>Reboot your server!</li>
+<li>Ideally restart your server</li>
 <li>Re-add your previously installed docker applications via CA's <b>Previous Apps</b> section.  No adjustment of the templates should be necessary</li>
 </list><br>
-<font color='red'>Note:</font> All files within the destination directory listed below will be deleted and replaced with the files from the backup set.  The destination share will also be automatically adjusted to only store the files on the cache drive.  If the settings below are not correct, then you will need to adjust the settings within the Backup/Settings tab.
+<font color='red'>Note:</font> All files within the destination directory listed below will be deleted and replaced with the files from the backup set.  The destination share will also be automatically adjusted to only store the files on the cache drive.  If the settings below are not correct, then you will need to adjust the settings within the Backup/Settings tab.  <font color='red'><b>Do not add any further apps or do anything with the docker.img file until after the restore is completed.</b></font>
 <br><br><br>
 
 

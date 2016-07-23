@@ -19,12 +19,35 @@ function deleteOldBackup() {
     }
   });
 }
+
+function deleteIncompleteBackup() {
+  $.post(URL,{action:'getBackupShare'},function(data) {
+    if (data) {
+      swal({
+        title: "Delete Incomplete Backup Sets?",
+        text: "This will delete incomplete backup sets contained within <strong><font color='red'>"+data+"</font></strong>.  There is no recovery from this and cannot be aborted.  Are you really sure?",
+        showConfirmButton: true,
+        showCancelButton: true,
+        type: 'warning',
+        html: true
+      },function() {
+        $.post(URL,{action:'deleteIncompleteBackupSets'});
+      });
+    }
+  });
+}
 </script>
 
 <table>
 <tr>
   <td>This script will delete ALL of your old backup sets.  This is useful when transitioning from non-dated backup sets to dated backup sets and vice-versa</td>
-  <td><input type='button' value='Delete Old Backups' onclick='deleteOldBackup();' id='deleteOldBackupSet' disabled></td><td><span class='statusLines'></span>
+  <td><input type='button' value='Delete Old Backups' onclick='deleteOldBackup();' id='deleteOldBackupSet' disabled></td>
+  <td><span class='statusLines'></span>
+</tr>
+<tr>
+  <td>This script will delete ALL your old backup sets which generated errors (ie: did not complete successfully)</td>
+  <td><input type='button' value='Delete Incomplete Backup Sets' onclick='deleteIncompleteBackup();' id='deleteIncompleteBackup' disabled></td>
+  <td><span class='statusLines'></span>
 </tr>
 </table>
 

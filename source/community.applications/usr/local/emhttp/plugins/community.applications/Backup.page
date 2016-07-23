@@ -405,7 +405,10 @@ function abort() {
 > For help with this plugin, click here (a new tab will open with the help file)  <strong><font size="2"><a href="Settings/caHelp#backupSettings" target="_blank">HELP</a></font></strong>
 
 <font color='red'><center><span id='errors'></span></font><span id='error1'></span></center>
+
 <div style='width:75%;align:center;margin:auto'>
+<font color='red'>Note:</font> If you are attempting to restore your appdata, then you shouldn't need to set any of the following settings if they appear correctly under the restore tab.<br><br><br>
+
 <table>
 <tr>
   <td><b>Appdata Share (Source):</b><br>(If your appData share is not listed, consider installing this <a href='http://lime-technology.com/forum/index.php?topic=49992.0' target='_blank'>plugin</a> in conjunction with <a href='http://lime-technology.com/forum/index.php?topic=50416.msg484239#msg484239' target='_blank'>this</a></td>
@@ -466,13 +469,6 @@ function abort() {
         <option value='false'>In replacement of</option>
       </select>
   </td>
-</tr>
-<tr>
-  <td><b>Include or exclude docker.img file:</b><br><font size='0'>Includes / Excludes docker.img IF it is stored within the appdata folder</font></td>
-  <td><select id='dockerIMG' onchange='validateOptions();'>
-    <option value='exclude'>Excluded</option>
-    <option value='include'>Included</option>
-  </select></td>
 </tr>
 <tr>
   <td><b>Save Log File to flash?<b></td>

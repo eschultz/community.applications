@@ -64,6 +64,7 @@ jQuery(document).ready(function() {
 <a href='#settings'>General Settings</a><br>
 <a href='#autoupdate'>Auto Update Settings</a><br>
 <a href='#backupSettings'>Backup Appdata Settings</a><br>
+<a href='#restoreAppdata'>Restoring your appdata settings</a><br>
 <a href='#deleteAppdata'>Cleanup Appdata</a><br>
 <a href='#othersettings'>Other Notes</a><br>
 <a href='#credits'>Credits</a><br>
@@ -309,9 +310,6 @@ This entry will allow you to add any custom options to the rsync command that th
 <font color="purple">Run Scripts in place of or in addition to</font><br>
 Setting this to "in place of" effectively disabled the backup command, and allows the custom scripts to perform the actual backup.
 
-<font color="purple">Include or exclude docker.img file</font><br>
-If you docker.img file is stored within the appdata folder, this setting allows you to choose whether to include it or not in the backup.  I don't believe there is much reason to include the docker.img file as it is very easily recreated in case of a cache drive failure, but the choice is yours.  Note that depending upon the image size, including this file may add significant time to the backup process
-
 <font color="purple">Scheduled Backup Frequency</font><br>
 Set these options to determine how often to run a scheduled backup operation (or include a custom CRON entry to manually make the schedule yourself)
 
@@ -329,6 +327,23 @@ NOTES:
 <font size='3'><b>All files within your chosen destination folder will be deleted during a backup process</b></font>
 
 Destinations have to be sent to a share <b>and</b> to a disk.  The reasons for this is due to symlinks (which is a subject unto itself), but the net result is that the only way to guarantee a successful backup / restore is to send the backup to a disk share.
+
+<hr>
+<p id='restoreAppdata'></p>
+<font color='red' size='3'>Restoring your appdata</font>
+
+In the case of a cache drive failure, the steps required to restore your docker apps back to operational status is as follows:
+
+<list>
+<li>Replace the cache drive</li>
+<li>Recreate the docker.img file via Settings - Docker Settings</li>
+<li>Go to Settings - CA section - Backup/Restore</li>
+<li>Select the restore tab</li>
+<li>Verify the source and destination which appear and select a backup set to restore</li>
+<li>After its finished, ideally you should also restart your server so that all changes made will take effect 100%</li>
+</list>
+
+The restore module will then copy the backup set back to your appdata share (and automatically set it to be cache-only).  Additionally, it will also delete any files which may have somehow been written to the array during the cache drive failure.
 
 
 <hr>

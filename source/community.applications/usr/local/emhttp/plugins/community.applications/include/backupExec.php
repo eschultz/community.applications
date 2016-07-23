@@ -178,6 +178,7 @@ case 'checkBackup':
       $('#Backup').attr('data-running','true');
       $('#Backup').prop('disabled',true);
       $('#deleteOldBackupSet').prop('disabled',true);
+      $('#deleteIncompleteBackup').prop('disabled',true);
       </script>";
   } else {
     $backupLines .= "
@@ -186,6 +187,7 @@ case 'checkBackup':
     $('.statusLines').html('');
     $('#abort').prop('disabled',true);
     $('#deleteOldBackupSet').prop('disabled',false);
+    $('#deleteIncompleteBackup').prop('disabled',false);
     $('#Backup').attr('data-running','false');
     if ( appliedChanges == false ) {
       $('#Backup').prop('disabled',false);
@@ -202,9 +204,11 @@ case 'checkBackup':
     }
   }
   if ( is_file($communityPaths['deleteProgress']) ) {
+    $description = trim(file_get_contents($communityPaths['deleteProgress']));
     $backupLines .= "<script>$('#deleteOldBackupSet').prop('disabled',true);
-    $('#backupStatus').html('<font color=red>Deleting Old Backup Sets</font>');
-    $('.statusLines').html('<font color=red>Deleting Old Backup Sets</font');
+    $('#deleteIncompleteBackup').prop('disabled',true);
+    $('#backupStatus').html('<font color=red>$description</font>');
+    $('.statusLines').html('<font color=red>$description</font>');
     $('#restore').prop('disabled',true);
     $('#Backup').prop('disabled',true);
     </script>";
@@ -231,6 +235,12 @@ case 'deleteOldBackupSets':
   $backupOptions = readJsonFile($communityPaths['backupOptions']);
   $deleteFolder = escapeshellarg("/mnt/user/".$backupOptions['destinationShare']);
   shell_exec("/usr/local/emhttp/plugins/community.applications/scripts/deleteOldBackupSets.sh $deleteFolder");
+  break;
+
+case 'deleteIncompleteBackupSets':
+  $backupOptions = readJsonFile($communityPaths['backupOptions']);
+  $deleteFolder = escapeshellarg("/mnt/user/".$backupOptions['destinationShare']);
+  shell_exec("/usr/local/emhttp/plugins/community.applications/scripts/deleteIncompleteBackupSets.sh $deleteFolder");
   break;
   
 case 'abortBackup':

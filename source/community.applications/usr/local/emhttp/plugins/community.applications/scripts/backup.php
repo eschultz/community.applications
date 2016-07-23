@@ -77,6 +77,7 @@ $backupOptions = readJsonFile($communityPaths['backupOptions']);
 if ( ! $backupOptions ) {
   exit;
 }
+$backupOptions['dockerIMG'] = "exclude";
 
 if ( ! $backupOptions['backupFlash'] ) { $backupOptions['backupFlash'] = "appdata"; }
 
@@ -286,15 +287,19 @@ if ( ! $restore && ($backupOptions['datedBackup'] == 'yes') ) {
 
 if ( $restore) {
   $temp = explode("/",$destination);
-  $shareName = $temp[2];
+  $shareName = $temp[3];
 
   $shareCfg = @file_get_contents("/boot/config/shares/$shareName.cfg");
   if ( ! $shareCfg ) {
     $shareCfg = file_get_contents($communityPaths['defaultShareConfig']);
   }
   $shareCfg = str_replace('shareUseCache="no"','shareUseCache="only"',$shareCfg);
-  file_put_contents($communityPaths['backupLog'],"Setting $shareName share to be cache-only\n");
+  file_put_contents($communityPaths['backupLog'],"Setting $shareName share to be cache-only\n",FILE_APPEND);
   file_put_contents("/boot/config/shares/$shareName.cfg",$shareCfg);
+  file_put_contents($communityPaths['backupLog'],"Deleting any appdata files stored on the array\n",FILE_APPEND);
+  exec('rm -rf '.escapeshellarg("/mnt/user0/$shareName"));
+  
+  file_put_contents($communityPaths['backupLog'],"Restore finished.\n",FILE_APPEND);
 }
 
 if ( $restore ) {
