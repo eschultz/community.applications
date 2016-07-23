@@ -6,16 +6,26 @@ Title="Miscellaneous"
 function deleteOldBackup() {
   $.post(URL,{action:'getBackupShare'},function(data) {
     if (data) {
-      swal({
-        title: "Delete Old Backup Sets?",
-        text: "This will delete all files contained within <strong><font color='red'>"+data+"</font></strong>.  There is no recovery from this and cannot be aborted.  Are you really sure?",
-        showConfirmButton: true,
-        showCancelButton: true,
-        type: 'warning',
-        html: true
-      },function() {
-        $.post(URL,{action:'deleteOldBackupSets'});
-      });
+      if ( data == "/mnt/user/" ) {
+        swal({
+          title: "Oops",
+          text: "You must define backup settings before you can use this script",
+          type: "error",
+          showConfirmButton: true,
+          showCancelButton: false
+        });
+      } else {
+        swal({
+          title: "Delete Old Backup Sets?",
+          text: "This will delete all files contained within <strong><font color='red'>"+data+"</font></strong>.  There is no recovery from this and cannot be aborted.  Are you really sure?",
+          showConfirmButton: true,
+          showCancelButton: true,
+          type: 'warning',
+          html: true
+        },function() {
+          $.post(URL,{action:'deleteOldBackupSets'});
+        });
+      }
     }
   });
 }
@@ -23,16 +33,26 @@ function deleteOldBackup() {
 function deleteIncompleteBackup() {
   $.post(URL,{action:'getBackupShare'},function(data) {
     if (data) {
-      swal({
-        title: "Delete Incomplete Backup Sets?",
-        text: "This will delete incomplete backup sets contained within <strong><font color='red'>"+data+"</font></strong>.  There is no recovery from this and cannot be aborted.  Are you really sure?",
-        showConfirmButton: true,
-        showCancelButton: true,
-        type: 'warning',
-        html: true
-      },function() {
-        $.post(URL,{action:'deleteIncompleteBackupSets'});
-      });
+      if ( data == "/mnt/user/" ) {
+        swal({
+          title: "Oops",
+          text: "You must define backup settings before you can use this script",
+          type: "error",
+          showConfirmButton: true,
+          showCancelButton: false
+        });
+      } else {
+        swal({
+          title: "Delete Incomplete Backup Sets?",
+          text: "This will delete incomplete backup sets contained within <strong><font color='red'>"+data+"</font></strong>.  There is no recovery from this and cannot be aborted.  Are you really sure?",
+          showConfirmButton: true,
+          showCancelButton: true,
+          type: 'warning',
+          html: true
+        },function() {
+          $.post(URL,{action:'deleteIncompleteBackupSets'});
+        });
+      }
     }
   });
 }

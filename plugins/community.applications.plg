@@ -2,8 +2,8 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.applications">
 <!ENTITY author    "Andrew Zawadzki">
-<!ENTITY version   "2016.07.16">
-<!ENTITY md5       "48c713d47d42a7d6a33710d611bf157e">
+<!ENTITY version   "2016.07.23">
+<!ENTITY md5       "0c721ac5e7a29cde7998f49ad75057a0">
 <!ENTITY launch    "Apps">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/community.applications">
@@ -13,6 +13,9 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
+###2016.07.23###
+- Major revamp to backup/restore appdata module (see thread for details)
+
 ###2016.07.16###
 - Better logging for CA Backup
 

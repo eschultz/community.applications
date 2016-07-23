@@ -299,7 +299,7 @@ if ( $restore) {
   file_put_contents($communityPaths['backupLog'],"Deleting any appdata files stored on the array\n",FILE_APPEND);
   exec('rm -rf '.escapeshellarg("/mnt/user0/$shareName"));
   
-  file_put_contents($communityPaths['backupLog'],"Restore finished.\n",FILE_APPEND);
+  file_put_contents($communityPaths['backupLog'],"Restore finished.  Ideally you should now restart your server\n",FILE_APPEND);
 }
 
 if ( $restore ) {

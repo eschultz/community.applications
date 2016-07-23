@@ -398,6 +398,44 @@ function abort() {
 
 </script>
 <style>
+
+.back-to-top {
+  background: none;
+  margin: 0;
+  position: fixed;
+  bottom: 50px;
+  right: 0;
+  width: 70px;
+  height: 70px;
+  z-index: 100;
+  display: none;
+  text-decoration: none;
+  color: #ffffff;
+}
+
+</style>
+<script>
+
+jQuery(document).ready(function() {
+  var offset = 250;
+  var duration = 500;
+  jQuery(window).scroll(function() {
+    if (jQuery(this).scrollTop() > offset) {
+      jQuery('.back-to-top').fadeIn(duration);
+    } else {
+      jQuery('.back-to-top').fadeOut(duration);
+    }
+  });
+
+  jQuery('.back-to-top').click(function(event) {
+    event.preventDefault();
+    jQuery('html, body').animate({scrollTop: 0}, duration);
+    return false;
+  })
+});
+
+</script>
+<style>
 .fileTree{width:305px;max-height:150px;overflow:scroll;position:absolute;z-index:100;display:none;}
 </style>
 <link type="text/css" rel="stylesheet" href="/webGui/styles/jquery.filetree.css">
@@ -581,3 +619,6 @@ function abort() {
 
 > <center><a href='https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7M7CBCVU732XG' target='_blank'><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif"></a></center>
 
+<a href="#" class="back-to-top" style="display: inline;">
+<img src='/plugins/community.applications/images/up.png' style='width:50px;height:50px' href="#" class="back-to-top"></img>
+</a>

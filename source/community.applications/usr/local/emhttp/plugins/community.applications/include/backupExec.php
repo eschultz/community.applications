@@ -233,12 +233,20 @@ case 'restoreNow':
   
 case 'deleteOldBackupSets':
   $backupOptions = readJsonFile($communityPaths['backupOptions']);
+
+  if ( ! $backupOptions['destinationShare'] ) {
+    break;
+  }
   $deleteFolder = escapeshellarg("/mnt/user/".$backupOptions['destinationShare']);
   shell_exec("/usr/local/emhttp/plugins/community.applications/scripts/deleteOldBackupSets.sh $deleteFolder");
   break;
 
 case 'deleteIncompleteBackupSets':
   $backupOptions = readJsonFile($communityPaths['backupOptions']);
+
+  if ( ! $backupOptions['destinationShare'] ) {
+    break;
+  }
   $deleteFolder = escapeshellarg("/mnt/user/".$backupOptions['destinationShare']);
   shell_exec("/usr/local/emhttp/plugins/community.applications/scripts/deleteIncompleteBackupSets.sh $deleteFolder");
   break;
