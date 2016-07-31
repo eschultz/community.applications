@@ -33,42 +33,100 @@ if ( ! $backupOptions['backupFlash'] ) { $backupOptions['backupFlash'] = "appdat
 # fix destinationShare for compatibility with initial release
 
 $backupOptions['destinationShare'] = "/mnt/user/".$backupOptions['destinationShare'].'/';
+$vars = parse_ini_file("/var/local/emhttp/var.ini");
+$unRaidVersion = $var['version'];
 
-logger("Searching for valid source shares");
+
 
 $destinationShareList = array();
 $udList = array();
 $sharesList = array();
 $disksList = array();
+$userSharesAllowed = version_compare($unRaidVersion,"6.2.0-rc3",">=");
+
+if ( $userSharesAllowed ) {
+  $disksDisallowed = array(".","..","user0","disks","cache");
+  $disksComment = "<tr><td><font color='red' size='0'>Note that using a user share as a source (or user as a destination disk) is a new feature in 6.2 allowing hardlinks on user shares.  This feature may or not be completely debugged.  While in testing I have discovered no issues, as of this moment, only cache-only shares as sources, and disks as destinations are guaranteed to provide a trouble free backup/restore</font></td></tr>";
+} else {
+  $disksDisallowed = array(".","..","user","user0","disks","cache");
+}
 
 if ( is_dir("/mnt/user") )  { $destinationShareList = array_diff(scandir("/mnt/user"),array(".","..")); }
 if ( is_dir("/mnt/disks") ) { $udList = array_diff(scandir("/mnt/disks"),array(".","..")); }
 if ( is_dir("/mnt/cache") ) { $sharesList = array_diff(scandir("/mnt/cache"),array(".","..")); }
-if ( is_dir("/mnt/") )      { $disksList = array_diff(scandir("/mnt/"),array(".","..","user","user0","disks","cache")); }
+if ( is_dir("/mnt/") )      { $disksList = array_diff(scandir("/mnt/"),$disksDisallowed); }
 natsort($disksList);
 
-$sourceShares = "<option value=''>Select A Share</option>";
-foreach ($sharesList as $addShare) {
-  $selected = "";
-  if ( ! is_dir("/mnt/cache/$addShare") ) {
-    continue;
+$sourceShares = "<option value='' disabled>Select A Share</option>";
+
+# add in support for user shares as source for 6.2-rc3 +
+
+if ( $userSharesAllowed ) {
+  foreach ( $destinationShareList as $addShare ) {
+    $selected = "";
+    $flag = false;
+    $basePath = "/mnt/cache/";
+    $shareComment = "(cache-only share)";
+    if ( is_dir("/mnt/cache/$addShare") ) {
+      if ( is_dir("/mnt/user0/$addShare") ) {
+        $dirContents = array_diff(scandir("/mnt/user0/$addShare"),array(".",".."));
+        if ( ! empty($dirContents) ) {
+          $basePath = "/mnt/user/";
+          $shareComment = "(user share)";
+          $flag = true;
+        }
+      }
+    } else {
+      $basePath = "/mnt/user/";
+      $shareComment = "(user share)";
+      $flag = true;
+    }
+    if ( is_file("/boot/config/shares/$addShare.cfg") ) {
+      $shareCfg = parse_ini_file("/boot/config/shares/$addShare.cfg");
+      if ( $shareCfg['shareUseCache'] == "yes" ) {
+        $basePath = "/mnt/user/";
+        $shareComment = "(user share)";
+        $flag = true;
+      }
+    }
+    
+    if ( $backupOptions['source'] == "$basePath$addShare" ) {
+      $selected = "selected";
+    }
+    if ( $flag ) {
+      $userShares .="<option value='$basePath$addShare' $selected>$addShare $shareComment</option>";
+    } else {
+      $cacheShares .= "<option value='$basePath$addShare' $selected>$addShare $shareComment</option>";
+    }
+#    $sourceShares .= "<option value='$basePath$addShare' $selected>$addShare $shareComment</option>";
   }
-  logger("Found share $addShare on cache drive");
-  if ( is_dir("/mnt/user0/$addShare") ) {
-    $dirContents = array_diff(scandir("/mnt/user0/$addShare"),array(".",".."));
-    if ( ! empty($dirContents) ) {
-      logger("Share $addShare is not exclusively stored on cache drive.  Skipping as potential source");
+  $sourceShares .= $cacheShares.$userShares;
+} else {
+  logger("Searching for valid source shares");  
+  # this section is for non user shares allowed (ie: 6.1)
+  
+  foreach ($sharesList as $addShare) {
+    $selected = "";
+    if ( ! is_dir("/mnt/cache/$addShare") ) {
       continue;
     }
+    logger("Found share $addShare on cache drive");
+    if ( is_dir("/mnt/user0/$addShare") ) {
+      $dirContents = array_diff(scandir("/mnt/user0/$addShare"),array(".",".."));
+      if ( ! empty($dirContents) ) {
+        logger("Share $addShare is not exclusively stored on cache drive.  Skipping as potential source");
+        continue;
+      }
+    }
+    if ( $backupOptions['source'] == "/mnt/cache/$addShare" ) {
+      $selected = "selected";
+    }    
+    $sourceShares .= "<option value='/mnt/cache/$addShare' $selected>$addShare (cache only share)</option>";
+    $flag = true;
   }
-  if ( $backupOptions['source'] == "/mnt/cache/$addShare" ) {
-    $selected = "selected";
-  }    
-  $sourceShares .= "<option value='/mnt/cache/$addShare' $selected>$addShare</option>";
-  $flag = true;
-}
-if ( ! $flag ) {
-  logger("No shares found exclusively stored on the cache drive");
+  if ( ! $flag ) {
+    logger("No shares found exclusively stored on the cache drive");
+  }
 }
 
 foreach ($udList as $udShare) {
@@ -82,7 +140,7 @@ foreach ($udList as $udShare) {
   $sourceShares .= "<option value='/mnt/disks/$udShare' $selected>$udShare (via Unassigned Devices)</option>";
 }
 
-$destinationShares = "<option value=''>Select A Disk</option>";
+$destinationShares = "<option value='' disabled>Select A Disk</option>";
 foreach ($disksList as $addShare) {
   $selected = "";
   if ( ! is_dir("/mnt/$addShare") ) {
@@ -453,9 +511,10 @@ jQuery(document).ready(function() {
   <td><select id='source' onchange='changeSource();'><?=$sourceShares?></select></td>
 </tr>
 <tr>
-  <td><b>Save To Disk #:</b><br>Backups and restores may not complete without error<br>when using an Unassigned Devices Mount Point</b></td>
+  <td><b>Save To Disk #:</b></td>
   <td><select id='destination' onchange='validateOptions();'><?=$destinationShares?></select></td>
 </tr>
+<?=$disksComment?>
 <tr>
   <td><b>Destination Share:</b><br>If using an Unassigned Devices mount as save to Disk #,<br> manually type in the destination folder here</td>
   <td><input type='text' id="destinationShare" name="shareFolder" value="/mnt/user" data-pickfilter="HIDE_FILES_FILTER" data-pickroot="/mnt/user" data-pickfolders="true" onchange='validateOptions();'></td>
