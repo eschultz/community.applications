@@ -57,12 +57,15 @@ if ( is_dir("/mnt/cache") ) { $sharesList = array_diff(scandir("/mnt/cache"),arr
 if ( is_dir("/mnt/") )      { $disksList = array_diff(scandir("/mnt/"),$disksDisallowed); }
 natsort($disksList);
 
-$sourceShares = "<option value='' disabled>Select A Share</option>";
+$sourceShares = "<option value=''>Select A Share</option>";
 
 # add in support for user shares as source for 6.2-rc3 +
 
 if ( $userSharesAllowed ) {
   foreach ( $destinationShareList as $addShare ) {
+    if ( is_file("/mnt/user/$addShare") ) {
+      continue;
+    }
     $selected = "";
     $flag = false;
     $basePath = "/mnt/cache/";

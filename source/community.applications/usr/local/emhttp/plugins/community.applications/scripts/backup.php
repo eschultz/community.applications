@@ -220,12 +220,6 @@ $message = getRsyncReturnValue($returnValue);
 if ( $returnValue > 0 ) {
   $status = "- Errors occurred";
   $type = "warning";
-  logger("Rsync Errors Occurred: $message");
-  logger("Last 10 lines of rsync log:");
-  exec("tail -n10 ".$communityPaths['backupLog'],$rsyncLog);
-  foreach ($rsyncLog as $logLine) {
-    logger($logLine);
-  }
 } else {
   $type = "normal";
 }
@@ -284,24 +278,33 @@ if ( ! $restore && ($backupOptions['datedBackup'] == 'yes') ) {
     }
   }
 }
+if ( ! startsWith($destination,"/mnt/user") ) {
+  if ( $restore) {
+    $temp = explode("/",$destination);
+    $shareName = $temp[3];
 
-if ( $restore) {
-  $temp = explode("/",$destination);
-  $shareName = $temp[3];
-
-  $shareCfg = @file_get_contents("/boot/config/shares/$shareName.cfg");
-  if ( ! $shareCfg ) {
-    $shareCfg = file_get_contents($communityPaths['defaultShareConfig']);
-  }
-  $shareCfg = str_replace('shareUseCache="no"','shareUseCache="only"',$shareCfg);
-  file_put_contents($communityPaths['backupLog'],"Setting $shareName share to be cache-only\n",FILE_APPEND);
-  file_put_contents("/boot/config/shares/$shareName.cfg",$shareCfg);
-  file_put_contents($communityPaths['backupLog'],"Deleting any appdata files stored on the array\n",FILE_APPEND);
-  exec('rm -rf '.escapeshellarg("/mnt/user0/$shareName"));
+    $shareCfg = @file_get_contents("/boot/config/shares/$shareName.cfg");
+    if ( ! $shareCfg ) {
+      $shareCfg = file_get_contents($communityPaths['defaultShareConfig']);
+    }
+    $shareCfg = str_replace('shareUseCache="no"','shareUseCache="only"',$shareCfg);
+    file_put_contents($communityPaths['backupLog'],"Setting $shareName share to be cache-only\n",FILE_APPEND);
+    file_put_contents("/boot/config/shares/$shareName.cfg",$shareCfg);
+    file_put_contents($communityPaths['backupLog'],"Deleting any appdata files stored on the array\n",FILE_APPEND);
+    exec('rm -rf '.escapeshellarg("/mnt/user0/$shareName"));
   
-  file_put_contents($communityPaths['backupLog'],"Restore finished.  Ideally you should now restart your server\n",FILE_APPEND);
+    file_put_contents($communityPaths['backupLog'],"Restore finished.  Ideally you should now restart your server\n",FILE_APPEND);
+  }
 }
-
+if ( $returnValue > 0 ) {
+  logger("Rsync Errors Occurred: $message");
+  logger("Possible rsync errors:");
+  exec("cat ".$communityPaths['backupLog']." | grep rsync",$rsyncLog);
+  foreach ($rsyncLog as $logLine) {
+    logger($logLine);
+    file_put_contents($communityPaths['backupLog'],$logLine,FILE_APPEND);
+  }
+}
 if ( $restore ) {
   unlink($communityPaths['restoreProgress']);
 } else {
