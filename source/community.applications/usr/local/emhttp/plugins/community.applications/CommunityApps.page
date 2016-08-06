@@ -747,27 +747,37 @@ function baseName(path) {
 function uninstallApp(application,humanName) {
   var pluginName = baseName(application);
 
-  swal({
-    title: "Uninstall Application?",
-    text: "Are you sure you want to uninstall <font color='red'><strong><em>"+humanName+"</em></strong></font>?",
-    type: "warning",
-    showCancelButton: true,
-    showConfirmButton: true,
-    confirmButtonColor: "#DD6B55",
-    confirmButtonText: "Yes, uninstall it!",
-    closeOnConfirm: false,
-    showLoaderOnConfirm: true,
-    html: true
-  },
-  function() {
-    swal("Uninstalling "+humanName,"","info");
-      $.post(URL,{action:'uninstall_application',application:application}, function(data) {
-        if (data) {
-          swal("","Uninstalled","success");
-          previousApps("InstalledApps",true);
-        }
-      });
-  });  
+  if ( humanName == "Community Applications" ) {
+    swal({
+      title: "AE-35 Error",
+      text: "Community Applications cannot be installed this way.  You must go to the plugins tab and remove it from there.  But, why would you ever want to uninstall CA?",
+      type: "error",
+      showConfirmButton: true,
+      closeOnConfirm: true
+    });
+  } else {
+    swal({
+      title: "Uninstall Application?",
+      text: "Are you sure you want to uninstall <font color='red'><strong><em>"+humanName+"</em></strong></font>?",
+      type: "warning",
+      showCancelButton: true,
+      showConfirmButton: true,
+      confirmButtonColor: "#DD6B55",
+      confirmButtonText: "Yes, uninstall it!",
+      closeOnConfirm: false,
+      showLoaderOnConfirm: true,
+      html: true
+    },
+    function() {
+      swal("Uninstalling "+humanName,"","info");
+        $.post(URL,{action:'uninstall_application',application:application}, function(data) {
+          if (data) {
+            swal("","Uninstalled","success");
+            previousApps("InstalledApps",true);
+          }
+        });
+    });  
+  }
 }
 
 function myTrim(x) {
