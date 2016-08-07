@@ -492,6 +492,8 @@ function display_apps($viewMode) {
 function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
   global $communityPaths, $info, $communitySettings, $plugin, $iconSize;
 
+  $pinnedApps = readJsonFile($communityPaths['pinned']);
+  
   $tabMode = $communitySettings['newWindow'];
 
   usort($file,"mySort");
@@ -572,9 +574,20 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
       }
       $t .= "</font></center>";
 
-      if ($template['Stars']) {
-        $t .= "<center><img src='/plugins/$plugin/images/red-star.png' style='height:15px;width:15px'> <strong>".$template['Stars']."</strong></center>";
+      $t .= "<center>";
+      if ( $pinnedApps[$template['Repository']] ) {
+        $pinned = "greenButton.png";
+        $pinnedTitle = "Click to unpin this application";
+      } else {
+        $pinned = "redButton.png";
+        $pinnedTitle = "Click to pin this application";
       }
+      $t .= "<img src='/plugins/$plugin/images/$pinned' style='height:15px;width:15px;cursor:pointer' title='$pinnedTitle' onclick=pinApp(this,'".$template['Repository']."');>";
+      
+      if ($template['Stars']) {
+        $t .= "<img src='/plugins/$plugin/images/red-star.png' style='height:15px;width:15px'> <strong>".$template['Stars']."</strong>";
+      }
+      $t .= "</center>";
 
       $t .= "<figure><center><a onclick=showDesc($ID,'$appName'); style='cursor:pointer' title='";
 
@@ -758,10 +771,18 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
       } else {
         $uninstall = "";
       }
+      if ( $pinnedApps[$template['Repository']] ) {
+        $pinned = "greenButton.png";
+        $pinnedTitle = "Click to unpin this application";
+      } else {
+        $pinned = "redButton.png";
+        $pinnedTitle = "Click to pin this application";
+      }
+      $pinButton = "&nbsp;&nbsp;<img src='/plugins/$plugin/images/$pinned' style='height:15px;width:15px;cursor:pointer' title='$pinnedTitle' onclick=pinApp(this,'".$template['Repository']."');>";
 
       $stars = $template['Stars'] ? "&nbsp;<img src='/plugins/$plugin/images/red-star.png' style='width:15px'><strong>".$template['Stars']."</strong>": "";
 
-      $t .= "<td><center>$dockerName<br>$changes$newIcon$removable$uninstall$stars</center>";
+      $t .= "<td><center>$dockerName<br>$changes$newIcon$removable$uninstall$pinButton$stars</center>";
 
       $t .= "<div><center><a href='".$template['Support']."' target='_blank' title='Click to go to the support thread'>[Support]</a></center></div></td>";
 
@@ -2245,6 +2266,45 @@ case "deleteAppdata":
   }
   echo "deleted";
   break;
+  
+##################################################
+#                                                #
+# Pins / Unpins an application for later viewing #
+#                                                #
+##################################################
+
+case "pinApp":
+  $repository = isset($_POST['repository']) ? urldecode(($_POST['repository'])) : "oops";
+  
+  $pinnedApps = readJsonFile($communityPaths['pinned']);
+  
+  if ( $pinnedApps[$repository] ) {
+    unset($pinnedApps[$repository]);
+  } else {
+    $pinnedApps[$repository] = $repository;
+  }
+  writeJsonFile($communityPaths['pinned'],$pinnedApps);
+  break;
+  
+case "pinnedApps":
+  $pinnedApps = readJsonFile($communityPaths['pinned']);
+  $file = readJsonFile($communityPaths['community-templates-info']);
+
+  foreach ($pinnedApps as $pinned) {
+    $index = searchArray($file,"Repository",$pinned);
+    if ( $index === false ) {
+      continue;
+    } else {
+      $displayed[] = $file[$index];
+    }
+  }
+  $displayedApplications['community'] = $displayed;
+  $displayedApplications['pinnedFlag']  = true;
+  writeJsonFile($communityPaths['community-templates-displayed'],$displayedApplications);  
+  echo "fini!";
+  break;
+  
+  
 }
 
 

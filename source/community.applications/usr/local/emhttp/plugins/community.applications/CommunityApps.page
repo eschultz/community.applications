@@ -910,9 +910,38 @@ function startCadvisor() {
       Monitor();
     }  
   });
-
-
 }
+
+function pinApp(button,repository) {
+  if ($(button).attr("src") == "/plugins/community.applications/images/greenButton.png" ) {
+    $(button).attr("src","/plugins/community.applications/images/redButton.png");
+    $(button).attr("title","Click to pin this application");
+  } else {
+    $(button).attr("src","/plugins/community.applications/images/greenButton.png");
+    $(button).attr("title","Click to unpin this application");
+  }
+  $.post(URL,{action:'pinApp',repository:repository});
+}
+
+function pinnedApps(button) {
+  $(".appButtons,#monitor").prop("disabled",false);
+  $(button).prop("disabled",true);
+  clearTimeout(monitorInterval);  
+  clearSearchBox();
+  $("#templates_content,#resourceMonitor,.dockerSearch,#AppsOnly").fadeOut("slow",function() {
+    $("#templates_content").html("<center><font size='3'>Searching</font></center>");
+    $("#templates_content,#sortButtons,#Total1,#templateSortButtons").fadeIn("slow");
+  });
+  
+  $("#Category").html("All Pinned Applications");
+
+  $.post(URL,{action:'pinnedApps'},function(data) {
+    if (data) {
+      changeSortOrder(null,null,null);
+    }
+  });
+}
+
 </script>
 
 <FORM method="get" id="myForm">
@@ -921,6 +950,7 @@ function startCadvisor() {
 <input type='button' class='appButtons' id='AppStore' value='Available Apps' disabled onclick='appStore();' style=margin:0px>
 <input type='button' class='appButtons' id='InstalledApps' value='Installed Apps' onclick='previousApps(this.id,true);' style=margin:0px></input>
 <input type='button' class='appButtons' id='OldApps' value='Previous Apps' onclick='previousApps(this.id,false);' style=margin:0px></input>
+<input type='button' class='appButtons' id='PinnedApps' value='Pinned Apps' onclick='pinnedApps(this);' style=margin:0px></input>
 <input type='button' id='monitor' value='Resource Monitor' style='float:right' margin:1px></input><br><br>
 <span id='AppsOnly'>
 <span id='MainCategory'>
