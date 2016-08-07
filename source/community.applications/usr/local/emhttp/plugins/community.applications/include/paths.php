@@ -34,7 +34,6 @@ $communityPaths['moderation']                    = $communityPaths['persistentDa
 $communityPaths['special-repos']                 = "/boot/config/plugins/community.applications/private.repositories.json";
 $communityPaths['unRaidVersion']                 = "/etc/unraid-version";
 $communityPaths['logos']                         = $communityPaths['tempFiles']."/logos.json";
-$communityPaths['accept_docker_warning']         = "/boot/config/plugins/community.applications/noDocker-accepted";
 $communityPaths['deleteAppdataScript']           = "/usr/local/emhttp/plugins/community.applications/scripts/deleteAppData.sh";
 $communityPaths['unRaidVars']                    = "/var/local/emhttp/var.ini";
 $communityPaths['appdataSize']                   = $communityPaths['tempFiles']."/appdata/";
@@ -54,7 +53,7 @@ $communityPaths['backupScript']                  = "/usr/local/emhttp/plugins/co
 $communityPaths['addCronScript']                 = "/usr/local/emhttp/plugins/community.applications/scripts/addCron.php";
 $communityPaths['unRaidDockerSettings']          = "/boot/config/docker.cfg";
 $communityPaths['unRaidDisks']                   = "/var/local/emhttp/disks.ini";
-$communityPaths['pinned']                        = "/boot/config/plugins/community.applications/pinned_apps.json";
+$communityPaths['pinned']                        = "/boot/config/plugins/community.applications/pinned_apps.json"; # stored on flash instead of docker.img so it will work without docker running
 
 $infoFile                                        = $communityPaths['community-templates-info'];
 $docker_repos                                    = $communityPaths['template-repos'];

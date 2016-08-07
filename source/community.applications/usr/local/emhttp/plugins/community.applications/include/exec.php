@@ -2286,6 +2286,12 @@ case "pinApp":
   writeJsonFile($communityPaths['pinned'],$pinnedApps);
   break;
   
+####################################
+#                                  #
+# Displays the pinned applications #
+#                                  #
+####################################
+
 case "pinnedApps":
   $pinnedApps = readJsonFile($communityPaths['pinned']);
   $file = readJsonFile($communityPaths['community-templates-info']);

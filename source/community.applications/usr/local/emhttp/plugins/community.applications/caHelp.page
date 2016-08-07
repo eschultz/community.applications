@@ -58,6 +58,7 @@ jQuery(document).ready(function() {
 <a href='#displayed'>Displayed Results</a><br>
 <a href='#searching'>Searching And Updating</a><br>
 <a href='#previous'>Installed / Previously Installed Applications</a><br>
+<a href='#pinned'>Pinning Applications</a><br>
 <a href='#monitor'>Resource Monitor</a><br>
 <a href='#dockerHub'>Advanced - dockerHub Integration</a><br>
 <a href='#private'>Private Repositories</a><br>
@@ -86,22 +87,22 @@ After installation, a new tab will appear on unRaid's main menu called "Apps".  
 
 To begin with, at the top of the page are the Category navigation buttons.  Clicking these buttons will display the recommended applications within the appropriate category.  Some of the categories (Network Services, Media Applications, and Media Servers) also have "sub-categories" to choose from.
 
-<input class='allButtons' type=button id='backup' value='Backup' style='margin:1px'; onclick='getContent(false,"backup:","Backup",false);'></input>
-<input class='allButtons' type=button id='cloud' value='Cloud' style='margin:1px'; onclick='getContent(false,"cloud:","Cloud",false);'></input>
-<input class='allButtons' type=button id='downloaders' value='Downloaders' style='margin:1px'; onclick='getContent(false,"downloaders:","Downloaders",false);'></input>
-<input class='allButtons' type=button id='HomeAutomation' value='Home Automation' style='margin:1px'; onclick='getContent(false,"HomeAutomation:","Home Automation",false);'></input>
-<input class='allButtons' type=button value='Network Services' style='margin:1px'; onclick='getContent(false,"network:","All Network Services",false);'></input>
-<input class='allButtons' type=button value='Media Applications' style='margin:1px'; onclick='getContent(false,"MediaApp:","All Media Applications",false);'></input>
-<input class='allButtons' type=button value='Media Servers' style='margin:1px'; onclick='getContent(false,"MediaServer:","All Media Servers",false);'></input>
-<input class='allButtons' type=button id='productivity' value='Productivity' style='margin:1px'; onclick='getContent(false,"productivity:","Productivity",false);'></input>
-<input class='allButtons' type=button id='tools' value='Tools/Utilities' style='margin:1px'; onclick='getContent(false,"tools:","Tools / Utilities",false);'></input>
-<input class='allButtons' type=button id='other' value='Other' style='margin:1px'; onclick='getContent(false,"other:","Other",false);'></input>
-<input class='allButtons' type=button id='plugins' value='Plugins' style='margin:1px';></input>
+<input class='allButtons' type=button id='backup' value='Backup' style='margin:0px'; onclick='getContent(false,"backup:","Backup",false);'></input>
+<input class='allButtons' type=button id='cloud' value='Cloud' style='margin:0px'; onclick='getContent(false,"cloud:","Cloud",false);'></input>
+<input class='allButtons' type=button id='downloaders' value='Downloaders' style='margin:0px'; onclick='getContent(false,"downloaders:","Downloaders",false);'></input>
+<input class='allButtons' type=button id='HomeAutomation' value='Home Automation' style='margin:0px'; onclick='getContent(false,"HomeAutomation:","Home Automation",false);'></input>
+<input class='allButtons' type=button value='Network Services' style='margin:0px'; onclick='getContent(false,"network:","All Network Services",false);'></input>
+<input class='allButtons' type=button value='Media Applications' style='margin:0px'; onclick='getContent(false,"MediaApp:","All Media Applications",false);'></input>
+<input class='allButtons' type=button value='Media Servers' style='margin:0px'; onclick='getContent(false,"MediaServer:","All Media Servers",false);'></input>
+<input class='allButtons' type=button id='productivity' value='Productivity' style='margin:0px'; onclick='getContent(false,"productivity:","Productivity",false);'></input>
+<input class='allButtons' type=button id='tools' value='Tools/Utilities' style='margin:0px'; onclick='getContent(false,"tools:","Tools / Utilities",false);'></input>
+<input class='allButtons' type=button id='other' value='Other' style='margin:0px'; onclick='getContent(false,"other:","Other",false);'></input>
+<input class='allButtons' type=button id='plugins' value='Plugins' style='margin:0px';></input>
 <span style='float:right'>
-<input class='allButtons' type=button id="New" style='margin:1px'; value='New/Updated' onclick='getContent(false,"New","New / Updated Applications",true);'></input>
-<input class='allButtons' type=button id="UNCATEGORIZED" style='margin:1px'; value='Uncategorized' onclick='getContent(false,"UNCATEGORIZED","All Uncategorized Applications",false);'></input>
-<input class='allButtons' type=button id="All" style='margin:1px'; value='All Applications' onclick='getContent(false,"All","All Applications",false);'></input>
-<input class='allButtons' type=button id='MainButton' style='margin:1px'; value='Back to unRaid Search' hidden onclick='backToSearch();'></input>
+<input class='allButtons' type=button id="New" style='margin:0px'; value='New/Updated' onclick='getContent(false,"New","New / Updated Applications",true);'></input>
+<input class='allButtons' type=button id="UNCATEGORIZED" style='margin:0px'; value='Uncategorized' onclick='getContent(false,"UNCATEGORIZED","All Uncategorized Applications",false);'></input>
+<input class='allButtons' type=button id="All" style='margin:0px'; value='All Applications' onclick='getContent(false,"All","All Applications",false);'></input>
+<input class='allButtons' type=button id='MainButton' style='margin:0px'; value='Back to unRaid Search' hidden onclick='backToSearch();'></input>
 </span>
 <hr>
 
@@ -137,6 +138,7 @@ After selecting a category, the applications will appear: (example from Icon Det
 <table><tr>
 <td><center>Author: <strong><a style='cursor:pointer'>limetech</a></strong><br>
 <center><a style='cursor:pointer'>Official Limetech Repository</a></center>
+<center><img src='/plugins/community.applications/images/redButton.png' style='height:15px;width:15px'></center>
 <figure><center><a><img src='http://d2631fvi2jdnb6.cloudfront.net/docker/limetech/plex.png' style='width:96px;height:96px'></a></center>
 <figcaption><strong><font size="3">PlexMediaServer</font></strong><img src='/plugins/community.applications/images/information.png'><img src='/plugins/community.applications/images/star.png' style='width:15px;height:15px;'></figcaption>
 <input type='button' value='Add' style='margin:2px'></td><td style='display:inline-block;width:350px;text-align:left'>
@@ -153,6 +155,7 @@ The Plex Media Server enriches your life by organizing all your personal media, 
 <li>Click on <img src='/plugins/community.applications/images/information.png'> to display the application's change log<br></li>
 <li>The <img src='/plugins/community.applications/images/star.png' style='height:15px;width:15px'> will display if the application has been added or updated recently<br></li>
 <li>The <img src='/plugins/community.applications/images/red-star.png' style='height:15px;width:15px'> will display dockerHub's rating on the application (Note that in and by itself this does not mean that application "A" is better than application "B"</li>
+<li>Clicking <img src='/plugins/community.applications/images/greenButton.png' style='height:15px;width:15px'> or <img src='/plugins/community.applications/images/redButton.png' style='height:15px;width:15px'> will pin/unpin the application.  See <a href='#pinned'>HERE</a> for more details</li>
 <li>Selecting <input type='button' value='Add'> will take you to the Add Container screen where you can set any path mountings and install the application.<br></li>
 <li>Selecting <input type='button' value='Edit'> will allow you to change the settings of an already installed application.<br></li>
 <li>Selecting <input type='button' value='Default'> will allow you to reset the settings of an already installed application back to the author's default settings.<br></li>
@@ -174,6 +177,16 @@ A <img src='/plugins/dynamix.docker.manager/images/remove.png' width='20px'></im
 
 By selecting <input type='button' value='Previous Apps'></input> will display all applications which have been previously installed, and allow you to re-install them.
 A <img src='/plugins/dynamix.docker.manager/images/remove.png' width='20px'></img> will appear next to the application.  Selecting this will remove (ie: delete the user template) from the list of previously installed applications<br><br>
+<hr>
+<font size='3' color='red'><p id='pinned'>Pinning Applications</p></font>
+
+On any of the displays (with the exception of when dockerHub search results are shown), you can "pin" an application for later viewing.  This is useful for when you're just skimming through the lists and come across an application that you'd like to try but don't have the time to do it right away.
+
+Pressing the <img src='/plugins/community.applications/images/redButton.png' style='height:20px;width:20px;'> will pin the application whereas pressing the <img src='/plugins/community.applications/images/greenButton.png' style='height:20px;width:20px'> will unpin the application.
+
+Pinned applications can be viewed by pressing the <input type='button' value='Pinned Apps'> button.
+
+
 <hr>
 
 <font size='3' color='red'><p id='monitor'>Resource Monitor</p></font>

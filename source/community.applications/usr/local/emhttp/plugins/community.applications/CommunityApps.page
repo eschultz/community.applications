@@ -25,14 +25,8 @@ if ( ! is_file("/boot/config/plugins/$plugin/accepted") ) {
   $firstRun = "true";
 }
 
-if ( ! is_file("/boot/config/plugins/$plugin/noDocker-accepted") ) {
-  $dockerWarningAccepted = "true";
-} else {
-  $dockerWarningAccepted = "false";
-}
 $tabMode = $cfg['newWindow'];
 $waiting = "<tr><td><center><img src='/plugins/community.applications/images/spinner2.gif' style='height:30px;width:30px'></center><br><center>Please Wait... Retrieving application information</center></td></tr>";
-
   
 $line_color = $display['theme']=='black' ? '#202020' : '#E8E8E8';
 
@@ -49,7 +43,6 @@ $viewMode = $cfg['viewMode'];
 $execPath = "/plugins/$plugin/scripts";
 $commandArg="?appNumber=";
 $commandExt="";
-
 
 if ( is_dir("/var/lib/docker/containers") ) {
   $dockerRunning = "true";
@@ -243,18 +236,6 @@ if ( "<?=$firstRun?>" == "true" ) {
   $("#appWarning").show();
 }
 
-if ( ( "<?=$dockerRunning?>" == "false" ) && ( "<?=$dockerWarningAccepted?>" == "true" ) ) {
-  swal({
-    title: "Docker Not Enabled",
-    text: "The vast majority of applications listed here will require docker to be enabled to be installed",
-    showCancelButton: true,
-    confirmButtonText: "Dismiss Warning",
-    type: "warning"
-  }, function()
-  {
-    $.post(URL,{action:'accept_docker_warning'});
-  });
-}
 if ( "<?=$dockerRunning?>" == "false" ) {
   $("#monitor").hide();
 }
@@ -309,7 +290,6 @@ function readMore() {
 
 function showInfo(appNumber,appName) {
   openBox('<?=$execPath?>/showInfo.php<?=$commandArg?>' + appNumber,appName + " Changelog / More Information",550,550);
-
 }
 
 function showCredits() {
@@ -396,7 +376,6 @@ function doSearch(button) {
       $('.dockerSearch').show();
     }
   });
-  
 }
 
 function dismissWarning() {
@@ -630,15 +609,11 @@ function dockerSearch(pageNumber)
 
   $(".appButtons").prop("disabled",false);
   $("#AppStore").prop("disabled",true);
-  $("#AppsOnly").show();
+  $("#AppsOnly,#New,#UNCATEGORIZED,#All").show();
 
-  $(".dockerSearch").hide();
-  $("#templateSortButtons").hide();
+  $(".dockerSearch,#templateSortButtons").hide();
 
   $("#Total").html("Searching... <img src='/plugins/community.applications/images/spinner2.gif' style='height:30px;width:30px'>");
-  $("#New").show();
-  $("#UNCATEGORIZED").show();
-  $("#All").show();
 
   $("#Category").html("DockerHub Search Results For <font color='red'>"+filter+"</font> <span id='pageNumber'></span>");
 
@@ -651,7 +626,7 @@ function dockerSearch(pageNumber)
     if (data) {
       $('#templates_content').html(data);
       readMore();
-     myCloseAlert();
+      myCloseAlert();
     }
   });
 }
@@ -748,13 +723,15 @@ function uninstallApp(application,humanName) {
   var pluginName = baseName(application);
 
   if ( humanName == "Community Applications" ) {
-    swal({
-      title: "AE-35 Error",
-      text: "Community Applications cannot be installed this way.  You must go to the plugins tab and remove it from there.  But, why would you ever want to uninstall CA?",
-      type: "error",
-      showConfirmButton: true,
-      closeOnConfirm: true
-    });
+    myAlert("AE-35 Error",
+      "<b><font color='red'>Community Applications</font></b> cannot be uninstalled this way.  You must go to the plugins tab and remove it from there.  <em><font color='purple'>But, why would you ever want to uninstall CA?</font></em>",
+      null,
+      null,
+      true,
+      false,
+      true,
+      "error"
+    );
   } else {
     swal({
       title: "Uninstall Application?",
@@ -1056,6 +1033,7 @@ Sort Direction:
 <div class='dockerSearch' style='display:none'><center><input type=button class='initDockerSearch' value='Get more results from dockerHub'></input></center></div>
 <center>Last Change To Appfeed: <strong><span id='updateTime'></span></strong></center>
 <a href="Settings/caHelp" target='_blank'>CA Manual</a><a style='float:right;cursor:pointer' onclick='showCredits();'>Credits</a><br><br></span>
+<center>Community Applications Version: <?=$installedVersion?></center>
 <span id='upgradeAvailable' hidden><center> <font color='red'>An update to Community Applications is Available. Click <a onclick=installPLGupdate('community.applications.plg',"CommunityApplications"); style=cursor:pointer>HERE</a> to install the update  <img src='/plugins/community.applications/images/information.png' onclick='showInfo("CA","Community Applications");' style='cursor:pointer'></center></span>
 > <center>For support for this plugin, visit here: <a href="http://lime-technology.com/forum/index.php?topic=40262.0" target="_blank">http://lime-technology.com/forum/index.php?topic=40262.0</a></center>
 > <center><a href='https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7M7CBCVU732XG' target='_blank'><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif"></a></center>
