@@ -92,7 +92,8 @@ if ( ! $template['IconWeb']  ) {
 $template['Description'] = ltrim($template['Description']);
 $category = str_replace("UNCATEGORIZED", "uncategorized", $template['Category']);
 
-$templateDescription = "\n<center><table><tr><td><figure style='margin:0px'><img id='icon' src='".$template['IconWeb']."' style='width:96px;height:96px' onerror='this.src=&quot;/plugins/community.applications/images/question.png&quot;';>";
+$templateDescription = "<style>p { margin-left:20px;margin-right:20px }</style>";
+$templateDescription .= "\n<center><table><tr><td><figure style='margin:0px'><img id='icon' src='".$template['IconWeb']."' style='width:96px;height:96px' onerror='this.src=&quot;/plugins/community.applications/images/question.png&quot;';>";
 
 if ( $template['Beta'] == "true" ) {
   $templateDescription .= "<figcaption><font size='1' color='red'><center><strong>(beta)</strong></center></font></figcaption>";
@@ -164,7 +165,7 @@ if ( $selected ) {
     $templateDescription .= "<tr><td nowrap><strong>Memory:</strong></td><td>Not running</td></tr>";
   }
 }
-$templateDescription .= "</table></td></tr></table></center>\n<strong><hr></strong>".$template['Description'];
+$templateDescription .= "</table></td></tr></table></center>\n<strong><hr></strong><p>".$template['Description']."</p>";
 
 if ( $template['ModeratorComment'] ) {
   $templateDescription .= "<br><b><font color='red'>Moderator Comments:</font></b> ".$template['ModeratorComment'];

@@ -33,7 +33,7 @@ require_once 'webGui/include/Markdown.php';
     $donateimg  = $template['DonateImg'];
     $donatetext = $template['DonateText'];
   }
-  
+
   if ( $template['Plugin'] )
   {
     $appInformation = Markdown($template['Changes']);
@@ -63,5 +63,6 @@ require_once 'webGui/include/Markdown.php';
       $templateDescription .= "<br><font size='0'>The above link is set by the author of the template, not the author of Community Applications</font></center>";
     }
   }
+  $appInformation = "<style>body { margin-left:20px;margin-right:20px }</style>$appInformation";
   echo $appInformation;
 ?>
