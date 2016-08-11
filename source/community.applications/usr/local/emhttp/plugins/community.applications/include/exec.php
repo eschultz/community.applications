@@ -845,6 +845,26 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
   return $ct;
 }
 
+#############################
+#                           #
+# Selects an app of the day #
+#                           #
+#############################
+
+function appOfDay($file) {
+  
+  $currentDaySinceEpoch = time() / 86400;
+  
+  $index = $currentDaySinceEpoch % count($file);
+/*   if ($file[$index]['Blacklist']) return false;
+  if ($file[$index]['ModeratorComment']) return false; */
+  if ( ! $file[$index] ) return false;
+  
+  return $index;
+}
+
+
+
 ##########################################################################
 #                                                                        #
 # function that comes up with alternate search suggestions for dockerHub #
@@ -1137,15 +1157,27 @@ case 'get_content':
     }
   }
   getConvertedTemplates();
-  if ( $category === "/NONE/i" ) {
-    echo "<center><font size=4>Select A Category Above</font></center>";
-    echo changeUpdateTime();
-    @unlink($communityPaths['community-templates-displayed']);
-    break;
-  }
 
   $file = readJsonFile($communityPaths['community-templates-info']);
 
+  if ( $category === "/NONE/i" ) {
+    echo "<center><font size=4>Select A Category Above</font></center>";
+    echo changeUpdateTime();
+    $displayApplications = array();
+    $appOfDay = appOfDay($file);
+
+    if ( $appOfDay ) {
+      $displayApplications['community'] = $file[$appOfDay];
+      writeJsonFile($communityPaths['community-templates-displayed'],$displayApplications);
+      echo "<script>$('#templateSortButtons').hide();$('#sortButtons').hide();</script>";
+      echo "<br><center><font size='4' color='purple'><b>App Of The Day</b></font><br><br>";
+      echo my_display_apps("detail",$displayApplications,array(),array());
+      break;
+    } else {
+      @unlink($communityPaths['community-templates-displayed']);
+      break;
+    }
+  }
   if (!is_array($file)) break;
 
   $display             = array();
