@@ -251,7 +251,6 @@ function DownloadApplicationFeed() {
     $o['SortName']      = $o['Name'];
     $o['Licence']       = $file['License']; # Support Both Spellings
     $o['Licence']       = $file['Licence'];
-
     $o['Plugin']        = $file['Plugin'];
     $o['PluginURL']     = $file['PluginURL'];
     $o['PluginAuthor']  = $file['PluginAuthor'];
@@ -582,7 +581,7 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
         $pinned = "redButton.png";
         $pinnedTitle = "Click to pin this application";
       }
-      $t .= "<img src='/plugins/$plugin/images/$pinned' style='height:15px;width:15px;cursor:pointer' title='$pinnedTitle' onclick=pinApp(this,'".$template['Repository']."');>";
+      $t .= "<img src='/plugins/$plugin/images/$pinned' style='height:15px;width:15px;cursor:pointer' title='$pinnedTitle' onclick='pinApp(this,&quot;".$template['Repository']."&quot;);'>";
       
       if ($template['Stars']) {
         $t .= "<img src='/plugins/$plugin/images/red-star.png' style='height:15px;width:15px'> <strong>".$template['Stars']."</strong>";
@@ -778,7 +777,7 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
         $pinned = "redButton.png";
         $pinnedTitle = "Click to pin this application";
       }
-      $pinButton = "&nbsp;&nbsp;<img src='/plugins/$plugin/images/$pinned' style='height:15px;width:15px;cursor:pointer' title='$pinnedTitle' onclick=pinApp(this,'".$template['Repository']."');>";
+      $pinButton = "&nbsp;&nbsp;<img src='/plugins/$plugin/images/$pinned' style='height:15px;width:15px;cursor:pointer' title='$pinnedTitle' onclick='pinApp(this,&quot;".$template['Repository']."&quot;);'>";
 
       $stars = $template['Stars'] ? "&nbsp;<img src='/plugins/$plugin/images/red-star.png' style='width:15px'><strong>".$template['Stars']."</strong>": "";
 
@@ -852,18 +851,34 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
 #############################
 
 function appOfDay($file) {
+  global $communityPaths;
   
-  $currentDaySinceEpoch = time() / 86400;
+  $oldAppDay = @filemtime($communityPaths['appOfTheDay']);
+  if ( ! $oldAppDay ) {
+    $oldAppDay = 1;
+  }
+  $oldAppDay = intval($oldAppDay / 86400);
+  $currentDay = intval(time() / 86400);
+  if ( $oldAppDay == $currentDay ) {
+    $app = readJsonFile($communityPaths['appOfTheDay']);
+    if ( $app ) {
+      return $app;
+    }
+  }
   
-  $index = $currentDaySinceEpoch % count($file);
-/*   if ($file[$index]['Blacklist']) return false;
-  if ($file[$index]['ModeratorComment']) return false; */
-  if ( ! $file[$index] ) return false;
-  
-  return $index;
+  while ( true ) {
+    $app[0] = mt_rand(0,count($file) -1);
+    $app[1] = mt_rand(0,count($file) -1);
+    if ($app[0] == $app[1]) continue;
+    if ( ! $file[$app[0]]['Compatible'] || ! $file[$app[1]]['Compatible'] ) continue;
+    if ( $file[$app[0]]['Blacklist'] || $file[$app[1]]['Blacklist'] ) continue;
+    if ( $file[$app[0]]['ModeratorComment'] || $file[$app[1]]['ModeratorComment'] ) continue;
+    
+    break;
+  }
+  writeJsonFile($communityPaths['appOfTheDay'],$app);
+  return $app;
 }
-
-
 
 ##########################################################################
 #                                                                        #
@@ -1159,26 +1174,22 @@ case 'get_content':
   getConvertedTemplates();
 
   $file = readJsonFile($communityPaths['community-templates-info']);
+  if (!is_array($file)) break;
 
   if ( $category === "/NONE/i" ) {
     echo "<center><font size=4>Select A Category Above</font></center>";
     echo changeUpdateTime();
     $displayApplications = array();
-    $appOfDay = appOfDay($file);
-
-    if ( $appOfDay ) {
-      $displayApplications['community'] = $file[$appOfDay];
+    if ( count($file) > 200) {
+      $appsOfDay = appOfDay($file);
+      $displayApplications['community'] = array($file[$appsOfDay[0]],$file[$appsOfDay[1]]);
       writeJsonFile($communityPaths['community-templates-displayed'],$displayApplications);
       echo "<script>$('#templateSortButtons').hide();$('#sortButtons').hide();</script>";
-      echo "<br><center><font size='4' color='purple'><b>App Of The Day</b></font><br><br>";
-      echo my_display_apps("detail",$displayApplications,array(),array());
-      break;
-    } else {
-      @unlink($communityPaths['community-templates-displayed']);
+      echo "<br><center><font size='4' color='purple'><b>Random Apps Of The Day</b></font><br><br>";
+      echo my_display_apps("detail",$displayApplications['community'],$runningDockers,$imagesDocker);
       break;
     }
   }
-  if (!is_array($file)) break;
 
   $display             = array();
   $official            = array();

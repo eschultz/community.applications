@@ -54,7 +54,7 @@ $communityPaths['addCronScript']                 = "/usr/local/emhttp/plugins/co
 $communityPaths['unRaidDockerSettings']          = "/boot/config/docker.cfg";
 $communityPaths['unRaidDisks']                   = "/var/local/emhttp/disks.ini";
 $communityPaths['pinned']                        = "/boot/config/plugins/community.applications/pinned_apps.json"; # stored on flash instead of docker.img so it will work without docker running
-
+$communityPaths['appOfTheDay']                   = $communityPaths['persistentDataStore']."/appOfTheDay.json";
 $infoFile                                        = $communityPaths['community-templates-info'];
 $docker_repos                                    = $communityPaths['template-repos'];
 

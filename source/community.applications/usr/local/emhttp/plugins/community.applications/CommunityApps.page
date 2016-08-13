@@ -920,7 +920,6 @@ function pinnedApps(button) {
 }
 
 </script>
-
 <FORM method="get" id="myForm">
 > For help with this plugin, click here (a new tab will open with the help file)  <strong><font size="2"><a href="Settings/caHelp" target="_blank">HELP</a></font></strong>
 
@@ -928,7 +927,7 @@ function pinnedApps(button) {
 <input type='button' class='appButtons' id='InstalledApps' value='Installed Apps' onclick='previousApps(this.id,true);' style=margin:0px></input>
 <input type='button' class='appButtons' id='OldApps' value='Previous Apps' onclick='previousApps(this.id,false);' style=margin:0px></input>
 <input type='button' class='appButtons' id='PinnedApps' value='Pinned Apps' onclick='pinnedApps(this);' style=margin:0px></input>
-<input type='button' id='monitor' value='Resource Monitor' style='float:right' margin:1px></input><br><br>
+<input type='button' id='monitor' value='Resource Monitor' style='float:right;margin:0px'></input><br><br>
 <span id='AppsOnly'>
 <span id='MainCategory'>
 <input class='allButtons' type=button id='backup' value='Backup' style='margin:-1px';></input>
@@ -1003,6 +1002,7 @@ Sort Direction:
 <input type='button' class='dockerView' id='dockerTable' value='Tables' style='margin:1px'>
 <input type='button' class='dockerView' id='dockerDetail' value='Icon Details' style='margin:1px'>
 <input type='button' class='dockerView' id='dockerIcon' value='Icons style='margin:1px'></center></span>
+<span id='upgradeAvailable' hidden><center> <font color='red'>An update to Community Applications is Available. Click <a onclick=installPLGupdate('community.applications.plg',"CommunityApplications"); style=cursor:pointer>HERE</a> to install the update  <img src='/plugins/community.applications/images/information.png' onclick='showInfo("CA","Community Applications");' style='cursor:pointer'></center></font></span>
 
 <div class='dockerSearch' style='display:none'><center><input type=button class='initDockerSearch' value='Get more results from dockerHub'></input></center></div>
 <table>
@@ -1034,7 +1034,6 @@ Sort Direction:
 <center>Last Change To Appfeed: <strong><span id='updateTime'></span></strong></center>
 <a href="Settings/caHelp" target='_blank'>CA Manual</a><a style='float:right;cursor:pointer' onclick='showCredits();'>Credits</a><br><br></span>
 <center>Community Applications Version: <?=$installedVersion?></center>
-<span id='upgradeAvailable' hidden><center> <font color='red'>An update to Community Applications is Available. Click <a onclick=installPLGupdate('community.applications.plg',"CommunityApplications"); style=cursor:pointer>HERE</a> to install the update  <img src='/plugins/community.applications/images/information.png' onclick='showInfo("CA","Community Applications");' style='cursor:pointer'></center></span>
 > <center>For support for this plugin, visit here: <a href="http://lime-technology.com/forum/index.php?topic=40262.0" target="_blank">http://lime-technology.com/forum/index.php?topic=40262.0</a></center>
 > <center><a href='https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7M7CBCVU732XG' target='_blank'><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif"></a></center>
 
