@@ -530,4 +530,51 @@ function validURL($URL) {
     return $URL;
   }
 }
+
+####################################################################################
+#                                                                                  #
+# Read the pinned apps from temp files.  If it fails, gets it from the flash drive #
+#                                                                                  #
+####################################################################################
+
+function getPinnedApps() {
+  global $communityPaths;
+ 
+  $pinnedApps = readJsonFile($communityPaths['pinnedRam']);
+  if ( ! $pinnedApps ) {
+    $pinnedApps = readJsonFile($communityPaths['pinned']);
+  }
+  return $pinnedApps;
+}
+
+########################################################
+#                                                      #
+# Avoids having to write this line over and over again #
+#                                                      #
+########################################################
+
+function getPost($setting,$default) {
+  return isset($_POST[$setting]) ? urldecode(($_POST[$setting])) : $default;
+}
+
+##########################################################
+#                                                        #
+# sprintf, but takes an associative array as an input    #
+# $format is "blah blah %index blah blah blah2 %index2") #
+#                                                        #
+##########################################################
+
+function sprintf2($str='', $vars=array(), $char='%')
+{
+    if (!$str) return '';
+    if (count($vars) > 0)
+    {
+        foreach ($vars as $k => $v)
+        {
+            $str = str_replace($char . $k, $v, $str);
+        }
+    }
+
+    return $str;
+}
 ?>

@@ -53,6 +53,7 @@ $communityPaths['backupScript']                  = "/usr/local/emhttp/plugins/co
 $communityPaths['addCronScript']                 = "/usr/local/emhttp/plugins/community.applications/scripts/addCron.php";
 $communityPaths['unRaidDockerSettings']          = "/boot/config/docker.cfg";
 $communityPaths['unRaidDisks']                   = "/var/local/emhttp/disks.ini";
+$communityPaths['pinnedRam']                     = $communityPaths['tempFiles']."/pinned_apps.json"; # the ram copy of pinned apps for speed
 $communityPaths['pinned']                        = "/boot/config/plugins/community.applications/pinned_apps.json"; # stored on flash instead of docker.img so it will work without docker running
 $communityPaths['appOfTheDay']                   = $communityPaths['persistentDataStore']."/appOfTheDay.json";
 $infoFile                                        = $communityPaths['community-templates-info'];

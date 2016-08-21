@@ -62,13 +62,8 @@ if ( $communitySettings['dockerRunning'] ) {
 
 $communitySettings['appFeed']    = "true";
 
-if ( !is_dir($communityPaths['tempFiles']) ) {
-  exec("mkdir -p ".$communityPaths['tempFiles']);
-}
-
-if ( !is_dir($communityPaths['persistentDataStore']) ) {
-  exec("mkdir -p ".$communityPaths['persistentDataStore']);
-}
+exec("mkdir -p ".$communityPaths['tempFiles']);
+exec("mkdir -p ".$communityPaths['persistentDataStore']);
 
 if ( !is_dir($communityPaths['templates-community']) ) {
   exec("mkdir -p ".$communityPaths['templates-community']);
@@ -80,7 +75,6 @@ $iconSize = $communitySettings['iconSize'];
 # Make sure the link is in place
 if (is_dir("/usr/local/emhttp/state/plugins/$plugin")) exec("rm -rf /usr/local/emhttp/state/plugins/$plugin");
 if (!is_link("/usr/local/emhttp/state/plugins/$plugin")) symlink($communityPaths['templates-community'], "/usr/local/emhttp/state/plugins/$plugin");
-
 
 #################################################################
 #                                                               #
@@ -491,7 +485,11 @@ function display_apps($viewMode) {
 function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
   global $communityPaths, $info, $communitySettings, $plugin, $iconSize;
 
-  $pinnedApps = readJsonFile($communityPaths['pinned']);
+  $pinnedApps = getPinnedApps();
+  $repos = readJsonFile($communityPaths['Repositories']);
+  if ( ! $repos ) {
+    $repos = array();
+  }
   
   $tabMode = $communitySettings['newWindow'];
 
@@ -516,76 +514,116 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
   $columnNumber = 0;
 
   foreach ($file as $template) {
-    $t = "";
-
     $name = $template['SortName'];
+    $t = "";
+    $ID = $template['ID'];
+    $selected = $info[$name]['template'] && stripos($info[$name]['icon'], $template['Author']) !== false;
+    if ( $template['Uninstall'] ) {
+      $selected = true;
+    }
+    $RepoName = ( $template['Private'] == "true" ) ? $template['RepoName']."<font color=red> (Private)</font>" : $template['RepoName'];
+    $template['display_DonateLink'] = $template['DonateLink'] ? "<font size='0'><a href='".$template['DonateLink']."' target='_blank' title='".$template['DonateText']."'>Donate To Author</a></font>" : "";
+    $template['display_Project'] = $template['Project'] ? "<a target='_blank' title='Click to go the the Project Home Page' href='".$template['Project']."'><font color=red>Project Home Page</font></a>" : "";
+    $template['display_Support'] = $template['Support'] ? "<a href='".$template['Support']."' target='_blank' title='Click to go to the support thread'><font color=red>Support Thread</font></a>" : "";
+    if ( $template['UpdateAvailable'] ) {
+      $template['display_UpdateAvailable'] = $template['Plugin'] ? "<br><center><font color='red'><b>Update Available.  Click <a onclick='installPLGupdate(&quot;".$template['MyPath']."&quot;,&quot;".$template['Name']."&quot;);' style='cursor:pointer'>Here</a> to Install</b></center></font>" : "<br><center><font color='red'><b>Update Available.  Click <a href='Docker'>Here</a> to install</b></font></center>";
+    }
+    $template['display_ModeratorComment'] .= $template['ModeratorComment'] ? "</b></strong><font color='red'><b>Moderator Comments:</b></font> ".$template['ModeratorComment'] : "";
+    $template['display_Announcement'] = $template['Announcement'] ? "<a href='".$template['Announcement']."' target='_blank' title='Click to go to the repository Announcement thread' >$RepoName</a>" : $RepoName;
+    $template['display_Stars'] = $template['Stars'] ? "<img src='/plugins/$plugin/images/red-star.png' style='height:15px;width:15px'> <strong>".$template['Stars']."</strong>" : "";
+    $template['display_Downloads'] = $template['Downloads'] ? "<td><center>".$template['Downloads']."</center></td>" : "<td><center>Not Available</center></td>";
+
+    if ( $pinnedApps[$template['Repository']] ) {
+      $pinned = "greenButton.png";
+      $pinnedTitle = "Click to unpin this application";
+    } else {
+      $pinned = "redButton.png";
+      $pinnedTitle = "Click to pin this application";
+    }
+    $template['display_pinButton'] = "<img src='/plugins/$plugin/images/$pinned' style='height:15px;width:15px;cursor:pointer' title='$pinnedTitle' onclick='pinApp(this,&quot;".$template['Repository']."&quot;);'>";
+    if ( $template['Uninstall'] ) {
+      $template['display_Uninstall'] = "<img src='/plugins/dynamix.docker.manager/images/remove.png' title='Uninstall Application' style='width:20px;height:20px;cursor:pointer' ";
+      if ( $template['Plugin'] ) {
+        $template['display_Uninstall'] .= "onclick='uninstallApp(&quot;".$template['MyPath']."&quot;,&quot;".$template['Name']."&quot;);'>";
+      } else {
+        $template['display_Uninstall'] .= "onclick='uninstallDocker(&quot;".$template['MyPath']."&quot;,&quot;".$template['Name']."&quot;);'>";
+      }
+    }
+    $template['display_removable'] = $template['Removable'] ? "<img src='/plugins/dynamix.docker.manager/images/remove.png' title='Remove Application From List' style='width:20px;height:20px;cursor:pointer' onclick='removeApp(&quot;".$template['MyPath']."&quot;,&quot;".$template['Name']."&quot;);'>" : "";
+    if ( $template['Date'] > strtotime($communitySettings['timeNew'] ) ) {
+      $template['display_newIcon'] = "<img src='/plugins/$plugin/images/star.png' style='width:15px;height:15px;' title='New / Updated - ".date("F d Y",$template['Date'])."'></img>";
+    }
+    $template['display_changes'] = $template['Changes'] ? " <a style='cursor:pointer'><img src='/plugins/$plugin/images/information.png' onclick=showInfo($ID,'$appName'); title='Click for the changelog / more information'></a>" : "";
+
+    $repoIndex = searchArray($repos,"name",$template['RepoName']);
+    $webPageURL = $repos[$repoIndex]['web'];
+    $template['display_webPage'] = $webPageURL ? "<a href='$webPageURL' target='_blank'><font color='red'>Web Page</font></a></font>" : "";
+    $template['display_humanDate'] = date("F j, Y",$template['Date']);
+
+    if ( $template['Plugin'] ) {
+      $pluginName = basename($template['PluginURL']);
+      if ( file_exists("/var/log/plugins/$pluginName") ) {
+        $pluginSettings = getPluginLaunch($pluginName);
+        $template['display_pluginSettings'] = $pluginSettings ? "<input type='submit' style='margin:0px' value='Settings' formtarget='$tabMode' formaction='$pluginSettings' formmethod='post'>" : "";
+      } else {
+        $buttonTitle = $template['MyPath'] ? "Reinstall Plugin" : "Install Plugin";
+        $template['display_pluginInstall'] = "<input type='button' value='$buttonTitle' style='margin:0px' title='Click to install this plugin' onclick=installPlugin('".$template['PluginURL']."');>";
+      }
+    } else {
+      if ( $communitySettings['dockerRunning'] ) {
+        if ( $selected ) {
+          $template['display_dockerDefault'] = "<input type='submit' value='Default' style='margin:1px' title='Click to reinstall the application using default values' formtarget='$tabMode' formmethod='post' formaction='AddContainer?xmlTemplate=default:".addslashes($template['Path'])."'>";
+          $template['display_dockerEdit']    = "<input type='submit' value='Edit' style='margin:1px' title='Click to edit the application values' formtarget='$tabMode' formmethod='post' formaction='UpdateContainer?xmlTemplate=edit:".addslashes($info[$name]['template'])."'>";
+        } else {
+          if ( $template['MyPath'] ) {
+            $template['display_dockerReinstall'] = "<input type='submit' style='margin:0px' title='Click to reinstall the application' value='Reinstall' formtarget='$tabMode' formmethod='post' formaction='AddContainer?xmlTemplate=user:".addslashes($template['MyPath'])."'>";
+          } else {
+            $template['display_dockerInstall']   = "<input type='submit' style='margin:0px' title='Click to install the application' value='Add' formtarget='$tabMode' formmethod='post' formaction='AddContainer?xmlTemplate=default:".addslashes($template['Path'])."'>";
+          }
+        }
+      } else {
+        $template['display_dockerDisable'] = "<font color='red'>Docker Not Enabled</font>";
+      }
+    }
+    if ( ! $template['Compatible'] && ! $template['UnknownCompatible'] ) {
+      $template['display_compatible'] = "NOTE: This application is listed as being NOT compatible with your version of unRaid<br>";
+      $template['display_compatibleShort'] = "Incompatible";
+    }
+    $template['display_author'] = "<a style='cursor:pointer' onclick='authorSearch(this.innerHTML);' title='Search for more containers from author'>".$template['Author']."</a>";
+
+
     $appName = str_replace(" ","",$template['SortName']);
 
     $dockerRepo="/".str_replace('/','',$template['Repository'])."/i";
 
     if ( $communitySettings['dockerSearch'] == "yes" && ! $template['Plugin'] ) {
-      $dockerName = "<a style='cursor:pointer' onclick='mySearch(this.innerHTML);' title='Search dockerHub for similar containers'>".$template['Name']."</a>";
+      $template['display_dockerName'] = "<a style='cursor:pointer' onclick='mySearch(this.innerHTML);' title='Search dockerHub for similar containers'>".$template['Name']."</a>";
     } else {
-      $dockerName = $template['Name'];
+      $template['display_dockerName'] = $template['Name'];
     }
 
     if ( $template['Category'] == "UNCATEGORIZED" )  $template['Category'] = "Uncategorized";
 
     if ( ( $template['Beta'] == "true" ) ) {
-      $dockerName .= "<span title='Beta Container &#13;See support forum for potential issues'><font size='1' color='red'><strong>(beta)</strong></font></span>";
-    }
-    $ID = $template['ID'];
-    $selected = $info[$name]['template'] && stripos($info[$name]['icon'], $template['Author']) !== false;
-
-    $changes = "";
-    if ( $template['Changes'] ) {
-      $changes= " <a style='cursor:pointer'><img src='/plugins/$plugin/images/information.png' onclick=showInfo($ID,'$appName'); title='Click for the changelog / more information'></a>";
+      $template['display_dockerName'] .= "<span title='Beta Container &#13;See support forum for potential issues'><font size='1' color='red'><strong>(beta)</strong></font></span>";
     }
 
-    $newIcon="";
-    if ( $template['Date'] > strtotime($communitySettings['timeNew'] ) ) {
-      $newDate = date("F d Y",$template['Date']);
-      $newIcon="<img src='/plugins/$plugin/images/star.png' style='width:15px;height:15px;' title='New / Updated - $newDate'></img>";
-    }
     $displayIcon = $template['IconWeb'];
     $displayIcon = $displayIcon ? $displayIcon : "/plugins/$plugin/images/question.png";
-
-    if ( $template['Uninstall'] ) {
-      $selected = true;
-    }
 
     if ( $communitySettings['viewMode'] == "icon" ) {
       $popUp = "Click for a full description\n".$template['PopUpDescription'];
       $t .= "<td>";
-      $t .= "<center>Author:<strong><a style='cursor:pointer' onclick='authorSearch(this.innerHTML);' title='Search for more containers from author'>".$template['Author']."</a></strong></center>";
+      $t .= "<center>Author:<strong>".$template['display_author']."</strong></center>";
       $t .= "<center><font size='1'>";
 
-      if ( $template['Private'] == "true" ) {
-        $RepoName = $template['RepoName']."<br><font color=red>Private</font>";
-      } else {
-        $RepoName = $template['RepoName'];
-      }
+      $t .= $template['display_Announcement'];
 
-      if ( $template['Announcement'] ) {
-        $t .= "<a href='".$template['Announcement']."' target='_blank' title='Click to go to the repository Announcement thread'>$RepoName</a>";
-      } else {
-        $t .= $RepoName;
-      }
       $t .= "</font></center>";
 
       $t .= "<center>";
-      if ( $pinnedApps[$template['Repository']] ) {
-        $pinned = "greenButton.png";
-        $pinnedTitle = "Click to unpin this application";
-      } else {
-        $pinned = "redButton.png";
-        $pinnedTitle = "Click to pin this application";
-      }
-      $t .= "<img src='/plugins/$plugin/images/$pinned' style='height:15px;width:15px;cursor:pointer' title='$pinnedTitle' onclick='pinApp(this,&quot;".$template['Repository']."&quot;);'>";
-      
-      if ($template['Stars']) {
-        $t .= "<img src='/plugins/$plugin/images/red-star.png' style='height:15px;width:15px'> <strong>".$template['Stars']."</strong>";
-      }
+      $t .= $template['display_pinButton'];
+      $t .= $template['display_Stars'];
       $t .= "</center>";
 
       $t .= "<figure><center><a onclick=showDesc($ID,'$appName'); style='cursor:pointer' title='";
@@ -596,70 +634,14 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
         $t .= "Click for a full description";
       }
 
-      if ( $template['Removable'] ) {
-        $removable = "<img src='/plugins/dynamix.docker.manager/images/remove.png' title='Remove Application From List' style='width:20px;height:20px;cursor:pointer' onclick='removeApp(&quot;".$template['MyPath']."&quot;,&quot;".$template['Name']."&quot;);'>";
-      } else {
-        $removable = "";
-      }
-      if ( $template['Uninstall'] ) {
-        $uninstall = "<img src='/plugins/dynamix.docker.manager/images/remove.png' title='Uninstall Application' style='width:20px;height:20px;cursor:pointer' ";
+      $t .= "'><img src='$displayIcon' onError='this.src=\"/plugins/$plugin/images/question.png\";' style='width:".$iconSize."px;height=".$iconSize."px;'></a></center><figcaption><strong><center><font size='3'>".$template['display_dockerName']."</font><br>".$template['display_newIcon'].$template['display_changes'].$template['display_removable'].$template['display_Uninstall']."</center></strong></figcaption></figure>";
 
-        if ( $template['Plugin'] ) {
-          $uninstall .= "onclick='uninstallApp(&quot;".$template['MyPath']."&quot;,&quot;".$template['Name']."&quot;);'>";
-        } else {
-          $uninstall .= "onclick='uninstallDocker(&quot;".$template['MyPath']."&quot;,&quot;".$template['Name']."&quot;);'>";
-        }
-      } else {
-        $uninstall = "";
-      }
+      $t .= "<center><font color='red'>".$template['display_compatibleShort']."</font></center>";
 
-      $t .= "'><img src='$displayIcon' onError='this.src=\"/plugins/$plugin/images/question.png\";' style='width:".$iconSize."px;height=".$iconSize."px;'></a></center><figcaption><strong><center><font size='3'>$dockerName</font><br>$newIcon$changes$removable$uninstall</center></strong></figcaption></figure>";
+      $t .= "<center>".$template['display_pluginSettings'].$template['display_pluginInstall'].$template['display_dockerDefault'].$template['display_dockerEdit'].$template['display_dockerReinstall'].$template['display_dockerInstall'].$template['display_dockerDisable']."</center>";
 
-      if ( ! $template['Compatible'] ) {
-        if ( ! $template['UnknownCompatible'] ) {
-          $t .= "<center><font color='red'>Incompatible</font></center>";
-        }
-      }
-
-      if ( $template['Plugin'] ) {
-        $pluginName = basename($template['PluginURL']);
-
-        if ( file_exists("/var/log/plugins/$pluginName") ) {
-          $pluginSettings = getPluginLaunch($pluginName);
-
-          if ( $pluginSettings ) {
-            $t .= "<center><input type='submit' value='Settings' style='margin:0px' formtarget='$tabMode' formaction='$pluginSettings' formmethod='post'></center></input>";
-          }
-        } else {
-          $t .= "<center>";
-          $buttonTitle = $template['MyPath'] ? "Reinstall Plugin" : "Install Plugin";
-          $t .= "<input type='button' value='$buttonTitle' style='margin:0px' title='Click to install this plugin' onclick=installPlugin('".$template['PluginURL']."');>";
-        }
-      } else {
-        if ( $communitySettings['dockerRunning'] ) {
-          if ( $selected ) {
-            $t .= "<center>";
-            $t .= "<input type='submit' value='Default' style='margin:1px' title='Click to reinstall the application using default values' formtarget='$tabMode' formmethod='post' formaction='AddContainer?xmlTemplate=default:".addslashes($template['Path'])."'>";
-
-            $t .= "<input type='submit' value='Edit' style='margin:1px' title='Click to edit the application values' formtarget='$tabMode' formmethod='post' formaction='UpdateContainer?xmlTemplate=edit:".addslashes($info[$name]['template'])."'>";
-            $t .= "</center><br>";
-          } else {
-            $t .= "<center>";
-
-            if ( $template['MyPath'] ) {
-              $t .= "<input type='submit' style='margin:0px' title='Click to reinstall the application' value='Reinstall' formtarget='$tabMode' formmethod='post' formaction='AddContainer?xmlTemplate=user:".addslashes($template['MyPath'])."'>";
-            } else {
-              $t .= "<input type='submit' style='margin:0px' title='Click to install the application' value='Add' formtarget='$tabMode' formmethod='post' formaction='AddContainer?xmlTemplate=default:".addslashes($template['Path'])."'>";
-            }
-
-            $t .= "</center><br>";
-          }
-        } else {
-          $t .= "<center><font color='red'>Docker Not Enabled</font></center>";
-        }
-      }
       if ( $communitySettings['maxColumn'] > 2 ) {
-        $t .= ($template['Support']) ? "<center><a href='".$template['Support']."' target='_blank' title='Click to go to the support thread'>[Support]</a></center>" : "";
+        $t .= "<center>".$template['display_Support']."</center>";
         if ( $template['UpdateAvailable'] ) {
           $t .= "<br><center><font color='red'><b>Update Available.  Click <a onclick='installPLGupdate(&quot;".$template['MyPath']."&quot;,&quot;".$template['Name']."&quot;);' style='cursor:pointer'>Here</a> to Install</b></center></font>";
         }
@@ -671,160 +653,57 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
         $t .= "<strong>Categories: </strong>".$template['Category']."<br><br>";
         $t .= "<span class='desc_readmore' style='display:block'>";
 
-        if ( ! $template['Compatible'] && ! $template['UnknownCompatible'] ) {
-          $t .= "<font color='red'>NOTE: This application is listed as being NOT compatible with your version of unRaid<br><br></font>";
-        }
+        $t .= "<font color='red'>".$template['display_compatible']."<br></font>";
 
         $t .= $template['Description'];
 
         if ( $template['Date'] ) {
-          $t .= "</b></strong><center><strong>Date Updated: </strong>".date("F j, Y",$template['Date'])."</center>";
+          $t .= "</b></strong><center><strong>Date Updated: </strong>".$template['display_humanDate']."</center>";
         }
         $t .= "</span><br>";
 
-        if ( $template['ModeratorComment'] ) {
-          $t .= "</b></strong><font color='red'><b>Moderator Comments:</b></font> ".$template['ModeratorComment'];
-        }
-        if ( $template['UpdateAvailable'] ) {
-          if ( $template['Plugin'] ) {
-            $t .= "<br><center><font color='red'><b>Update Available.  Click <a onclick='installPLGupdate(&quot;".$template['MyPath']."&quot;,&quot;".$template['Name']."&quot;);' style='cursor:pointer'>Here</a> to Install</b></center></font>";
-          } else {
-            $t .= "<br><center><font color='red'><b>Update Available.  Click <a href='Docker'>Here</a> to install</b></font></center>";
-          }
-        }
+        $t .= $template['display_ModeratorComment'];
+        $t .= $template['display_UpdateAvailable'];
         $t .= "</b></strong><center>";
-        $t .= ($template['Support']) ? "<a href='".$template['Support']."' target='_blank' title='Click to go to the support thread'><font color=red>Support Thread</font></a>" : "";
-
-        if ( $template['Project'] ) {
-          $t .= "<a target='_blank' title='Click to go the the Project Home Page' href='".$template['Project']."'><font color=red>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Project Home Page</font></a>";
-        }
-        if ( $template['DonateLink'] ) {
-          $t .= "<br><font size='0'><a href='".$template['DonateLink']."' target='_blank' title='".$template['DonateText']."'>Donate To Author</a></font>";
-        }
+        $t .= $template['display_Support'];
+        $t .= $template['display_Project'];
+        $t .= $template['display_webPage'];
+        $t .= "<br>".$template['display_DonateLink'];
         $t .= "</center></font>";
         $t .= "</td>";
       }
 ###################################################
 # TABLE MODE
     } else {
-      $appName = str_replace(" ","",$template['SortName']);
-
       $t .= "<tr><td style='margin:0;padding:0'>";
       $t .= "<a onclick='showDesc(".$template['ID'].",&#39;".$name."&#39;);' style='cursor:pointer'><img title='Click to display full description' src='".$displayIcon."' style='width:48px;height:48px;' onError='this.src=\"/plugins/$plugin/images/question.png\";'></a></td>";
 
       $t .= "<td><center>";
 
-      if ( ! $template['Compatible'] ) {
-        if ( ! $template['UnknownCompatible'] ) {
-          $t .= "<center><font color='red'>Incompatible</font></center>";
-        }
-      }
+      $t .= "<center><font color='red'>".$template['display_compatibleShort']."</font></center>";
 
-      if ( $template['Plugin'] ) {
-        $pluginName = basename($template['PluginURL']);
+      $t .= "<center>".$template['display_pluginSettings'].$template['display_pluginInstall'].$template['display_dockerDefault'].$template['display_dockerEdit'].$template['display_dockerReinstall'].$template['display_dockerInstall'].$template['display_dockerDisable']."</center>";
+      $t .= "</td>";
 
-        if ( file_exists("/var/log/plugins/$pluginName") ) {
-          $pluginSettings = getPluginLaunch($pluginName);
+      $t .= "<td><center>".$template['display_dockerName']."<br>".$template['display_changes'].$template['display_newIcon'].$template['display_removable'].$template['display_Uninstall']."&nbsp;&nbsp;".$template['display_pinButton'].$template['display_Stars']."</center>";
 
-          if ( $pluginSettings ) {
-            $t .= "<center><input type='submit' style='margin:0px' value='Settings' formtarget='$tabMode' formaction='$pluginSettings' formmethod='post'></center></input>";
-          }
-        } else {
-          $buttonTitle = $template['MyPath'] ? "Reinstall Plugin" : "Install Plugin";
-          $t .= "<input type='button' style='margin:0px' value='$buttonTitle' title='Click to install plugin' onclick=installPlugin('".$template['PluginURL']."');>";
-        }
-      } else {
-        if ( $communitySettings['dockerRunning'] ) {
-          if ($selected) {
-            $t .= "<input type='submit' style='margin:0px' title='Click to reinstall the application using default values' value='Default' formtarget='$tabMode' formmethod='post' formaction='AddContainer?xmlTemplate=default:".$template['Path']."'>";
-          } else {
-            if ( $template['MyPath'] ) {
-              $t .= "<input type='submit' style='margin:0px' title='Click to install the application' value='Reinstall' formtarget='$tabMode' formmethod='post' formaction='AddContainer?xmlTemplate=user:".$template['MyPath']."'>";
-            } else {
-              $t .= "<input type='submit' style='margin:0px' title='Click to install the application' value='Add' formtarget='$tabMode' formmethod='post' formaction='AddContainer?xmlTemplate=default:".$template['Path']."'>";
-            }
-          }
-
-          if ($selected) {
-            $t .= "<input type='submit' style='margin:0px' title='Click to install the application' value='Edit' formtarget='$tabMode' formmethod='post' formaction='UpdateContainer?xmlTemplate=edit:".addslashes($info[$name][template])."'>";
-          }
-        } else {
-          $t .= "<center><font color='red'>Docker Not Enabled</font></center>";
-        }
-      }
-
-      $t .= "</center></td>";
-
-      if ( $template['Removable'] ) {
-        $removable = "<img src='/plugins/dynamix.docker.manager/images/remove.png' title='Remove Application From List' style='width:20px;height:20px;cursor:pointer' onclick='removeApp(&quot;".$template['MyPath']."&quot;,&quot;".$template['Name']."&quot;);'>";
-      } else {
-        $removable = "";
-      }
-      if ( $template['Uninstall'] ) {
-        $uninstall = "<img src='/plugins/dynamix.docker.manager/images/remove.png' title='Uninstall Application' style='width:20px;height:20px;cursor:pointer' ";
-        if ( $template['Plugin'] ) {
-          $uninstall .= "onclick='uninstallApp(&quot;".$template['MyPath']."&quot;,&quot;".$template['Name']."&quot;);'>";
-        } else {
-          $uninstall .= "onclick='uninstallDocker(&quot;".$template['MyPath']."&quot;,&quot;".$template['Name']."&quot;);'>";
-        }
-      } else {
-        $uninstall = "";
-      }
-      if ( $pinnedApps[$template['Repository']] ) {
-        $pinned = "greenButton.png";
-        $pinnedTitle = "Click to unpin this application";
-      } else {
-        $pinned = "redButton.png";
-        $pinnedTitle = "Click to pin this application";
-      }
-      $pinButton = "&nbsp;&nbsp;<img src='/plugins/$plugin/images/$pinned' style='height:15px;width:15px;cursor:pointer' title='$pinnedTitle' onclick='pinApp(this,&quot;".$template['Repository']."&quot;);'>";
-
-      $stars = $template['Stars'] ? "&nbsp;<img src='/plugins/$plugin/images/red-star.png' style='width:15px'><strong>".$template['Stars']."</strong>": "";
-
-      $t .= "<td><center>$dockerName<br>$changes$newIcon$removable$uninstall$pinButton$stars</center>";
-
-      $t .= "<div><center><a href='".$template['Support']."' target='_blank' title='Click to go to the support thread'>[Support]</a></center></div></td>";
-
-      $t .= $template['Downloads'] ? "<td><center>".$template['Downloads']."</center></td>" : "<td><center>Not Available</center></td>";
-
-      $t .= "<td><a style='cursor:pointer' onclick='authorSearch(this.innerHTML);' title='Search for more containers from author'>".$template['Author']."</a></td>";
+      $t .= $template['display_Downloads'];
+      $t .= "<td>".$template['display_author']."</td>";
 
       $t .= "<td><span class='desc_readmore' style='display:block' title='Categories: ".$template['Category']."'>".$template['Description']."</span>";
 
-      if ( $template['ModeratorComment'] ) {
-        $t .= "</strong></b><b><font color='red'>Moderator Comments:</font></b> ".$template['ModeratorComment'];
-      }
-      if ( $template['UpdateAvailable'] ) {
-        if ( $template['Plugin'] ) {
-          $t .= "<br><center><font color='red'><b>Update Available.  Click <a onclick='installPLGupdate(&quot;".$template['MyPath']."&quot;,&quot;".$template['Name']."&quot;);' style='cursor:pointer'>Here</a> to Install</b></center></font>";
-        }  else {
-            $t .= "<br><center><font color='red'><b>Update Available.  Click <a href='Docker'>Here</a> to install</b></font></center>";
-        }
-      }
+      $t .= "<br>".$template['display_ModeratorComment'];
+      $t .= $template['display_UpdateAvailable'];
       $t .= "</b></strong><center>";
-      $t .= ($template['Support']) ? "<a href='".$template['Support']."' target='_blank' title='Click to go to the support thread'><font color=red>Support Thread</font></a>" : "";
-
-      if ( $template['Project'] ) {
-        $t .= "<a target='_blank' title='Click to go the the Project Home Page' href='".$template['Project']."'><font color=red>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Project Home Page</font></a>";
-      }
-      if ( $template['DonateLink'] ) {
-        $t .= "<font size='0'><a href='".$template['DonateLink']."' target='_blank'  title='".addslashes($template['DonateText'])."'>&nbsp;&nbsp;&nbsp;&nbsp;Donate To Author</a></font>";
-      }
+      $t .= $template['display_Support'];
+      $t .= $template['display_Project'];
+      $t .= "&nbsp;&nbsp;&nbsp;".$template['display_DonateLink'];
 
       $t .= "</td>";
 
       $t .= "<td style='text-align:left'><font size=1px>";
 
-      if ( $template['Private'] == "true" ) {
-        $RepoName = $template['RepoName']."<font color=red> (Private)</font>";
-      } else {
-        $RepoName = $template['RepoName'];
-      }
-      if ( $template['Announcement'] ) {
-        $t .="<a href='".$template['Announcement']."' target='_blank' title='Click to go to the repository Announcement thread' >$RepoName</a>";
-      } else {
-        $t .= $RepoName;
-      }
+      $t .= $template['display_Announcement'];
       $t .= "</font></td>";
       $t .= "</tr>";
     }
@@ -1120,13 +999,12 @@ switch ($_POST['action']) {
 ######################################################################################
 
 case 'get_content':
-  $filter   = isset($_POST['filter']) ? urldecode(($_POST['filter'])) : false;
-  $category = isset($_POST['category']) ? '/'.urldecode(($_POST['category'])).'/i' : false;
-  $newApp   = isset($_POST['newApp']) ? urldecode(($_POST['newApp'])) : false;
-
-  $viewMode = isset($_POST['viewMode']) ? urldecode(($_POST['viewMode'])) : "Icon";
-  $sortKey  = isset($_POST['sortBy']) ? urldecode(($_POST['sortBy'])) : "Name";
-  $sortDir  = isset($_POST['sortDir']) ? urldecode(($_POST['sortDir'])) : "Up";
+  $filter   = getPost("filter",false);
+  $category = "/".getPost("category",false)."/i";
+  $newApp   = getPost("newApp",false);
+  $viewMode = getPost("viewMode","Icon");
+  $sortKey  = getPost("sortBy","Name");
+  $sortDir  = getPost("sortDir","Up");
 
   $newAppTime = strtotime($communitySettings['timeNew']);
 
@@ -1385,9 +1263,9 @@ case 'force_update_button':
 ####################################################################################
 
 case 'display_content':
-  $viewMode = isset($_POST['viewMode']) ? urldecode(($_POST['viewMode'])) : "icon";
-  $sortKey  = isset($_POST['sortBy']) ? urldecode(($_POST['sortBy'])) : "Name";
-  $sortDir  = isset($_POST['sortDir']) ? urldecode(($_POST['sortDir'])) : "Up";
+  $viewMode = getPost("viewMode","icon");
+  $sortKey  = getPost("sortBy","Name");
+  $sortDir  = getPost("sortDir","Up");
 
   if ( file_exists($communityPaths['community-templates-displayed']) ) {
     display_apps($viewMode);
@@ -1403,7 +1281,7 @@ case 'display_content':
 ########################################################################
 
 case 'change_docker_view':
-  $viewMode = isset($_POST['view']) ? urldecode(($_POST['view'])) : "icon";
+  $viewMode = getPost("view","icon");
 
   if ( ! file_exists($communityPaths['dockerSearchResults']) ) {
     break;
@@ -1423,7 +1301,7 @@ case 'change_docker_view':
 #######################################################################
 
 case 'convert_docker':
-  $dockerID = isset($_POST['ID']) ? urldecode(($_POST['ID'])) : "";
+  $dockerID = getPost("ID","");
 
   $file = readJsonFile($communityPaths['dockerSearchResults']);
 
@@ -1586,10 +1464,10 @@ case 'convert_docker':
 #########################################################
 
 case 'search_dockerhub':
-  $filter     = isset($_POST['filter']) ? urldecode(($_POST['filter'])) : "";
-  $pageNumber = isset($_POST['page']) ? urldecode(($_POST['page'])) : "1";
-  $viewMode   = isset($_POST['view']) ? urldecode(($_POST['view'])) : "icon";
-
+  $filter     = getPost("filter","");
+  $pageNumber = getPost("page","1");
+  $viewMode   = getPost("view","icon");
+  
   $communityTemplates = readJsonFile($communityPaths['community-templates-info']);
 
   $filter = str_replace(" ","%20",$filter);
@@ -1674,8 +1552,7 @@ case 'dismiss_warning':
 ###############################################################
 
 case 'previous_apps':
-
-  $installed = isset($_POST['installed']) ? urldecode(($_POST['installed'])) : "";
+  $installed = getPost("installed","");
 
   $dockerUpdateStatus = readJsonFile($communityPaths['dockerUpdateStatus']);
   
@@ -1872,7 +1749,7 @@ case 'previous_apps':
 ####################################################################################
 
 case 'remove_application':
-  $application = isset($_POST['application']) ? urldecode(($_POST['application'])) : "";
+  $application = getPost("application","");
 
   @unlink($application);
 
@@ -1886,7 +1763,7 @@ case 'remove_application':
 #######################
 
 case 'uninstall_application':
-  $application = isset($_POST['application']) ? urldecode(($_POST['application'])) : "";
+  $application = getPost("application","");
 
   $filename = pathinfo($application,PATHINFO_BASENAME);
 
@@ -1903,7 +1780,7 @@ case 'uninstall_application':
 #######################
 
 case 'uninstall_docker':
-  $application = isset($_POST['application']) ? urldecode(($_POST['application'])) : "";
+  $application = getPost("application","");
 
 # get the name of the container / image
   $doc = new DOMDocument();
@@ -1938,7 +1815,7 @@ case 'uninstall_docker':
 ##################################
 
 case 'remove_appdata':
-  $appdata = isset($_POST['appdata']) ? urldecode(($_POST['appdata'])) : "";
+  $appdata = getPost("appdata","");
 
   $appdata = trim($appdata);
 
@@ -1955,8 +1832,8 @@ case 'remove_appdata':
 ############################################################
 
 case 'resourceMonitor':
-  $sortKey = isset($_POST['sortBy']) ? urldecode(($_POST['sortBy'])) : "Name";
-  $sortDir = isset($_POST['sortDir']) ? urldecode(($_POST['sortDir'])) : "Up";
+  $sortKey = getPost("sortBy","Name");
+  $sortDir = getPost("sortDir","Up");
 
 #get running containers
 
@@ -2162,8 +2039,8 @@ case 'startCadvisor':
 #################################################
 
 case 'autoUpdatePlugins':
-  $globalUpdate = isset($_POST['globalUpdate']) ? urldecode(($_POST['globalUpdate'])) : "no";
-  $pluginList   = isset($_POST['pluginList']) ? urldecode(($_POST['pluginList'])) : "";
+  $globalUpdate = getPost("globalUpdate","no");
+  $pluginList   = getPost("pluginList","");
 
   if ( $globalUpdate == "yes" ) {
     $updateArray['Global'] = "true";
@@ -2301,7 +2178,7 @@ case 'getOrphanAppdata':
 ########################################
 
 case "deleteAppdata":
-  $paths =  isset($_POST['paths']) ? urldecode(($_POST['paths'])) : "no";
+  $paths = getPost("paths","no");
   $paths = explode("*",$paths);
   foreach ($paths as $path) {
     $userPath = str_replace("/mnt/cache/","/mnt/user/",$path);
@@ -2317,7 +2194,7 @@ case "deleteAppdata":
 ##################################################
 
 case "pinApp":
-  $repository = isset($_POST['repository']) ? urldecode(($_POST['repository'])) : "oops";
+  $repository = getPost("repository","oops");
   
   $pinnedApps = readJsonFile($communityPaths['pinned']);
   
@@ -2327,6 +2204,7 @@ case "pinApp":
     $pinnedApps[$repository] = $repository;
   }
   writeJsonFile($communityPaths['pinned'],$pinnedApps);
+  writeJsonFile($communityPaths['pinnedRam'],$pinnedApps);
   break;
   
 ####################################
@@ -2336,7 +2214,7 @@ case "pinApp":
 ####################################
 
 case "pinnedApps":
-  $pinnedApps = readJsonFile($communityPaths['pinned']);
+  $pinnedApps = getPinnedApps();
   $file = readJsonFile($communityPaths['community-templates-info']);
 
   foreach ($pinnedApps as $pinned) {
@@ -2351,9 +2229,7 @@ case "pinnedApps":
   $displayedApplications['pinnedFlag']  = true;
   writeJsonFile($communityPaths['community-templates-displayed'],$displayedApplications);  
   echo "fini!";
-  break;
-  
-  
+  break;  
 }
 
 

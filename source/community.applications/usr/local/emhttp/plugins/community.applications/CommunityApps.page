@@ -720,8 +720,6 @@ function baseName(path) {
 }
 
 function uninstallApp(application,humanName) {
-  var pluginName = baseName(application);
-
   if ( humanName == "Community Applications" ) {
     myAlert("AE-35 Error",
       "<b><font color='red'>Community Applications</font></b> cannot be uninstalled this way.  You must go to the plugins tab and remove it from there.  <em><font color='purple'>But, why would you ever want to uninstall CA?</font></em>",
