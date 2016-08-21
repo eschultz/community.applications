@@ -655,7 +655,23 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
       
       $displayTemplate = "<tr><td style='margin:0;padding:0'> %60\$s </td><td><center><font color='red'> %58\$s </font></center><center> %50\$s %51\$s %52\$s %53\$s %54\$s %55\$s %56\$s </center></td><td><center> %66\$s <br> %47\$s %46\$s %45\$s %44\$s &nbsp;&nbsp;%43\$s %41\$s </center><td> %42\$s</td><td> %59\$s </td><td><span class='desc_readmore' style='display:block' title='Categories: %21\$s '>%22\$s'</span><br>%39\$s %38\$s</b></strong><center>%37\$s&nbsp;&nbsp;&nbsp;&nbsp;%36\$s&nbsp;&nbsp;&nbsp;&nbsp;%35\$s</td><td style='text-align:left'><font size=1px>%40\$s </font></td></tr>";
       $t .= vsprintf($displayTemplate,toNumericArray($template));
-      
+    }
+    $columnNumber=++$columnNumber;
+
+    if ( $communitySettings['viewMode'] == "icon" ) {
+      if ( $columnNumber == $communitySettings['maxColumn'] ) {
+        $columnNumber = 0;
+        $t .= "</tr><tr>";
+      }
+    }
+    $ct .= $t;
+  }
+
+  $ct .= "</table>";
+
+  return $ct;
+}
+
 /*       $t .= "<tr><td style='margin:0;padding:0'>";
       $t .= $template['display_iconSmall']."</td>";
       $t .= "<td><center>";
@@ -677,22 +693,6 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
       $t .= $template['display_Announcement'];
       $t .= "</font></td>";
       $t .= "</tr>"; */
-    }
-    $columnNumber=++$columnNumber;
-
-    if ( $communitySettings['viewMode'] == "icon" ) {
-      if ( $columnNumber == $communitySettings['maxColumn'] ) {
-        $columnNumber = 0;
-        $t .= "</tr><tr>";
-      }
-    }
-    $ct .= $t;
-  }
-
-  $ct .= "</table>";
-
-  return $ct;
-}
 
 #############################
 #                           #
