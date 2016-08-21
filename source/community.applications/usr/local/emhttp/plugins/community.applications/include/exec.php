@@ -70,7 +70,7 @@ if ( !is_dir($communityPaths['templates-community']) ) {
   @unlink($infoFile);
 }
 
-$iconSize = $communitySettings['iconSize'];
+
 
 # Make sure the link is in place
 if (is_dir("/usr/local/emhttp/state/plugins/$plugin")) exec("rm -rf /usr/local/emhttp/state/plugins/$plugin");
@@ -483,14 +483,14 @@ function display_apps($viewMode) {
 }
 
 function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
-  global $communityPaths, $info, $communitySettings, $plugin, $iconSize;
+  global $communityPaths, $info, $communitySettings, $plugin;
 
   $pinnedApps = getPinnedApps();
   $repos = readJsonFile($communityPaths['Repositories']);
   if ( ! $repos ) {
     $repos = array();
   }
-  
+  $iconSize = $communitySettings['iconSize'];
   $tabMode = $communitySettings['newWindow'];
 
   usort($file,"mySort");
@@ -515,6 +515,7 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
 
   foreach ($file as $template) {
     $name = $template['SortName'];
+    $appName = str_replace(" ","",$template['SortName']);
     $t = "";
     $ID = $template['ID'];
     $selected = $info[$name]['template'] && stripos($info[$name]['icon'], $template['Author']) !== false;
@@ -531,7 +532,7 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
     $template['display_ModeratorComment'] .= $template['ModeratorComment'] ? "</b></strong><font color='red'><b>Moderator Comments:</b></font> ".$template['ModeratorComment'] : "";
     $template['display_Announcement'] = $template['Announcement'] ? "<a href='".$template['Announcement']."' target='_blank' title='Click to go to the repository Announcement thread' >$RepoName</a>" : $RepoName;
     $template['display_Stars'] = $template['Stars'] ? "<img src='/plugins/$plugin/images/red-star.png' style='height:15px;width:15px'> <strong>".$template['Stars']."</strong>" : "";
-    $template['display_Downloads'] = $template['Downloads'] ? "<td><center>".$template['Downloads']."</center></td>" : "<td><center>Not Available</center></td>";
+    $template['display_Downloads'] = $template['Downloads'] ? "<center>".$template['Downloads']."</center>" : "<center>Not Available</center>";
 
     if ( $pinnedApps[$template['Repository']] ) {
       $pinned = "greenButton.png";
@@ -590,11 +591,14 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
       $template['display_compatibleShort'] = "Incompatible";
     }
     $template['display_author'] = "<a style='cursor:pointer' onclick='authorSearch(this.innerHTML);' title='Search for more containers from author'>".$template['Author']."</a>";
-
-
-    $appName = str_replace(" ","",$template['SortName']);
-
-    $dockerRepo="/".str_replace('/','',$template['Repository'])."/i";
+    $displayIcon = $template['IconWeb'];
+    $displayIcon = $displayIcon ? $displayIcon : "/plugins/$plugin/images/question.png";
+    $template['display_iconSmall'] = "<a onclick='showDesc(".$template['ID'].",&#39;".$name."&#39;);' style='cursor:pointer'><img title='Click to display full description' src='".$displayIcon."' style='width:48px;height:48px;' onError='this.src=\"/plugins/$plugin/images/question.png\";'></a>";
+    $template['display_iconSelectable'] = "<img src='$displayIcon' onError='this.src=\"/plugins/$plugin/images/question.png\";' style='width:".$iconSize."px;height=".$iconSize."px;'>";
+    $template['display_popupDesc'] = ( $communitySettings['maxColumn'] > 2 ) ? "Click for a full description\n".$template['PopUpDescription'] : "Click for a full description";
+    $template['display_updateAvail'] = $template['UpdateAvailable'] ? "<br><center><font color='red'><b>Update Available.  Click <a onclick='installPLGupdate(&quot;".$template['MyPath']."&quot;,&quot;".$template['Name']."&quot;);' style='cursor:pointer'>Here</a> to Install</b></center></font>" : "";
+    $template['display_dateUpdated'] = $template['Date'] ? "</b></strong><center><strong>Date Updated: </strong>".$template['display_humanDate']."</center>" : "";
+    $template['display_iconClickable'] = "<a onclick=showDesc($ID,'$appName'); style='cursor:pointer' title='".$template['display_popupDesc']."'>".$template['display_iconSelectable']."</a>";
 
     if ( $communitySettings['dockerSearch'] == "yes" && ! $template['Plugin'] ) {
       $template['display_dockerName'] = "<a style='cursor:pointer' onclick='mySearch(this.innerHTML);' title='Search dockerHub for similar containers'>".$template['Name']."</a>";
@@ -608,60 +612,32 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
       $template['display_dockerName'] .= "<span title='Beta Container &#13;See support forum for potential issues'><font size='1' color='red'><strong>(beta)</strong></font></span>";
     }
 
-    $displayIcon = $template['IconWeb'];
-    $displayIcon = $displayIcon ? $displayIcon : "/plugins/$plugin/images/question.png";
-
     if ( $communitySettings['viewMode'] == "icon" ) {
-      $popUp = "Click for a full description\n".$template['PopUpDescription'];
       $t .= "<td>";
       $t .= "<center>Author:<strong>".$template['display_author']."</strong></center>";
       $t .= "<center><font size='1'>";
-
       $t .= $template['display_Announcement'];
-
       $t .= "</font></center>";
-
       $t .= "<center>";
       $t .= $template['display_pinButton'];
       $t .= $template['display_Stars'];
       $t .= "</center>";
-
-      $t .= "<figure><center><a onclick=showDesc($ID,'$appName'); style='cursor:pointer' title='";
-
-      if ( $communitySettings['maxColumn'] > 2 ) {
-        $t .= $popUp;
-      } else {
-        $t .= "Click for a full description";
-      }
-
-      $t .= "'><img src='$displayIcon' onError='this.src=\"/plugins/$plugin/images/question.png\";' style='width:".$iconSize."px;height=".$iconSize."px;'></a></center><figcaption><strong><center><font size='3'>".$template['display_dockerName']."</font><br>".$template['display_newIcon'].$template['display_changes'].$template['display_removable'].$template['display_Uninstall']."</center></strong></figcaption></figure>";
-
+      $t .= "<figure><center>".$template['display_iconClickable']."</center><figcaption><strong><center><font size='3'>".$template['display_dockerName']."</font><br>".$template['display_newIcon'].$template['display_changes'].$template['display_removable'].$template['display_Uninstall']."</center></strong></figcaption></figure>";
       $t .= "<center><font color='red'>".$template['display_compatibleShort']."</font></center>";
-
       $t .= "<center>".$template['display_pluginSettings'].$template['display_pluginInstall'].$template['display_dockerDefault'].$template['display_dockerEdit'].$template['display_dockerReinstall'].$template['display_dockerInstall'].$template['display_dockerDisable']."</center>";
-
       if ( $communitySettings['maxColumn'] > 2 ) {
         $t .= "<center>".$template['display_Support']."</center>";
-        if ( $template['UpdateAvailable'] ) {
-          $t .= "<br><center><font color='red'><b>Update Available.  Click <a onclick='installPLGupdate(&quot;".$template['MyPath']."&quot;,&quot;".$template['Name']."&quot;);' style='cursor:pointer'>Here</a> to Install</b></center></font>";
-        }
+        $t .= $template['display_updateAvail'];
       }
       $t .= "</td>";
-
       if ( $communitySettings['maxColumn'] == 2 ) {
         $t .= "<td style='display:inline-block;width:350px;text-align:left'>";
         $t .= "<strong>Categories: </strong>".$template['Category']."<br><br>";
         $t .= "<span class='desc_readmore' style='display:block'>";
-
         $t .= "<font color='red'>".$template['display_compatible']."<br></font>";
-
         $t .= $template['Description'];
-
-        if ( $template['Date'] ) {
-          $t .= "</b></strong><center><strong>Date Updated: </strong>".$template['display_humanDate']."</center>";
-        }
+        $t .= $template['display_dateUpdated'];
         $t .= "</span><br>";
-
         $t .= $template['display_ModeratorComment'];
         $t .= $template['display_UpdateAvailable'];
         $t .= "</b></strong><center>";
@@ -675,37 +651,32 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
 ###################################################
 # TABLE MODE
     } else {
-      $t .= "<tr><td style='margin:0;padding:0'>";
-      $t .= "<a onclick='showDesc(".$template['ID'].",&#39;".$name."&#39;);' style='cursor:pointer'><img title='Click to display full description' src='".$displayIcon."' style='width:48px;height:48px;' onError='this.src=\"/plugins/$plugin/images/question.png\";'></a></td>";
-
+      $temp = toNumericArray($template);
+      
+      $displayTemplate = "<tr><td style='margin:0;padding:0'> %60\$s </td><td><center><font color='red'> %58\$s </font></center><center> %50\$s %51\$s %52\$s %53\$s %54\$s %55\$s %56\$s </center></td><td><center> %66\$s <br> %47\$s %46\$s %45\$s %44\$s &nbsp;&nbsp;%43\$s %41\$s </center><td> %42\$s</td><td> %59\$s </td><td><span class='desc_readmore' style='display:block' title='Categories: %21\$s '>%22\$s'</span><br>%39\$s %38\$s</b></strong><center>%37\$s&nbsp;&nbsp;&nbsp;&nbsp;%36\$s&nbsp;&nbsp;&nbsp;&nbsp;%35\$s</td><td style='text-align:left'><font size=1px>%40\$s </font></td></tr>";
+      $t .= vsprintf($displayTemplate,toNumericArray($template));
+      
+/*       $t .= "<tr><td style='margin:0;padding:0'>";
+      $t .= $template['display_iconSmall']."</td>";
       $t .= "<td><center>";
-
       $t .= "<center><font color='red'>".$template['display_compatibleShort']."</font></center>";
-
       $t .= "<center>".$template['display_pluginSettings'].$template['display_pluginInstall'].$template['display_dockerDefault'].$template['display_dockerEdit'].$template['display_dockerReinstall'].$template['display_dockerInstall'].$template['display_dockerDisable']."</center>";
       $t .= "</td>";
-
       $t .= "<td><center>".$template['display_dockerName']."<br>".$template['display_changes'].$template['display_newIcon'].$template['display_removable'].$template['display_Uninstall']."&nbsp;&nbsp;".$template['display_pinButton'].$template['display_Stars']."</center>";
-
       $t .= $template['display_Downloads'];
       $t .= "<td>".$template['display_author']."</td>";
-
       $t .= "<td><span class='desc_readmore' style='display:block' title='Categories: ".$template['Category']."'>".$template['Description']."</span>";
-
       $t .= "<br>".$template['display_ModeratorComment'];
       $t .= $template['display_UpdateAvailable'];
       $t .= "</b></strong><center>";
       $t .= $template['display_Support'];
       $t .= $template['display_Project'];
       $t .= "&nbsp;&nbsp;&nbsp;".$template['display_DonateLink'];
-
       $t .= "</td>";
-
       $t .= "<td style='text-align:left'><font size=1px>";
-
       $t .= $template['display_Announcement'];
       $t .= "</font></td>";
-      $t .= "</tr>";
+      $t .= "</tr>"; */
     }
     $columnNumber=++$columnNumber;
 

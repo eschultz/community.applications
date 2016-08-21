@@ -26,7 +26,6 @@ if ( ! is_file("/boot/config/plugins/$plugin/accepted") ) {
 }
 
 $tabMode = $cfg['newWindow'];
-$waiting = "<tr><td><center><img src='/plugins/community.applications/images/spinner2.gif' style='height:30px;width:30px'></center><br><center>Please Wait... Retrieving application information</center></td></tr>";
   
 $line_color = $display['theme']=='black' ? '#202020' : '#E8E8E8';
 
@@ -361,12 +360,8 @@ function doSearch(button) {
    
   $.post(URL,{action:'get_content',filter:filter,sortBy:sortOrder.sortBy,sortDir:sortOrder.sortDir,viewMode:sortOrder.viewMode},function(data) {
     if (data) { 
-      $("#templates_content").fadeOut("slow",function () {
-        $('#templates_content').html(data);
-        $("#templates_content,#Total1").fadeIn("slow",function() {
-          readMore();
-        });
-      });
+      $('#templates_content').html(data);
+      readMore();
       myCloseAlert();
     }
     $('#templates_list').trigger('update',true);
@@ -431,11 +426,9 @@ function changeDockerView(viewButton) {
   $("#Total").html("Rendering");
   $.post(URL,{action:'change_docker_view',view:sortOrder.viewMode},function(data) {
     if (data) {
-      $("#templates_content").fadeOut("slow",function() {
-        $('#templates_content').html(data);
-        $("#Total").html(totalDisplayed);
-        $("#templates_content").fadeIn("slow");
-      });
+      $('#templates_content').html(data);
+      $("#Total").html(totalDisplayed);
+      $("#templates_content").fadeIn("slow");
       readMore();
     }
   });
@@ -465,12 +458,8 @@ function changeSortOrder(button,buttonClass,previousApps) {
 
     $.post(URL,{action:'display_content',viewMode:sortOrder.viewMode,sortBy:sortOrder.sortBy,sortDir:sortOrder.sortDir},function(data3) {
       if (data3) {
-        $("#templates_content").fadeOut("slow",function() {
-          $('#templates_content').html(data3);
-          $("#templates_content").fadeIn("slow", function() {
-            readMore();
-          });
-        });
+        $('#templates_content').html(data3);
+        readMore();
       }
     });
   }
@@ -558,12 +547,8 @@ function getContent(init,category,description,newApp) {
 
     $.post(URL,{action:'get_content',category:category,newApp:newApp,viewMode:sortOrder.viewMode,sortBy:sortOrder.sortBy,sortDir:sortOrder.sortDir},function(data) {
       if (data) {
-        $("#templates_content").fadeOut("slow",function() {
-          $('#templates_content').html(data);
-          $("#templates_content").fadeIn("slow",function() {
-            readMore();
-          });
-        });
+        $('#templates_content').html(data);
+        readMore();
         myCloseAlert();
         if ( ! initialize )
         {
@@ -675,10 +660,9 @@ function previousApps(button,installed) {
   $("#"+button).prop("disabled",true);
 
   $("#Total").html("Searching... <img src='/plugins/community.applications/images/spinner2.gif' style='height:30px;width:30px'>");
-  $("#templates_content,#resourceMonitor,.dockerSearch,#AppsOnly").fadeOut("slow",function() {
-    $("#templates_content").html("<center><font size='3'>Searching</font></center>");
-    $("#templates_content,#sortButtons,#Total1,#templateSortButtons").fadeIn("slow");
-  });
+  $("#templates_content,#resourceMonitor,.dockerSearch,#AppsOnly").hide();
+  $("#templates_content").html("<center><font size='3'>Searching</font></center>");
+  $("#templates_content,#sortButtons,#Total1,#templateSortButtons").show();
 
   if ( button == "OldApps" ) {
     $("#Category").html("All Previously Installed Applications");
@@ -813,7 +797,6 @@ function uninstallDocker(application,humanName) {
   });
 }
 
-
 function appStore() {
   clearTimeout(monitorInterval);
   $("#templates_content").html("");
@@ -903,10 +886,9 @@ function pinnedApps(button) {
   $(button).prop("disabled",true);
   clearTimeout(monitorInterval);  
   clearSearchBox();
-  $("#templates_content,#resourceMonitor,.dockerSearch,#AppsOnly").fadeOut("slow",function() {
-    $("#templates_content").html("<center><font size='3'>Searching</font></center>");
-    $("#templates_content,#sortButtons,#Total1,#templateSortButtons").fadeIn("slow");
-  });
+  $("#templates_content,#resourceMonitor,.dockerSearch,#AppsOnly").hide();
+  $("#templates_content").html("<center><font size='3'>Searching</font></center>");
+  $("#templates_content,#sortButtons,#Total1,#templateSortButtons").show();
   
   $("#Category").html("All Pinned Applications");
 

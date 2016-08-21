@@ -557,24 +557,85 @@ function getPost($setting,$default) {
   return isset($_POST[$setting]) ? urldecode(($_POST[$setting])) : $default;
 }
 
-##########################################################
-#                                                        #
-# sprintf, but takes an associative array as an input    #
-# $format is "blah blah %index blah blah blah2 %index2") #
-#                                                        #
-##########################################################
+############################################################################
+#                                                                          #
+# Function to convert a template's associative tags to static numeric tags #
+# (Because the associate tag order can change depending upon the template) #
+#                                                                          #
+############################################################################
 
-function sprintf2($str='', $vars=array(), $char='%')
-{
-    if (!$str) return '';
-    if (count($vars) > 0)
-    {
-        foreach ($vars as $k => $v)
-        {
-            $str = str_replace($char . $k, $v, $str);
-        }
-    }
-
-    return $str;
+function toNumericArray($template) {
+  $o[1]  = $template['Repository'];
+  $o[2]  = $template['Author'];
+  $o[3]  = $template['Name'];
+  $o[4]  = $template['DockerHubName'];
+  $o[5]  = $template['Beta'];
+  $o[6]  = $template['Changes'];
+  $o[7]  = $template['Date'];
+  $o[8]  = $template['RepoName'];
+  $o[9]  = $template['Project'];
+  $o[10] = $template['ID'];
+  $o[11] = $template['Base'];
+  $o[12] = $template['BaseImage'];
+  $o[13] = $template['SortAuthor'];
+  $o[14] = $template['SortName'];
+  $o[15] = $template['Licence'];
+  $o[16] = $template['Plugin'];
+  $o[17] = $template['PluginURL'];
+  $o[18] = $template['PluginAuthor'];
+  $o[19] = $template['MinVer'];
+  $o[20] = $template['MaxVer'];
+  $o[21] = $template['Category'];
+  $o[22] = $template['Description'];
+  $o[23] = $template['Overview'];
+  $o[24] = $template['Downloads'];
+  $o[25] = $template['Stars'];
+  $o[26] = $template['Announcement'];
+  $o[27] = $template['Support'];
+  $o[28] = $template['IconWeb'];
+  $o[29] = $template['DonateText'];
+  $o[30] = $template['DonateImg'];
+  $o[31] = $template['DonateLink'];
+  $o[32] = $template['PopUpDescription'];
+  $o[33] = $template['ModeratorComment'];
+  $o[34] = $template['Compatible'];
+  $o[35] = $template['display_DonateLink'];
+  $o[36] = $template['display_Project'];
+  $o[37] = $template['display_Support'];
+  $o[38] = $template['display_UpdateAvailable'];
+  $o[39] = $template['display_ModeratorComment'];
+  $o[40] = $template['display_Announcement'];
+  $o[41] = $template['display_Stars'];
+  $o[42] = $template['display_Downloads'];
+  $o[43] = $template['display_pinButton'];
+  $o[44] = $template['display_Uninstall'];
+  $o[45] = $template['display_removable'];
+  $o[46] = $template['display_newIcon'];
+  $o[47] = $template['display_changes'];
+  $o[48] = $template['display_webPage'];
+  $o[49] = $template['display_humanDate'];
+  $o[50] = $template['display_pluginSettings'];
+  $o[51] = $template['display_pluginInstall'];
+  $o[52] = $template['display_dockerDefault'];
+  $o[53] = $template['display_dockerEdit'];
+  $o[54] = $template['display_dockerReinstall'];
+  $o[55] = $template['display_dockerInstall'];
+  $o[56] = $template['display_dockerDisable'];
+  $o[57] = $template['display_compatible'];
+  $o[58] = $template['display_compatibleShort'];
+  $o[59] = $template['display_author'];
+  $o[60] = $template['display_iconSmall'];
+  $o[61] = $template['display_iconSelectable'];
+  $o[62] = $template['display_popupDesc'];
+  $o[63] = $template['display_updateAvail'];
+  $o[64] = $template['display_dateUpdated'];
+  $o[65] = $template['display_iconClickable'];
+  $o[66] = $template['display_dockerName'];
+  $o[67] = $template['Path'];
+  return $o;
 }
+  
+
+  
+
 ?>
