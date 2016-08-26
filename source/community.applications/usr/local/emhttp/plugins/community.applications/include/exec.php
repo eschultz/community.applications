@@ -497,21 +497,12 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
 
   $communitySettings['viewMode'] = $viewMode;
 
-  switch ( $viewMode ) {
-    case "icon":
-      $displayTemplate = "<td><center>Author: <strong>%59\$s</strong></center><center><font size='1'>%40\$s</font></center><center>%43\$s%41\$s</center><figure><center>%65\$s</center><figcaption><strong><center><font size='3'>%66\$s</font><br>%46\$s%47\$s%45\$s%44\$s</center></strong></figcaption></figure><center><font color='red'>%58\$s</font></center><center>%50\$s%51\$s%52\$s%53\$s%54\$s%55\$s%56\$s</center></td>";
-      $ct = "<table class='tablesorter'><tr>";
-      break;
-    case "table":
-      $displayTemplate = "<tr><td style='margin:0;padding:0'> %60\$s </td><td><center><font color='red'> %58\$s </font></center><center> %50\$s %51\$s %52\$s %53\$s %54\$s %55\$s %56\$s </center></td><td><center> %66\$s <br> %47\$s %46\$s %45\$s %44\$s &nbsp;&nbsp;%43\$s %41\$s </center><td> %42\$s</td><td> %59\$s </td><td><span class='desc_readmore' style='display:block' title='Categories: %21\$s '>%22\$s'</span><br>%39\$s %38\$s</b></strong><center>%37\$s&nbsp;&nbsp;&nbsp;&nbsp;%36\$s&nbsp;&nbsp;&nbsp;&nbsp;%35\$s</td><td style='text-align:left'><font size=1px>%40\$s </font></td></tr>";
-      $ct = "<table class='tablesorter'><thead><th></th><th style='width:100px'></th><th>Application</th><th>Downloads</th><th>Author</th><th>Description</th><th>Repository</th></tr></thead><tr>";
-      break;
-    case "detail":
-      $displayTemplate = "<td><center>Author: <strong>%59\$s</strong></center><center><font size='1'>%40\$s</font></center><center>%43\$s%41\$s</center><figure><center>%65\$s</center><figcaption><strong><center><font size='3'>%66\$s</font><br>%46\$s%47\$s%45\$s%44\$s</center></strong></figcaption></figure><center><font color='red'>%58\$s</font></center><center>%50\$s%51\$s%52\$s%53\$s%54\$s%55\$s%56\$s</center></td><td style='display:inline-block;width:350px;text-align:left'><strong>Categories: </strong>%21\$s<br><span class='desc_readmore' style='display:block'><font color='red'>%57\$s<br></font>%22\$s%64\$s</span><br>%39\$s%63\$s</b></strong><center>%37\$s%36\$s%48\$s<br>%35\$s</center><font><td>";
-      $ct = "<table class='tablesorter'><tr>";
-      $communitySettings['maxColumn'] = 2;       /* Temporarily set configuration values to reflect icon details mode */
-      $communitySettings['viewMode'] = "icon";
-      break;
+  $skin = readJsonFile($communityPaths['defaultSkin']);
+  $ct = $skin[$viewMode]['header'].$skin[$viewMode]['sol'];
+  $displayTemplate = $skin[$viewMode]['template'];
+  if ( $viewMode == "detail" ) {
+    $communitySettings['maxColumn'] = 2; 
+    $communitySettings['viewMode'] = "icon";
   }
 
   $columnNumber = 0;
@@ -627,72 +618,19 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
     if ( $communitySettings['viewMode'] == "icon" ) {
       if ( $columnNumber == $communitySettings['maxColumn'] ) {
         $columnNumber = 0;
-        $t .= "</tr><tr>";
+        $t .= $skin[$viewMode]['eol'].$skin[$viewMode]['sol'];
       }
+    } else {
+      $t .= $skin[$viewMode]['eol'].$skin[$viewMode]['sol'];
     }
+ 
     $ct .= $t;
   }
 
-  $ct .= "</table>";
+  $ct .= $skin[$viewMode]['footer'];
 
   return $ct;
 }
-    /*       $t .= "<td>";
-      $t .= "<center>Author:<strong>".$template['display_author']."</strong></center>";
-      $t .= "<center><font size='1'>";
-      $t .= $template['display_Announcement'];
-      $t .= "</font></center>";
-      $t .= "<center>";
-      $t .= $template['display_pinButton'];
-      $t .= $template['display_Stars'];
-      $t .= "</center>";
-      $t .= "<figure><center>".$template['display_iconClickable']."</center><figcaption><strong><center><font size='3'>".$template['display_dockerName']."</font><br>".$template['display_newIcon'].$template['display_changes'].$template['display_removable'].$template['display_Uninstall']."</center></strong></figcaption></figure>";
-      $t .= "<center><font color='red'>".$template['display_compatibleShort']."</font></center>";
-     $t .= "<center>".$template['display_pluginSettings'].$template['display_pluginInstall'].$template['display_dockerDefault'].$template['display_dockerEdit'].$template['display_dockerReinstall'].$template['display_dockerInstall'].$template['display_dockerDisable']."</center>";
-      if ( $communitySettings['maxColumn'] > 2 ) {
-        $t .= "<center>".$template['display_Support']."</center>";
-        $t .= $template['display_updateAvail'];
-      }
-      $t .= "</td>";
-      if ( $communitySettings['maxColumn'] == 2 ) {
-         $t .= "<td style='display:inline-block;width:350px;text-align:left'>";
-       $t .= "<strong>Categories: </strong>".$template['Category']."<br><br>";
-        $t .= "<span class='desc_readmore' style='display:block'>";
-         $t .= "<font color='red'>".$template['display_compatible']."<br></font>"; 
-        $t .= $template['Description'];
-        $t .= $template['display_dateUpdated'];
-        $t .= "</span><br>";
-        $t .= $template['display_ModeratorComment'];
-        $t .= $template['display_UpdateAvailable'];
-        $t .= "</b></strong><center>";
-        $t .= $template['display_Support'];
-        $t .= $template['display_Project'];
-        $t .= $template['display_webPage'];
-        $t .= "<br>".$template['display_DonateLink'];
-        $t .= "</center></font>";
-        $t .= "</td>";
-      } */
-/*       $t .= "<tr><td style='margin:0;padding:0'>";
-      $t .= $template['display_iconSmall']."</td>";
-      $t .= "<td><center>";
-      $t .= "<center><font color='red'>".$template['display_compatibleShort']."</font></center>";
-      $t .= "<center>".$template['display_pluginSettings'].$template['display_pluginInstall'].$template['display_dockerDefault'].$template['display_dockerEdit'].$template['display_dockerReinstall'].$template['display_dockerInstall'].$template['display_dockerDisable']."</center>";
-      $t .= "</td>";
-      $t .= "<td><center>".$template['display_dockerName']."<br>".$template['display_changes'].$template['display_newIcon'].$template['display_removable'].$template['display_Uninstall']."&nbsp;&nbsp;".$template['display_pinButton'].$template['display_Stars']."</center>";
-      $t .= $template['display_Downloads'];
-      $t .= "<td>".$template['display_author']."</td>";
-      $t .= "<td><span class='desc_readmore' style='display:block' title='Categories: ".$template['Category']."'>".$template['Description']."</span>";
-      $t .= "<br>".$template['display_ModeratorComment'];
-      $t .= $template['display_UpdateAvailable'];
-      $t .= "</b></strong><center>";
-      $t .= $template['display_Support'];
-      $t .= $template['display_Project'];
-      $t .= "&nbsp;&nbsp;&nbsp;".$template['display_DonateLink'];
-      $t .= "</td>";
-      $t .= "<td style='text-align:left'><font size=1px>";
-      $t .= $template['display_Announcement'];
-      $t .= "</font></td>";
-      $t .= "</tr>"; */
 
 #############################
 #                           #
@@ -819,28 +757,22 @@ function displaySearchResults($pageNumber,$viewMode) {
 
   echo "<br><br>";
 
+  $iconSize = $communitySettings['iconSize'];
+  $maxColumn = $communitySettings['maxColumn'];
+
   switch ($viewMode) {
     case "icon":
       $t = "<table>";
       break;
     case "table":
       $t =  "<table class='tablesorter'><thead><th></th><th></th><th>Container</th><th>Author</th><th>Stars</th><th>Description</th></thead>";
+      $iconSize = 48;
       break;
     case "detail":
       $t = "<table class='tablesorter'>";
+      $viewMode = "icon";
+      $maxColumn = 2;
       break;
-  }
-
-  $iconSize = $communitySettings['iconSize'];
-
-  if ( $viewMode == "table" ) {
-    $iconSize = 48;
-  }
-
-  $maxColumn = $communitySettings['maxColumn'];
-  if ( $viewMode == "detail" ) {
-    $viewMode = "icon";
-    $maxColumn = 2;
   }
 
   $column = 0;
@@ -856,19 +788,16 @@ function displaySearchResults($pageNumber,$viewMode) {
         $result['Description'] = str_replace('"',"&quot;",$result['Description']);
       }
     }
+    $result['display_stars'] = $result['Stars'] ? "<img src='/plugins/$plugin/images/red-star.png' style='height:20px;width:20px'> <strong>".$result['Stars']."</strong>" : "";
+    $result['display_official'] =  $result['Official'] ? "<strong><font color=red>Official</font> ".$result['Name']." container.</strong><br><br>": "";
+    $result['display_official_short'] = $result['Official'] ? "<font color='red'><strong>Official</strong></font>" : "";
 
     if ( $viewMode == "icon" ) {
       $t .= "<td>";
-
-      if ( $result['Official'] ) {
-        $t .= "<center><font color='red'><strong>Official</strong></font></center>";
-      }
+      $t .= "<center>".$result['display_official_short']."</center>";
 
       $t .= "<center>Author: </strong><font size='3'><a style='cursor:pointer' onclick='mySearch(this.innerHTML);' title='Search Containers From Author'>".$result['Author']."</a></font></center>";
-
-      if ( $result['Stars'] ) {
-        $t .= "<center><img src='/plugins/$plugin/images/red-star.png' style='height:20px;width:20px'> <strong>".$result['Stars']."</strong></center>";
-      }
+      $t .= "<center>".$result['display_stars']."</center>";
 
       $description = "Click to go to the dockerHub website for this container";
       if ( $result['Description'] ) {
@@ -886,9 +815,7 @@ function displaySearchResults($pageNumber,$viewMode) {
         $t .= "<td style='display:inline-block;width:350px;text-align:left;'>";
         $t .= "<br><br><br>";
 
-        if ( $result['Official'] ) {
-          $t .= "<strong><font color=red>Official</font> ".$result['Name']." container.</strong><br><br>";
-        }
+        $t .= $result['display_official'];
 
         if ( $result['Description'] ) {
           $t .= "<strong><span class='desc_readmore' style='display:block'>".$result['Description']."</span></strong><br><br>";
@@ -916,16 +843,10 @@ function displaySearchResults($pageNumber,$viewMode) {
 
       $t .= "<td><a style='cursor:pointer' onclick='mySearch(this.innerHTML);' title='Search Similar Containers'>".$result['Name']."</a></td>";
       $t .= "<td><a style='cursor:pointer' onclick='mySearch(this.innerHTML);' title='Search Containers From Author'>".$result['Author']."</a></td>";
-      if ( $result['Stars'] ) {
-        $t .= "<td><img src='/plugins/$plugin/images/red-star.png' style='height:20px;width:20px'> <strong>".$result['Stars']."</strong></td>";
-      } else {
-        $t .= "<td></td>";
-      }
+      $t .= "<td>".$result['display_stars']."</td>";
 
       $t .= "<td>";
-      if ( $result['Official'] ) {
-        $t .= "<strong><font color=red>Official</font> ".$result['Name']." container.</strong><br><br>";
-      }
+      $t .= $result['display_official'];
       $t .= "<strong><span class='desc_readmore' style='display:block'>".$result['Description']."</span></strong></td>";
       $t .= "</tr>";
     }

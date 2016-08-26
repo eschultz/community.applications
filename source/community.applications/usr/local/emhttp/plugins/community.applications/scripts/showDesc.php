@@ -13,7 +13,6 @@ require_once("/usr/local/emhttp/plugins/dynamix.docker.manager/include/DockerCli
 
 $DockerTemplates = new DockerTemplates();
 
-
 if ( is_dir("/var/lib/docker/containers") ) {
   $communitySettings['dockerRunning'] = "true";
 } else {
@@ -29,8 +28,6 @@ if ( $communitySettings['dockerRunning'] ) {
   $dockerRunning = array();
   $o = "";
 }
-#print_r($info);
-
 
 $appNumber =  urldecode($_GET['appNumber']);
 
@@ -53,7 +50,6 @@ if ( $templateIndex === false ) {
 } else {
   $template = $displayed['community'][$templateIndex];
 }
-#$template = $file[$templateIndex];
 
 $repoIndex = searchArray($repos,"name",$template['RepoName']);
 $webPageURL = $repos[$repoIndex]['web'];
@@ -61,7 +57,6 @@ $webPageURL = $repos[$repoIndex]['web'];
 $donatelink = $template['DonateLink'];
 $donateimg = $template['DonateImg'];
 $donatetext = $template['DonateText'];
-
 
 $name = $template['Name'];
 
@@ -192,11 +187,7 @@ if ( ($donatelink) && ($donateimg) ) {
     $templateDescription .= "<br><font size='0'>The above link is set by the author of the template, not the author of Community Applications</font></center>";
   }
 }
-$templateDescription .= "
-  <script>
-    document.getElementById('wait').innerHTML = '';
-  </script>
-";
+$templateDescription .= "<script>document.getElementById('wait').innerHTML = '';</script>";
 if ( $imageID ) {
   $templateDescription .= "
     <script src='/webGui/javascript/dynamix.js'></script>
