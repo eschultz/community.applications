@@ -223,10 +223,6 @@ $("#calculateAppdata").click(function() {
   calculateAppdataSize();
 });
 
-$(".dockerView").click(function() {
-  changeDockerView(this.id);
-});
-
 $(".initDockerSearch").click(function() {
   initDockerSearch();
 });
@@ -343,7 +339,7 @@ function doSearch(button) {
   }
   
   $("#sortButtons,#MainCategory,#topLevelButton").show();
-  $("#dockerButtons,#NetworkCategory,#MediaAppCategory,#MediaServerCategory,#NONE,#ToolsCategory").hide();
+  $("#NetworkCategory,#MediaAppCategory,#MediaServerCategory,#NONE,#ToolsCategory").hide();
 
   $("#convert").val("");
 
@@ -416,7 +412,6 @@ function enableButtons() {
 }
 
 function changeDockerView(viewButton) {
-  $(".dockerView").prop("disabled", false);      
   $("#"+viewButton).prop("disabled",true);
 
   var sortOrder = new Object();
@@ -594,7 +589,7 @@ function dockerSearch(pageNumber)
 
   $(".appButtons").prop("disabled",false);
   $("#AppStore").prop("disabled",true);
-  $("#AppsOnly,#New,#UNCATEGORIZED,#All").show();
+  $("#AppsOnly,#New,#UNCATEGORIZED,#All,#sortButtons").show();
 
   $(".dockerSearch,#templateSortButtons").hide();
 
@@ -978,10 +973,6 @@ Sort Direction:
 <input type='button' class='dirButton' id='Up' value='Ascending' style='margin:1px' disabled>
 <input type='button' class='dirButton' id='Down' value='Descending' style='margin:1px'>
 </center></span></span>
-<span id='dockerButtons' hidden><center>View Mode:
-<input type='button' class='dockerView' id='dockerTable' value='Tables' style='margin:1px'>
-<input type='button' class='dockerView' id='dockerDetail' value='Icon Details' style='margin:1px'>
-<input type='button' class='dockerView' id='dockerIcon' value='Icons style='margin:1px'></center></span>
 <span id='upgradeAvailable' hidden><center> <font color='red'>An update to Community Applications is Available. Click <a onclick=installPLGupdate('community.applications.plg',"CommunityApplications"); style=cursor:pointer>HERE</a> to install the update  <img src='/plugins/community.applications/images/information.png' onclick='showInfo("CA","Community Applications");' style='cursor:pointer'></center></font></span>
 
 <div class='dockerSearch' style='display:none'><center><input type=button class='initDockerSearch' value='Get more results from dockerHub'></input></center></div>
@@ -1002,10 +993,9 @@ Sort Direction:
 <tbody id='resourceBody'></tbody>
 </table>
 </div>
-<span id='appWarning' hidden>
-<center><img src='https://raw.githubusercontent.com/Squidly271/community.applications/master/webImages/Warning2.png' height='50px' width='50px'><br>
+<div id='appWarning' style='display:none'><center><img src='https://raw.githubusercontent.com/Squidly271/community.applications/master/webImages/Warning2.png' height='50px' width='50px'><br>
 <font size='2' color='red'>Note: All Applications listed here are 3rd party additions to unRaid.<br>Neither the authors of Community Applications nor Limetech make any warranty as to the suitability of any applications listed herein</font>
-<br><input type='button' value='Dismiss Warning' onclick='dismissWarning();'></input></center></span>
+<br><input type='button' value='Dismiss Warning' onclick='dismissWarning();'></input></center></div>
 </center>
 <a href="#" class="back-to-top" style="display: inline;">
 <img src='/plugins/community.applications/images/up.png' style='width:50px;height:50px' href="#" class="back-to-top"></img>
