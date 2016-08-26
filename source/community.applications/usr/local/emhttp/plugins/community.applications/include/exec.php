@@ -854,7 +854,6 @@ function displaySearchResults($pageNumber,$viewMode) {
         $result['Description'] = $template['Description'];
         $result['Description'] = str_replace("'","&#39;",$result['Description']);
         $result['Description'] = str_replace('"',"&quot;",$result['Description']);
- #       $recommended = true;
       }
     }
 
@@ -879,13 +878,7 @@ function displaySearchResults($pageNumber,$viewMode) {
       $t .= "<figure><center><a href='".$result['DockerHub']."' title='$description' target='_blank'>";
       $t .= "<img style='width:".$iconSize."px;height:".$iconSize."px;' src='".$result['Icon']."' onError='this.src=\"/plugins/$plugin/images/question.png\";'></a>";
       $t .= "<figcaption><strong><center><font size='3'><a style='cursor:pointer' onclick='mySearch(this.innerHTML);' title='Search For Similar Containers'>".$result['Name']."</a></font></center></strong></figcaption></figure>";
-
-      if ( $recommended ) {
-        $searchTerm = explode("/",$result['Repository']);
-        $t .= "<center><input type='button' value='Display Recommended' onclick='recommendedSearch(&#39;".$searchTerm[1]."&#39;)' style='margin:0px'></center>";
-      } else {
-        $t .= "<center><input type='button' value='Add' onclick='dockerConvert(&#39;".$result['ID']."&#39;)' style='margin:0px'></center>";
-      }
+      $t .= "<center><input type='button' value='Add' onclick='dockerConvert(&#39;".$result['ID']."&#39;)' style='margin:0px'></center>";
 
       $t .= "</td>";
 
@@ -919,13 +912,7 @@ function displaySearchResults($pageNumber,$viewMode) {
       $t .= "<tr><td><a href='".$result['DockerHub']."' target='_blank' title='Click to go to the dockerHub website for this container'>";
       $t .= "<img src='".$result['Icon']."' onError='this.src=\"/plugins/$plugin/images/question.png\";' style='width:".$iconSize."px;height:".$iconSize."px;'>";
       $t .= "</a></td>";
-
-      if ( $recommended ) {
-        $searchTerm = explode("/",$result['Repository']);
-        $t .= "<td><input type='button' value='Display Recommended' onclick='recommendedSearch(&#39;".$searchTerm[1]."&#39;)' style='margin:0px'></td>";
-      } else {
-        $t .= "<td><input type='button' value='Add' onclick='dockerConvert(&#39;".$result['ID']."&#39;)';></td>";
-      }
+      $t .= "<td><input type='button' value='Add' onclick='dockerConvert(&#39;".$result['ID']."&#39;)';></td>";
 
       $t .= "<td><a style='cursor:pointer' onclick='mySearch(this.innerHTML);' title='Search Similar Containers'>".$result['Name']."</a></td>";
       $t .= "<td><a style='cursor:pointer' onclick='mySearch(this.innerHTML);' title='Search Containers From Author'>".$result['Author']."</a></td>";

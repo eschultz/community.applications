@@ -11,7 +11,6 @@ Title="Community Applications"
 
 require_once("/usr/local/emhttp/plugins/community.applications/include/caCredits.php");
 
-
 $installedVersion = exec("/usr/local/emhttp/plugins/dynamix.plugin.manager/scripts/plugin version /var/log/plugins/community.applications.plg");
 if ( is_file("/tmp/plugins/community.applications.plg") ) {
   $upgradeVersion = exec("/usr/local/emhttp/plugins/dynamix.plugin.manager/scripts/plugin version /tmp/plugins/community.applications.plg");
@@ -296,10 +295,6 @@ function showDesc(appNumber,appName) {
 }
 function showStats(appNumber,appName) {
   openBox('<?=$execPath?>/showStats.sh',appName + " Statistics",550,550);
-}
-function recommendedSearch(repository) {
-  $('#searchBox').val(repository);
-  doSearch(false);
 }
 
 function doSearch(button) {
