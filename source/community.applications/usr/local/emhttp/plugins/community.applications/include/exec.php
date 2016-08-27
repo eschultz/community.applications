@@ -85,14 +85,11 @@ if (!is_link("/usr/local/emhttp/state/plugins/$plugin")) symlink($communityPaths
 function DownloadCommunityTemplates() {
   global $communityPaths, $infoFile, $DockerTemplates, $plugin, $communitySettings, $unRaidVersion;
 
-  if ( is_file($communityPaths['moderation']) ) {
-    $moderation = readJsonFile($communityPaths['moderation']);
-    if ( ! is_array($moderation) ) {
+  $moderation = readJsonFile($communityPaths['moderation']);
+  if ( ! is_array($moderation) ) {
       $moderation = array();
-    }
-  } else {
-    $moderation = array();
   }
+
   $DockerTemplates = new DockerTemplates();
 
   if (! $download = download_url($communityPaths['community-templates-url']) ) {
@@ -192,14 +189,11 @@ function DownloadCommunityTemplates() {
 function DownloadApplicationFeed() {
   global $communityPaths, $infoFile, $DockerTemplates, $plugin, $communitySettings, $unRaidVersion;
 
-  if ( file_exists($communityPaths['moderation']) ) {
-    $moderation = readJsonFile($communityPaths['moderation']);
-    if ( ! is_array($moderation) ) {
-      $moderation = array();
-    }
-  } else {
+  $moderation = readJsonFile($communityPaths['moderation']);
+  if ( ! is_array($moderation) ) {
     $moderation = array();
   }
+
   $Repositories = readJsonFile($communityPaths['Repositories']);
   if ( ! $Repositories ) {
     $Repositories = array();
@@ -210,7 +204,6 @@ function DownloadApplicationFeed() {
     return false;
   }
   $ApplicationFeed  = readJsonFile($downloadURL);
-
   if ( ! is_array($ApplicationFeed) ) {
     return false;
   }
@@ -336,12 +329,8 @@ function getConvertedTemplates() {
 
   $appCount = count($myTemplates);
 
-  if ( is_file($communityPaths['moderation']) ) {
-    $moderation = readJsonFile($communityPaths['moderation']);
-    if ( ! is_array($moderation) ) {
-      $moderation = array();
-    }
-  } else {
+  $moderation = readJsonFile($communityPaths['moderation']);
+  if ( ! is_array($moderation) ) {
     $moderation = array();
   }
 
@@ -424,12 +413,9 @@ function display_apps($viewMode) {
       $navigate[] = "doesn't matter what's here -> first element gets deleted anyways";
       $display = "<center><b>";
 
-      if ( is_file($communityPaths['logos']) ) {
-        $logos = readJsonFile($communityPaths['logos']);
-
-        if ( $logos[$officialRepo] ) {
-          $display .= "<img src='".$logos[$officialRepo]."' style='width:48px'>&nbsp;&nbsp;";
-        }
+      $logos = readJsonFile($communityPaths['logos']);
+      if ( $logos[$officialRepo] ) {
+        $display .= "<img src='".$logos[$officialRepo]."' style='width:48px'>&nbsp;&nbsp;";
       }
 
       $display .= "<font size='4' color='purple' id='OFFICIAL'>$officialRepo</font></b></center><br>";
@@ -486,6 +472,7 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
   global $communityPaths, $info, $communitySettings, $plugin;
 
   $pinnedApps = getPinnedApps();
+  $logos = readJsonFile($communityPaths['logos']);
   $repos = readJsonFile($communityPaths['Repositories']);
   if ( ! $repos ) {
     $repos = array();
@@ -498,6 +485,7 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
   $communitySettings['viewMode'] = $viewMode;
 
   $skin = readJsonFile($communityPaths['defaultSkin']);
+ # print_r($skin);
   $ct = $skin[$viewMode]['header'].$skin[$viewMode]['sol'];
   $displayTemplate = $skin[$viewMode]['template'];
   if ( $viewMode == "detail" ) {
@@ -532,7 +520,8 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
       $template['display_UpdateAvailable'] = $template['Plugin'] ? "<br><center><font color='red'><b>Update Available.  Click <a onclick='installPLGupdate(&quot;".$template['MyPath']."&quot;,&quot;".$template['Name']."&quot;);' style='cursor:pointer'>Here</a> to Install</b></center></font>" : "<br><center><font color='red'><b>Update Available.  Click <a href='Docker'>Here</a> to install</b></font></center>";
     }
     $template['display_ModeratorComment'] .= $template['ModeratorComment'] ? "</b></strong><font color='red'><b>Moderator Comments:</b></font> ".$template['ModeratorComment'] : "";
-    $template['display_Announcement'] = $template['Announcement'] ? "<a href='".$template['Announcement']."' target='_blank' title='Click to go to the repository Announcement thread' >$RepoName</a>" : $RepoName;
+    $tempLogo = $logos[$RepoName] ? "<img src='".$logos[$RepoName]."' height=20px>" : "";
+    $template['display_Announcement'] = $template['Announcement'] ? "<a href='".$template['Announcement']."' target='_blank' title='Click to go to the repository Announcement thread' >$RepoName $tempLogo</a>" : "$RepoName $tempLogo";
     $template['display_Stars'] = $template['Stars'] ? "<img src='/plugins/$plugin/images/red-star.png' style='height:15px;width:15px'> <strong>".$template['Stars']."</strong>" : "";
     $template['display_Downloads'] = $template['Downloads'] ? "<center>".$template['Downloads']."</center>" : "<center>Not Available</center>";
 

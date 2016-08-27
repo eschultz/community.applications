@@ -971,9 +971,9 @@ Sort Direction:
 <span id='upgradeAvailable' hidden><center> <font color='red'>An update to Community Applications is Available. Click <a onclick=installPLGupdate('community.applications.plg',"CommunityApplications"); style=cursor:pointer>HERE</a> to install the update  <img src='/plugins/community.applications/images/information.png' onclick='showInfo("CA","Community Applications");' style='cursor:pointer'></center></font></span>
 
 <div class='dockerSearch' style='display:none'><center><input type=button class='initDockerSearch' value='Get more results from dockerHub'></input></center></div>
-<table>
-<br><br><tbody id='templates_content'></tbody>
-</table>
+
+<span id='templates_content'></span>
+
 <div id='resourceMonitor' hidden>
 <center>Sort By:
 <input type='button' value='Name' id='resourceName' class='resourceSort' style='margin:1px' disabled>
