@@ -342,14 +342,11 @@ function doSearch(button) {
     getContent(true,'INITIALIZE','None Selected');
     return;
   }
-
-  var sortOrder = new Object();
- 
-  sortOrder = getSortOrder();
+  var sortOrder = getSortOrder();
 
   myAlert("Searching...", "Searching for <strong><font color=red>"+filter+"</font></strong>","/plugins/community.applications/images/spinner2.gif","40x40");
    
-  $.post(URL,{action:'get_content',filter:filter,sortBy:sortOrder.sortBy,sortDir:sortOrder.sortDir,viewMode:sortOrder.viewMode},function(data) {
+  $.post(URL,{action:'get_content',filter:filter,sortOrder:sortOrder},function(data) {
     if (data) { 
       $('#templates_content').html(data);
       readMore();
@@ -437,16 +434,13 @@ function changeSortOrder(button,buttonClass,previousApps) {
     $("#Up").prop("disabled", false);
   }
 
-  var sortOrder = new Object();
-
-  sortOrder = getSortOrder();
-
+  var sortOrder = getSortOrder();
   if ( $("#templateSortButtons").is(":hidden") ) {
     changeDockerView(button);
   } else {
     $("#Total").html("Rendering... <img src='/plugins/community.applications/images/spinner2.gif' style='height:30px;width:30px'>");
 
-    $.post(URL,{action:'display_content',viewMode:sortOrder.viewMode,sortBy:sortOrder.sortBy,sortDir:sortOrder.sortDir},function(data3) {
+    $.post(URL,{action:'display_content',sortOrder:sortOrder},function(data3) {
       if (data3) {
         $('#templates_content').html(data3);
         readMore();
@@ -466,7 +460,7 @@ function getSortOrder() {
   if ( $("#RepoName").prop("disabled") )       sortOrder.sortBy = "RepoName";
   if ( $("#Author").prop("disabled") )         sortOrder.sortBy = "SortAuthor";
   if ( $("#Date").prop("disabled") )           sortOrder.sortBy = "Date";
-  if ( $("#Downloads").prop("disabled") )      sortOrder.sortBy = "Downloads";
+  if ( $("#Downloads").prop("disabled") )      sortOrder.sortBy = "downloads";
 
   if ( $("#Up").prop("disabled") )             sortOrder.sortDir = "Up";
   if ( $("#Down").prop("disabled") )           sortOrder.sortDir = "Down";
@@ -477,8 +471,8 @@ function getSortOrder() {
   
   if ( $("#resourceUp").prop("disabled") )     sortOrder.resourceDir = "Up";
   if ( $("#resourceDown").prop("disabled") )   sortOrder.resourceDir = "Down";
-
-  return sortOrder;
+  var sort = [sortOrder.viewMode,sortOrder.sortBy,sortOrder.sortDir,sortOrder.resourceKey,sortOrder.resourceDir];
+  return sort;
 }
 
 function getContent(init,category,description,newApp) {
@@ -532,10 +526,9 @@ function getContent(init,category,description,newApp) {
     if ( category == "New" ) { category = ""; }
     if ( category == "All" ) { category = ""; }
 
-    var sortOrder = new Object();
-    sortOrder = getSortOrder();
+    var sortOrder = getSortOrder();
 
-    $.post(URL,{action:'get_content',category:category,newApp:newApp,viewMode:sortOrder.viewMode,sortBy:sortOrder.sortBy,sortDir:sortOrder.sortDir},function(data) {
+    $.post(URL,{action:'get_content',category:category,newApp:newApp,sortOrder:sortOrder},function(data) {
       if (data) {
         $('#templates_content').html(data);
         readMore();
@@ -592,12 +585,11 @@ function dockerSearch(pageNumber)
 
   $("#Category").html("DockerHub Search Results For <font color='red'>"+filter+"</font> <span id='pageNumber'></span>");
 
-  var sortOrder = new Object();
   sortOrder = getSortOrder();
 
   myAlert("Searching dockerHub", "Retrieving <strong><font color=red>"+filter+"</font></strong> page <strong><font color=red>"+pageNumber+"</font></strong>","/plugins/community.applications/images/spinner2.gif","40x40");
 
-  $.post(URL,{action:'search_dockerhub',filter:filter,page:pageNumber,view:sortOrder.viewMode},function(data) {
+  $.post(URL,{action:'search_dockerhub',filter:filter,page:pageNumber,view:sortOrder[0]},function(data) {
     if (data) {
       $('#templates_content').html(data);
       readMore();
@@ -826,7 +818,7 @@ function runMonitor() {
       }
     });
     var sortOrder = getSortOrder();
-    $.post(URL,{action:'resourceMonitor',sortBy:sortOrder.resourceKey,sortDir:sortOrder.resourceDir},function(data) {
+    $.post(URL,{action:'resourceMonitor',sortOrder:sortOrder},function(data) {
       if (data) {
         $('#resourceBody').html(data);
         monitorInterval = setTimeout(runMonitor,300);

@@ -158,18 +158,18 @@ function fixSecurity(&$template) {
 #######################
 
 function mySort($a, $b) {
-  global $sortKey, $sortDir;
+  global $sortKey, $sortDir, $sortOrder;
 
-  if ( $sortKey != "Downloads" ) {
-    $c = strtolower($a[$sortKey]);
-    $d = strtolower($b[$sortKey]);
+  if ( $sortOrder['sortBy'] != "downloads" ) {
+    $c = strtolower($a[$sortOrder['sortBy']]);
+    $d = strtolower($b[$sortOrder['sortBy']]);
   } else {
-    $c = $a[$sortKey];
-    $d = $b[$sortKey];
+    $c = $a[$sortOrder['sortBy']];
+    $d = $b[$sortOrder['sortBy']];
   }
 
-  $return1 = ($sortDir == "Down") ? -1 : 1;
-  $return2 = ($sortDir == "Down") ? 1 : -1;
+  $return1 = ($sortOrder['sortDir'] == "Down") ? -1 : 1;
+  $return2 = ($sortOrder['sortDir'] == "Down") ? 1 : -1;
 
   if ($c > $d) { return $return1; }
   else if ($c < $d) { return $return2; }
@@ -441,7 +441,7 @@ function readXmlFile($xmlfile) {
   $o['Description'] = preg_replace('#\[([^\]]*)\]#', '<$1>', $o['Description']);
   $o['Overview']    = $doc->getElementsByTagName("Overview")->item(0)->nodeValue;
 
-  $o['Announcement'] = $Repo['forum'];
+  $o['Forum'] = $Repo['forum'];
   $o['Support']     = ($doc->getElementsByTagName( "Support" )->length ) ? $doc->getElementsByTagName( "Support" )->item(0)->nodeValue : $Repo['forum'];
   $o['Support']     = $o['Support'];
   $o['IconWeb']     = stripslashes($doc->getElementsByTagName( "Icon" )->item(0)->nodeValue);
@@ -556,6 +556,17 @@ function getPinnedApps() {
 function getPost($setting,$default) {
   return isset($_POST[$setting]) ? urldecode(($_POST[$setting])) : $default;
 }
+function getPostArray($setting) {
+  return $_POST[$setting];
+}
+function getSortOrder($sortArray) {
+  $sortOrder['viewMode'] = $sortArray[0];
+  $sortOrder['sortBy'] = $sortArray[1];
+  $sortOrder['sortDir'] = $sortArray[2];
+  $sortOrder['resourceKey'] = $sortArray[3];
+  $sortOrder['resourceDir'] = $sortArray[4];
+  return $sortOrder;
+}
 
 ############################################################################
 #                                                                          #
@@ -565,74 +576,75 @@ function getPost($setting,$default) {
 ############################################################################
 
 function toNumericArray($template) {
-  $o[1]  = $template['Repository'];
-  $o[2]  = $template['Author'];
-  $o[3]  = $template['Name'];
-  $o[4]  = $template['DockerHubName'];
-  $o[5]  = $template['Beta'];
-  $o[6]  = $template['Changes'];
-  $o[7]  = $template['Date'];
-  $o[8]  = $template['RepoName'];
-  $o[9]  = $template['Project'];
-  $o[10] = $template['ID'];
-  $o[11] = $template['Base'];
-  $o[12] = $template['BaseImage'];
-  $o[13] = $template['SortAuthor'];
-  $o[14] = $template['SortName'];
-  $o[15] = $template['Licence'];
-  $o[16] = $template['Plugin'];
-  $o[17] = $template['PluginURL'];
-  $o[18] = $template['PluginAuthor'];
-  $o[19] = $template['MinVer'];
-  $o[20] = $template['MaxVer'];
-  $o[21] = $template['Category'];
-  $o[22] = $template['Description'];
-  $o[23] = $template['Overview'];
-  $o[24] = $template['Downloads'];
-  $o[25] = $template['Stars'];
-  $o[26] = $template['Announcement'];
-  $o[27] = $template['Support'];
-  $o[28] = $template['IconWeb'];
-  $o[29] = $template['DonateText'];
-  $o[30] = $template['DonateImg'];
-  $o[31] = $template['DonateLink'];
-  $o[32] = $template['PopUpDescription'];
-  $o[33] = $template['ModeratorComment'];
-  $o[34] = $template['Compatible'];
-  $o[35] = $template['display_DonateLink'];
-  $o[36] = $template['display_Project'];
-  $o[37] = $template['display_Support'];
-  $o[38] = $template['display_UpdateAvailable'];
-  $o[39] = $template['display_ModeratorComment'];
-  $o[40] = $template['display_Announcement'];
-  $o[41] = $template['display_Stars'];
-  $o[42] = $template['display_Downloads'];
-  $o[43] = $template['display_pinButton'];
-  $o[44] = $template['display_Uninstall'];
-  $o[45] = $template['display_removable'];
-  $o[46] = $template['display_newIcon'];
-  $o[47] = $template['display_changes'];
-  $o[48] = $template['display_webPage'];
-  $o[49] = $template['display_humanDate'];
-  $o[50] = $template['display_pluginSettings'];
-  $o[51] = $template['display_pluginInstall'];
-  $o[52] = $template['display_dockerDefault'];
-  $o[53] = $template['display_dockerEdit'];
-  $o[54] = $template['display_dockerReinstall'];
-  $o[55] = $template['display_dockerInstall'];
-  $o[56] = $template['display_dockerDisable'];
-  $o[57] = $template['display_compatible'];
-  $o[58] = $template['display_compatibleShort'];
-  $o[59] = $template['display_author'];
-  $o[60] = $template['display_iconSmall'];
-  $o[61] = $template['display_iconSelectable'];
-  $o[62] = $template['display_popupDesc'];
-  $o[63] = $template['display_updateAvail'];
-  $o[64] = $template['display_dateUpdated'];
-  $o[65] = $template['display_iconClickable'];
-  $o[66] = $template['display_dockerName'];
-  $o[67] = $template['Path'];
-  return $o;
+  return array(
+  $template['Repository'],        #1
+  $template['Author'],            #2
+  $template['Name'],              #3
+  $template['DockerHubName'],     #4  
+  $template['Beta'],              #5
+  $template['Changes'],           #6
+  $template['Date'],              #7  
+  $template['RepoName'],          #8
+  $template['Project'],           #9  
+  $template['ID'],                #10 
+  $template['Base'],              #11
+  $template['BaseImage'],         #12
+  $template['SortAuthor'],        #13
+  $template['SortName'],          #14
+  $template['Licence'],           #15
+  $template['Plugin'],            #16
+  $template['PluginURL'],         #17
+  $template['PluginAuthor'],      #18
+  $template['MinVer'],            #19
+  $template['MaxVer'],            #20
+  $template['Category'],          #21
+  $template['Description'],       #22
+  $template['Overview'],          #23
+  $template['Downloads'],         #24
+  $template['Stars'],             #25
+  $template['Announcement'],      #26
+  $template['Support'],           #27
+  $template['IconWeb'],           #28
+  $template['DonateText'],        #29
+  $template['DonateImg'],         #30
+  $template['DonateLink'],        #31
+  $template['PopUpDescription'],  #32
+  $template['ModeratorComment'],  #33
+  $template['Compatible'],        #34
+  $template['display_DonateLink'],#35
+  $template['display_Project'],   #36
+  $template['display_Support'],   #37
+  $template['display_UpdateAvailable'], #38
+  $template['display_ModeratorComment'],#39
+  $template['display_Announcement'],    #40
+  $template['display_Stars'],     #41
+  $template['display_Downloads'], #42
+  $template['display_pinButton'], #43
+  $template['display_Uninstall'], #44
+  $template['display_removable'], #45
+  $template['display_newIcon'],   #46
+  $template['display_changes'],   #47
+  $template['display_webPage'],   #48
+  $template['display_humanDate'], #49
+  $template['display_pluginSettings'], #50
+  $template['display_pluginInstall'],  #51
+  $template['display_dockerDefault'],  #52
+  $template['display_dockerEdit'],#53
+  $template['display_dockerReinstall'],#54
+  $template['display_dockerInstall'],  #55
+  $template['display_dockerDisable'],  #56
+  $template['display_compatible'],#57
+  $template['display_compatibleShort'],#58
+  $template['display_author'],    #59
+  $template['display_iconSmall'], #60
+  $template['display_iconSelectable'], #61
+  $template['display_popupDesc'], #62
+  $template['display_updateAvail'],#63
+  $template['display_dateUpdated'],#64
+  $template['display_iconClickable'],#65
+  $template['display_dockerName'],#66
+  $template['Path']               #67
+  );
 }
   
 

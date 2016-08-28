@@ -80,40 +80,22 @@ if ( $selected ) {
   } 
 }
 
-if ( ! $template['IconWeb']  ) {
-  $template['IconWeb'] = "/plugins/community.applications/images/question.png";
-}
-
+$template['Icon'] = $template['Icon'] ? $template['Icon'] : "/plugins/community.applications/images/question.png";
 $template['Description'] = ltrim($template['Description']);
-$category = str_replace("UNCATEGORIZED", "uncategorized", $template['Category']);
 
 $templateDescription = "<style>p { margin-left:20px;margin-right:20px }</style>";
-$templateDescription .= "\n<center><table><tr><td><figure style='margin:0px'><img id='icon' src='".$template['IconWeb']."' style='width:96px;height:96px' onerror='this.src=&quot;/plugins/community.applications/images/question.png&quot;';>";
-
-if ( $template['Beta'] == "true" ) {
-  $templateDescription .= "<figcaption><font size='1' color='red'><center><strong>(beta)</strong></center></font></figcaption>";
-}
-
+$templateDescription .= "\n<center><table><tr><td><figure style='margin:0px'><img id='icon' src='".$template['Icon']."' style='width:96px;height:96px' onerror='this.src=&quot;/plugins/community.applications/images/question.png&quot;';>";
+$templateDescription .= ($template['Beta'] == "true") ? "<figcaption><font size='1' color='red'><center><strong>(beta)</strong></center></font></figcaption>" : "";
 $templateDescription .= "</figure>";
 $templateDescription .= "</td><td></td><td><table><tr><td><strong>Author: </strong></td><td>".$template['Author']."</td></tr>";
-
 $templateDescription .= "<tr><td><strong>Repository: </strong></td><td>";
-if ( $template['Announcement'] ) {
-  $templateDescription .= "<a href='".$template['Announcement']."' target='_blank'>".$template['RepoName']."</a>";
-} else {
-  $templateDescription .= $template['RepoName'];
-}
-
+$templateDescription .= $template['Forum'] ? "<a href='".$template['Forum']."' target='_blank'>".$template['RepoName']."</a>" : $template['RepoName'];
 $templateDescription .= "</td></tr>";
+$templateDescription .= ($template['Private'] == "true") ? "<tr><td></td><td><font color=red>Private Repository</font></td></tr>" : "";
+$templateDescription .= "<tr><td><strong>Categories: </strong></td><td>".$template['Category']."</td></tr>";
 
-if ( $template['Private'] == "true" ) {
-    $templateDescription .= "<tr><td></td><td><font color=red>Private Repository</font></td></tr>";
-}
-$templateDescription .= "<tr><td><strong>Categories: </strong></td><td>".$category."</td></tr>";
+$template['Base'] = $template['Plugin'] ? "<font color='red'>unRaid Plugin</font>" : $template['Base'];
 
-if ( $template['Plugin'] ) {
-  $template['Base'] = "<font color='red'>unRaid Plugin</font>";
-}
 if ( strtolower($template['Base']) == "unknown" ) {
   $template['Base'] = $template['BaseImage'];
 }
@@ -122,29 +104,16 @@ if ( ! $template['Base'] ) {
 }
 
 $templateDescription .= "<tr><td nowrap><strong>Base OS: </strong></td><td>".$template['Base']."</td></tr>";
-
-if ($template['Stars']) {
-  $templateDescription .= "<tr><td nowrap><strong>Star Rating: </strong></td><td><img src='/plugins/community.applications/images/red-star.png' style='height:15px;width:15px'> ".$template['Stars']."</td></tr>";
-}
+$templateDescription .= $template['stars'] ? "<tr><td nowrap><strong>Star Rating: </strong></td><td><img src='/plugins/community.applications/images/red-star.png' style='height:15px;width:15px'> ".$template['stars']."</td></tr>" : "";
 
 if ( $template['Date'] ) {
   $niceDate = date("F j, Y",$template['Date']);
   $templateDescription .= "<tr><td nowrap><strong>Date Updated: </strong></td><td>$niceDate</td></tr>";
 }
-
-if ( $template['MinVer'] ) {
-  $templateDescription .= "<tr><td nowrap><strong>Minimum OS:</strong></td><td>unRaid v".$template['MinVer']."</td></tr>";
-}
-if ( $template['MaxVer'] ) {
-  $templateDescription .= "<tr><td nowrap><strong>Max OS:</strong></td><td>unRaid v".$template['MaxVer']."</td></tr>";
-}
-
-if ( $template['Downloads'] ) {
-  $templateDescription .= "<tr><td><strong>Downloads:</strong></td><td>".$template['Downloads']."</td></tr>";
-}
-if ( $template['Licence'] ) {
-  $templateDescription .= "<tr><td><strong>Licence:</strong></td><td>".$template['Licence']."</td></tr>";
-}
+$templateDescription .= $template['MinVer'] ? "<tr><td nowrap><strong>Minimum OS:</strong></td><td>unRaid v".$template['MinVer']."</td></tr>" : "";
+$templateDescription .= $template['MaxVer'] ? "<tr><td nowrap><strong>Max OS:</strong></td><td>unRaid v".$template['MaxVer']."</td></tr>" : "";
+$templateDescription .= $template['downloads'] ? "<tr><td><strong>Downloads:</strong></td><td>".$template['downloads']."</td></tr>" : "";
+$templateDescription .= $template['Licence'] ? "<tr><td><strong>Licence:</strong></td><td>".$template['Licence']."</td></tr>" : "";
   
 if ( $selected ) {
   $result = searchArray($dockerRunning,'Name',$template['Name']);
@@ -160,25 +129,12 @@ if ( $selected ) {
     $templateDescription .= "<tr><td nowrap><strong>Memory:</strong></td><td>Not running</td></tr>";
   }
 }
-$templateDescription .= "</table></td></tr></table></center>\n<strong><hr></strong><p>".$template['Description']."</p>";
-
-if ( $template['ModeratorComment'] ) {
-  $templateDescription .= "<br><b><font color='red'>Moderator Comments:</font></b> ".$template['ModeratorComment'];
-}
-
-$templateDescription .= "\n<center><table><tr>";
-if ($template['Support']) {
-  $templateDescription .= "<td><a href='".$template['Support']."' target='_blank'><strong>Support Thread</strong></a></td>";
-}
-
-if ( $template['Project'] ) {
-  $templateDescription .= "<td></td><td><a href='".$template['Project']."' target='_blank'><strong>Project Page</strong></a></td>";
-}
-
-if ( $webPageURL ) {
-  $templateDescription .= "<td></td><td><a href='$webPageURL' target='_blank'><strong>Web Page</strong></a></td>";
-}
-
+$templateDescription .= "</table></td></tr></table></center>\n<strong><hr></strong><p>".$template['Description'];
+$templateDescription .= $template['ModeratorComment'] ? "<br><br><b><font color='red'>Moderator Comments:</font></b> ".$template['ModeratorComment'] : "";
+$templateDescription .= "</p>\n<center><table><tr>";
+$templateDescription .= $template['Support'] ? "<td><a href='".$template['Support']."' target='_blank'><strong>Support Thread</strong></a></td>" : "";
+$templateDescription .= $template['Project'] ? "<td></td><td><a href='".$template['Project']."' target='_blank'><strong>Project Page</strong></a></td>" : "";
+$templateDescription .= $template['WebPageURL'] ? "<td></td><td><a href='".$template['WebPageURL']."' target='_blank'><strong>Web Page</strong></a></td>" : "";
 $templateDescription .= "</tr></table>\n<span id='script'></span>";
 
 if ( ($donatelink) && ($donateimg) ) {

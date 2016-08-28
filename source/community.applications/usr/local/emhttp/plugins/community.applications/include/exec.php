@@ -22,8 +22,6 @@ $DockerTemplates = new DockerTemplates();
 ################################################################################
 
 $communitySettings = parse_plugin_cfg("$plugin");
-$unRaidSettings = parse_ini_file($communityPaths['unRaidVersion']);
-$unRaidVersion = $unRaidSettings['version'];
 
 if ( ! $communitySettings['timeNew'] )           { $communitySettings['timeNew'] = "-3 Months"; }
 if ( ! $communitySettings['maxColumn'] )         { $communitySettings['maxColumn'] = 5; }
@@ -70,8 +68,6 @@ if ( !is_dir($communityPaths['templates-community']) ) {
   @unlink($infoFile);
 }
 
-
-
 # Make sure the link is in place
 if (is_dir("/usr/local/emhttp/state/plugins/$plugin")) exec("rm -rf /usr/local/emhttp/state/plugins/$plugin");
 if (!is_link("/usr/local/emhttp/state/plugins/$plugin")) symlink($communityPaths['templates-community'], "/usr/local/emhttp/state/plugins/$plugin");
@@ -83,7 +79,7 @@ if (!is_link("/usr/local/emhttp/state/plugins/$plugin")) symlink($communityPaths
 #################################################################
 
 function DownloadCommunityTemplates() {
-  global $communityPaths, $infoFile, $DockerTemplates, $plugin, $communitySettings, $unRaidVersion;
+  global $communityPaths, $infoFile, $plugin, $communitySettings;
 
   $moderation = readJsonFile($communityPaths['moderation']);
   if ( ! is_array($moderation) ) {
@@ -148,22 +144,15 @@ function DownloadCommunityTemplates() {
             continue;
           }
         }
-        $o['Announcement'] = $Repo['forum'];
+        $o['Forum'] = $Repo['forum'];
         $o['RepoName'] = $Repo['name'];
         $o['ID'] = $i;
-        if (!$o['Support']) {
-          $o['Support'] = $o['Announcement'];
-        }
-
-        if ( ! $o['DonateText'] ) {
-          $o['DonateText'] = $Repo['donatetext'];
-        }
-        if ( ! $o['DonateLink'] ) {
-          $o['DonateLink'] = $Repo['donatelink'];
-        }
-        if ( ! $o['DonateImg'] ) {
-          $o['DonateImg'] = $Repo['donateimg'];
-        }
+        $o['Support'] = $o['Support'] ? $o['Support'] : $o['Forum'];
+        $o['DonateText'] = $o['DonateText'] ? $o['DonateText'] : $Repo['donatetext'];
+        $o['DonateLink'] = $o['DonateLink'] ? $o['DonateLink'] : $Repo['donatelink'];
+        $o['DonateImg'] = $o['DonateImg'] ? $o['DonateImg'] : $Repo['donateimg'];
+        $o['WebPageURL'] = $Repo['web'];
+        $o['Logo'] = $Repo['logo'];
         fixSecurity($o);
         $o = fixTemplates($o);
         $o['Compatible'] = versionCheck($o);
@@ -187,7 +176,7 @@ function DownloadCommunityTemplates() {
 #  DownloadApplicationFeed MUST BE CALLED prior to DownloadCommunityTemplates in order for private repositories to be merged correctly.
 
 function DownloadApplicationFeed() {
-  global $communityPaths, $infoFile, $DockerTemplates, $plugin, $communitySettings, $unRaidVersion;
+  global $communityPaths, $infoFile, $plugin, $communitySettings;
 
   $moderation = readJsonFile($communityPaths['moderation']);
   if ( ! is_array($moderation) ) {
@@ -204,9 +193,7 @@ function DownloadApplicationFeed() {
     return false;
   }
   $ApplicationFeed  = readJsonFile($downloadURL);
-  if ( ! is_array($ApplicationFeed) ) {
-    return false;
-  }
+  if ( ! is_array($ApplicationFeed) ) { return false; }
 
   unlink($downloadURL);
   $i = 0;
@@ -221,38 +208,16 @@ function DownloadApplicationFeed() {
     }
     unset($o);
     # Move the appropriate stuff over into a CA data file
-    $o['Path']          = $file['Path'];
-    $o['Repository']    = $file['Repository'];
-    $o['Author']        = preg_replace("#/.*#", "", $o['Repository']);
-    $o['Name']          = $file['Name'];
-    $o['DockerHubName'] = strtolower($file['Name']);
-    $o['Beta']          = $file['Beta'];
-    $o['Changes']       = $file['Changes'];
-    $o['Date']          = $file['Date'];
-    $o['RepoName']      = $file['Repo'];
-    $o['Project']       = $file['Project'];
+    $o = $file;
     $o['ID']            = $i;
-    $o['Base']          = $file['Base'];
-    $o['BaseImage']     = $file['BaseImage'];
+    $o['Author']        = preg_replace("#/.*#", "", $o['Repository']);
+    $o['DockerHubName'] = strtolower($file['Name']);
+    $o['RepoName']      = $file['Repo'];
     $o['SortAuthor']    = $o['Author'];
     $o['SortName']      = $o['Name'];
     $o['Licence']       = $file['License']; # Support Both Spellings
     $o['Licence']       = $file['Licence'];
-    $o['Plugin']        = $file['Plugin'];
-    $o['PluginURL']     = $file['PluginURL'];
-    $o['PluginAuthor']  = $file['PluginAuthor'];
-    $o['MinVer']        = $file['MinVer'];
-    $o['MaxVer']        = $file['MaxVer'];
-    $o['Category']      = $file['Category'];
-    $o['Description']   = $file['Description'];
-    $o['Overview']      = $file['Overview'];
-    $o['Downloads']     = $file['downloads'];
-    $o['Stars']         = $file['stars'];
-    $o['Announcement']  = $file['Forum'];
-    $o['Support']       = $file['Support'];
-    $o['IconWeb']       = $file['Icon'];
     $o['Path']          = $communityPaths['templates-community']."/".$i.".xml";
-
     if ( $o['Plugin'] ) {
       $o['Author']        = $o['PluginAuthor'];
       $o['Repository']    = $o['PluginURL'];
@@ -261,18 +226,18 @@ function DownloadApplicationFeed() {
       $o['SortName']      = $o['Name'];
     }
     $RepoIndex = searchArray($Repositories,"name",$o['RepoName']);
+
     if ( $RepoIndex != false ) {
       $o['DonateText'] = $Repositories[$RepoIndex]['donatetext'];
-      $o['DonateImg'] = $Repositories[$RepoIndex]['donateimg'];
+      $o['DonateImg']  = $Repositories[$RepoIndex]['donateimg'];
       $o['DonateLink'] = $Repositories[$RepoIndex]['donatelink'];
+      $o['WebPageURL'] = $Repositories[$RepoIndex]['web'];
+      $o['Logo']       = $Repositories[$RepoIndex]['logo'];
     }
-    if ( $file['DonateText'] ) {
-      $o['DonateText']    = $file['DonateText'];
-    }
-    if ( $file['DonateLink'] ) {
-      $o['DonateLink']    = $file['DonateLink'];
-    }
-    if ( ($file['DonateImg']) || ($file['DonateImage']) ) {
+    $o['DonateText'] = $file['DonateText'] ? $file['DonateText'] : $o['DonateText'];
+    $o['DonateLink'] = $file['DonateLink'] ? $file['DonateLink'] : $o['DonateLink'];
+
+    if ( ($file['DonateImg']) || ($file['DonateImage']) ) {  #because Sparklyballs can't read the tag documentation
       if ( $file['DonateImage'] ) {
         $o['DonateImg'] = $file['DonateImage'];
       } else {
@@ -313,7 +278,7 @@ function DownloadApplicationFeed() {
 }
 
 function getConvertedTemplates() {
-  global $communityPaths, $infoFile, $DockerTemplates, $plugin, $communitySettings, $unRaidVersion;
+  global $communityPaths, $infoFile, $plugin, $communitySettings;
 
 # Start by removing any pre-existing private (converted templates)
 
@@ -358,18 +323,15 @@ function getConvertedTemplates() {
       if ( strpos($template,".xml") === FALSE ) {
         continue;
       }
-
-      $file = $repoPath.$template;
-
-      if (is_file($file)) {
-        $o = readXmlFile($file);
+      if (is_file($repoPath.$template)) {
+        $o = readXmlFile($repoPath.$template);
         $o = fixTemplates($o);
         $o['RepoName']     = $Repo." Repository";
         $o['ID']           = $i;
         $o['Date']         = ( $o['Date'] ) ? strtotime( $o['Date'] ) : 0;
         $o['SortAuthor']   = $o['Author'];
         $o['Private']      = "true";
-        $o['Announcement'] = "";
+        $o['Forum']        = "";
         $o['Compatible']   = versionCheck($o);
         
         fixSecurity($o);
@@ -414,10 +376,7 @@ function display_apps($viewMode) {
       $display = "<center><b>";
 
       $logos = readJsonFile($communityPaths['logos']);
-      if ( $logos[$officialRepo] ) {
-        $display .= "<img src='".$logos[$officialRepo]."' style='width:48px'>&nbsp;&nbsp;";
-      }
-
+      $display .= $logos[$officialRepo] ? "<img src='".$logos[$officialRepo]."' style='width:48px'>&nbsp;&nbsp;" : "";
       $display .= "<font size='4' color='purple' id='OFFICIAL'>$officialRepo</font></b></center><br>";
       $display .= my_display_apps($viewMode,$officialApplications,$runningDockers,$imagesDocker);
     }
@@ -451,15 +410,10 @@ function display_apps($viewMode) {
     $bookmark .= implode("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",$navigate);
   }
 
-  if ( $totalApplications == 0 ) {
-    $display .= "<center><font size='3'>No Matching Content Found</font></center>";
-  }
-
+  $display .= ( $totalApplications == 0 ) ? "<center><font size='3'>No Matching Content Found</font></center>" : "";
+ 
   $totalApps = "$totalApplications";
-
-  if ( count($privateApplications) ) {
-    $totalApps .= " <font size=1>( ".count($privateApplications)." Private )</font>";
-  }
+  $totalApps .= (count($privateApplications)) ? " <font size=1>( ".count($privateApplications)." Private )</font>" : "";
 
   $display .= "<script>$('#Total').html('$totalApps');</script>";
   $display .= changeUpdateTime();
@@ -472,11 +426,6 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
   global $communityPaths, $info, $communitySettings, $plugin;
 
   $pinnedApps = getPinnedApps();
-  $logos = readJsonFile($communityPaths['logos']);
-  $repos = readJsonFile($communityPaths['Repositories']);
-  if ( ! $repos ) {
-    $repos = array();
-  }
   $iconSize = $communitySettings['iconSize'];
   $tabMode = $communitySettings['newWindow'];
 
@@ -485,7 +434,6 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
   $communitySettings['viewMode'] = $viewMode;
 
   $skin = readJsonFile($communityPaths['defaultSkin']);
- # print_r($skin);
   $ct = $skin[$viewMode]['header'].$skin[$viewMode]['sol'];
   $displayTemplate = $skin[$viewMode]['template'];
   if ( $viewMode == "detail" ) {
@@ -500,30 +448,24 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
     $appName = str_replace(" ","",$template['SortName']);
     $t = "";
     $ID = $template['ID'];
-    $selected = $info[$name]['template'] && stripos($info[$name]['icon'], $template['Author']) !== false;
-    if ( $template['Uninstall'] ) {
-      $selected = true;
-    }
+    $selected = $info[$name]['template'] && stripos($info[$name]['icon'], $template['SortAuthor']) !== false;
+    $selected = $template['Uninstall'] ? true : $selected;
     $RepoName = ( $template['Private'] == "true" ) ? $template['RepoName']."<font color=red> (Private)</font>" : $template['RepoName'];
     $template['display_DonateLink'] = $template['DonateLink'] ? "<font size='0'><a href='".$template['DonateLink']."' target='_blank' title='".$template['DonateText']."'>Donate To Author</a></font>" : "";
     $template['display_Project'] = $template['Project'] ? "<a target='_blank' title='Click to go the the Project Home Page' href='".$template['Project']."'><font color=red>Project Home Page</font></a>" : "";
     $template['display_Support'] = $template['Support'] ? "<a href='".$template['Support']."' target='_blank' title='Click to go to the support thread'><font color=red>Support Thread</font></a>" : "";
-    
-    $repoIndex = searchArray($repos,"name",$template['RepoName']);
-    $webPageURL = $repos[$repoIndex]['web'];
-    $template['display_webPage'] = $webPageURL ? "<a href='$webPageURL' target='_blank'><font color='red'>Web Page</font></a></font>" : "";
+    $template['display_webPage'] = $template['WebPageURL'] ? "<a href='".$template['WebPageURL']."' target='_blank'><font color='red'>Web Page</font></a></font>" : "";
 
     if ( $template['display_Support'] && $template['display_Project'] ) { $template['display_Project'] = "&nbsp;&nbsp;&nbsp".$template['display_Project'];}
     if ( $template['display_webPage'] && ( $template['display_Project'] || $template['display_Support'] ) ) { $template['display_webPage'] = "&nbsp;&nbsp;&nbsp;".$template['display_webPage']; }
- 
     if ( $template['UpdateAvailable'] ) {
       $template['display_UpdateAvailable'] = $template['Plugin'] ? "<br><center><font color='red'><b>Update Available.  Click <a onclick='installPLGupdate(&quot;".$template['MyPath']."&quot;,&quot;".$template['Name']."&quot;);' style='cursor:pointer'>Here</a> to Install</b></center></font>" : "<br><center><font color='red'><b>Update Available.  Click <a href='Docker'>Here</a> to install</b></font></center>";
     }
     $template['display_ModeratorComment'] .= $template['ModeratorComment'] ? "</b></strong><font color='red'><b>Moderator Comments:</b></font> ".$template['ModeratorComment'] : "";
-    $tempLogo = $logos[$RepoName] ? "<img src='".$logos[$RepoName]."' height=20px>" : "";
-    $template['display_Announcement'] = $template['Announcement'] ? "<a href='".$template['Announcement']."' target='_blank' title='Click to go to the repository Announcement thread' >$RepoName $tempLogo</a>" : "$RepoName $tempLogo";
-    $template['display_Stars'] = $template['Stars'] ? "<img src='/plugins/$plugin/images/red-star.png' style='height:15px;width:15px'> <strong>".$template['Stars']."</strong>" : "";
-    $template['display_Downloads'] = $template['Downloads'] ? "<center>".$template['Downloads']."</center>" : "<center>Not Available</center>";
+    $tempLogo = $template['Logo'] ? "<img src='".$template['Logo']."' height=20px>" : "";
+    $template['display_Announcement'] = $template['Forum'] ? "<a href='".$template['Forum']."' target='_blank' title='Click to go to the repository Announcement thread' >$RepoName $tempLogo</a>" : "$RepoName $tempLogo";
+    $template['display_Stars'] = $template['stars'] ? "<img src='/plugins/$plugin/images/red-star.png' style='height:15px;width:15px'> <strong>".$template['stars']."</strong>" : "";
+    $template['display_Downloads'] = $template['downloads'] ? "<center>".$template['downloads']."</center>" : "<center>Not Available</center>";
 
     if ( $pinnedApps[$template['Repository']] ) {
       $pinned = "greenButton.png";
@@ -546,7 +488,6 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
       $template['display_newIcon'] = "<img src='/plugins/$plugin/images/star.png' style='width:15px;height:15px;' title='New / Updated - ".date("F d Y",$template['Date'])."'></img>";
     }
     $template['display_changes'] = $template['Changes'] ? " <a style='cursor:pointer'><img src='/plugins/$plugin/images/information.png' onclick=showInfo($ID,'$appName'); title='Click for the changelog / more information'></a>" : "";
-
     $template['display_humanDate'] = date("F j, Y",$template['Date']);
 
     if ( $template['Plugin'] ) {
@@ -579,7 +520,7 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
       $template['display_compatibleShort'] = "Incompatible";
     }
     $template['display_author'] = "<a style='cursor:pointer' onclick='authorSearch(this.innerHTML);' title='Search for more containers from author'>".$template['Author']."</a>";
-    $displayIcon = $template['IconWeb'];
+    $displayIcon = $template['Icon'];
     $displayIcon = $displayIcon ? $displayIcon : "/plugins/$plugin/images/question.png";
     $template['display_iconSmall'] = "<a onclick='showDesc(".$template['ID'].",&#39;".$name."&#39;);' style='cursor:pointer'><img title='Click to display full description' src='".$displayIcon."' style='width:48px;height:48px;' onError='this.src=\"/plugins/$plugin/images/question.png\";'></a>";
     $template['display_iconSelectable'] = "<img src='$displayIcon' onError='this.src=\"/plugins/$plugin/images/question.png\";' style='width:".$iconSize."px;height=".$iconSize."px;'>";
@@ -593,8 +534,7 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
     } else {
       $template['display_dockerName'] = $template['Name'];
     }
-
-    if ( $template['Category'] == "UNCATEGORIZED" )  $template['Category'] = "Uncategorized";
+    $template['Category'] = ($template['Category'] == "UNCATEGORIZED") ? "Uncategorized" : $template['Category'];
 
     if ( ( $template['Beta'] == "true" ) ) {
       $template['display_dockerName'] .= "<span title='Beta Container &#13;See support forum for potential issues'><font size='1' color='red'><strong>(beta)</strong></font></span>";
@@ -615,7 +555,6 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
  
     $ct .= $t;
   }
-
   $ct .= $skin[$viewMode]['footer'];
 
   return $ct;
@@ -650,7 +589,6 @@ function appOfDay($file) {
     if ( ! $file[$app[0]]['Compatible'] || ! $file[$app[1]]['Compatible'] ) continue;
     if ( $file[$app[0]]['Blacklist'] || $file[$app[1]]['Blacklist'] ) continue;
     if ( $file[$app[0]]['ModeratorComment'] || $file[$app[1]]['ModeratorComment'] ) continue;
-    
     break;
   }
   writeJsonFile($communityPaths['appOfTheDay'],$app);
@@ -677,7 +615,6 @@ function suggestSearch($filter,$displayFlag) {
     foreach ( $otherSearch as $suggestedSearch) {
       $returnSearch .= "<a style='cursor:pointer' onclick='mySearch(this.innerHTML);' title='Search For $suggestedSearch'><font color='blue'>$suggestedSearch</font></a>&nbsp;&nbsp;&nbsp;&nbsp;";
     }
-
   } else {
     $otherSearch = preg_split('/(?=[A-Z])/',$dockerFilter);
 
@@ -720,9 +657,7 @@ function dockerNavigate($num_pages, $pageNumber) {
   } else {
     $returnValue .= "<a onclick='dockerSearch($pageNumber+1);' style='cursor:pointer' title='Next Page'><img src='/plugins/community.applications/images/green-right.png'></a>";
   }
-
   $returnValue .= "</center>";
-
   $returnValue .= "<span style='float:right;position:relative;bottom:30px'><input type='button' value='Display Recommended' onclick='doSearch();'></span>";
 
   return $returnValue;
@@ -743,7 +678,6 @@ function displaySearchResults($pageNumber,$viewMode) {
   $templates = readJsonFile($communityPaths['community-templates-info']);
 
   echo dockerNavigate($num_pages,$pageNumber);
-
   echo "<br><br>";
 
   $iconSize = $communitySettings['iconSize'];
@@ -797,13 +731,11 @@ function displaySearchResults($pageNumber,$viewMode) {
       $t .= "<img style='width:".$iconSize."px;height:".$iconSize."px;' src='".$result['Icon']."' onError='this.src=\"/plugins/$plugin/images/question.png\";'></a>";
       $t .= "<figcaption><strong><center><font size='3'><a style='cursor:pointer' onclick='mySearch(this.innerHTML);' title='Search For Similar Containers'>".$result['Name']."</a></font></center></strong></figcaption></figure>";
       $t .= "<center><input type='button' value='Add' onclick='dockerConvert(&#39;".$result['ID']."&#39;)' style='margin:0px'></center>";
-
       $t .= "</td>";
 
       if ( $maxColumn == 2 ) {
         $t .= "<td style='display:inline-block;width:350px;text-align:left;'>";
         $t .= "<br><br><br>";
-
         $t .= $result['display_official'];
 
         if ( $result['Description'] ) {
@@ -812,7 +744,6 @@ function displaySearchResults($pageNumber,$viewMode) {
           $t .= "<em>Container Overview not available.</em><br><br>";
         }
         $t .= "Click container's icon for full description<br><br>";
-
         $t .= "</td>";
       }
 
@@ -829,11 +760,9 @@ function displaySearchResults($pageNumber,$viewMode) {
       $t .= "<img src='".$result['Icon']."' onError='this.src=\"/plugins/$plugin/images/question.png\";' style='width:".$iconSize."px;height:".$iconSize."px;'>";
       $t .= "</a></td>";
       $t .= "<td><input type='button' value='Add' onclick='dockerConvert(&#39;".$result['ID']."&#39;)';></td>";
-
       $t .= "<td><a style='cursor:pointer' onclick='mySearch(this.innerHTML);' title='Search Similar Containers'>".$result['Name']."</a></td>";
       $t .= "<td><a style='cursor:pointer' onclick='mySearch(this.innerHTML);' title='Search Containers From Author'>".$result['Author']."</a></td>";
       $t .= "<td>".$result['display_stars']."</td>";
-
       $t .= "<td>";
       $t .= $result['display_official'];
       $t .= "<strong><span class='desc_readmore' style='display:block'>".$result['Description']."</span></strong></td>";
@@ -843,9 +772,7 @@ function displaySearchResults($pageNumber,$viewMode) {
   $t .= "</table>";
 
   echo $t;
-
   echo dockerNavigate($num_pages,$pageNumber);
-
   echo "<script>$('#pageNumber').html('(Page $pageNumber of $num_pages)');</script>";
 }
 
@@ -870,9 +797,7 @@ case 'get_content':
   $filter   = getPost("filter",false);
   $category = "/".getPost("category",false)."/i";
   $newApp   = getPost("newApp",false);
-  $viewMode = getPost("viewMode","Icon");
-  $sortKey  = getPost("sortBy","Name");
-  $sortDir  = getPost("sortDir","Up");
+  $sortOrder = getSortOrder(getPostArray("sortOrder"));
 
   $newAppTime = strtotime($communitySettings['timeNew']);
 
@@ -1033,18 +958,14 @@ case 'get_content':
     }
   }
 
-  $displayApplications              = array();
   $displayApplications['official']  = $official;
   $displayApplications['community'] = $display;
   $displayApplications['beta']      = $beta;
   $displayApplications['private']   = $privateApplications;
 
   writeJsonFile($communityPaths['community-templates-displayed'],$displayApplications);
-
-  display_apps($viewMode);
-
+  display_apps($sortOrder['viewMode']);
   changeUpdateTime();
-
   break;
 
 ########################################################
@@ -1060,13 +981,10 @@ case 'force_update':
   }
 
   download_url($communityPaths['moderationURL'],$communityPaths['moderation']);
-
   $tmpFileName = randomFile();
-
   download_url($communityPaths['community-templates-url'],$tmpFileName);
   $Repositories = readJsonFile($tmpFileName);
   writeJsonFile($communityPaths['Repositories'],$Repositories);
-
   $repositoriesLogo = readJsonFile($tmpFileName);
   if ( ! is_array($repositoriesLogo) ) {
     $repositoriesLogo = array();
@@ -1131,12 +1049,10 @@ case 'force_update_button':
 ####################################################################################
 
 case 'display_content':
-  $viewMode = getPost("viewMode","icon");
-  $sortKey  = getPost("sortBy","Name");
-  $sortDir  = getPost("sortDir","Up");
-
+  $sortOrder = getSortOrder(getPostArray('sortOrder'));
+  
   if ( file_exists($communityPaths['community-templates-displayed']) ) {
-    display_apps($viewMode);
+    display_apps($sortOrder['viewMode']);
   } else {
     echo "<center><font size='4'>Select A Category Above</font></center>";
   }
@@ -1318,7 +1234,6 @@ case 'convert_docker':
     exec("mkdir -p ".$xmlFile);
   }
   $xmlFile .= str_replace("/","-",$docker['Repository']).".xml";
-
   file_put_contents($xmlFile,$dockerXML);
   file_put_contents($communityPaths['addConverted'],"Dante");
   echo $xmlFile;
@@ -1360,11 +1275,9 @@ case 'search_dockerhub':
   foreach ($pageresults['results'] as $result) {
     unset($o);
     $o['Repository'] = $result['name'];
-
     $details = explode("/",$result['name']);
     $o['Author'] = $details[0];
     $o['Name'] = $details[1];
-
     $o['Description'] = $result['description'];
     $o['Automated'] = $result['is_automated'];
     $o['Stars'] = $result['star_count'];
@@ -1376,18 +1289,15 @@ case 'search_dockerhub':
     } else {
       $o['DockerHub'] = "https://hub.docker.com/r/".$result['name']."/";
     }
-
     $o['ID'] = $i;
     $searchName = str_replace("docker-","",$o['Name']);
     $searchName = str_replace("-docker","",$searchName);
-
     $iconMatch = searchArray($communityTemplates,"DockerHubName",$searchName);
     if ( $iconMatch !== false) {
-      $o['Icon'] = $communityTemplates[$iconMatch]['IconWeb'];
+      $o['Icon'] = $communityTemplates[$iconMatch]['Icon'];
     }
 
     $dockerResults[$i] = $o;
-
     $i=++$i;
   }
   $dockerFile['num_pages'] = $num_pages;
@@ -1395,11 +1305,8 @@ case 'search_dockerhub':
   $dockerFile['results'] = $dockerResults;
 
   writeJsonFile($communityPaths['dockerSearchResults'],$dockerFile);
-
   echo suggestSearch($filter,false);
-
   displaySearchResults($pageNumber, $viewMode);
-
   break;
 
 #####################################################################
@@ -1410,7 +1317,6 @@ case 'search_dockerhub':
 
 case 'dismiss_warning':
   file_put_contents("/boot/config/plugins/community.applications/accepted","warning dismissed");
-
   break;
 
 ###############################################################
@@ -1421,7 +1327,6 @@ case 'dismiss_warning':
 
 case 'previous_apps':
   $installed = getPost("installed","");
-
   $dockerUpdateStatus = readJsonFile($communityPaths['dockerUpdateStatus']);
   
   if ( is_file($communityPaths['moderation']) ) {
@@ -1431,9 +1336,7 @@ case 'previous_apps':
   }
 
   $DockerClient = new DockerClient();
-
   $info = $DockerClient->getDockerContainers();
-
   $file = readJsonFile($communityPaths['community-templates-info']);
 
 # $info contains all installed containers
@@ -1605,9 +1508,7 @@ case 'previous_apps':
 
   $displayedApplications['community'] = $displayed;
   writeJsonFile($communityPaths['community-templates-displayed'],$displayedApplications);
-
   echo "ok";
-
   break;
 
 ####################################################################################
@@ -1618,9 +1519,7 @@ case 'previous_apps':
 
 case 'remove_application':
   $application = getPost("application","");
-
   @unlink($application);
-
   echo "ok";
   break;
 
@@ -1634,11 +1533,8 @@ case 'uninstall_application':
   $application = getPost("application","");
 
   $filename = pathinfo($application,PATHINFO_BASENAME);
-
   shell_exec("/usr/local/emhttp/plugins/dynamix.plugin.manager/scripts/plugin remove '$filename'");
-
   echo "ok";
-
   break;
 
 #######################
@@ -1656,9 +1552,7 @@ case 'uninstall_docker':
   $containerName  = stripslashes($doc->getElementsByTagName( "Name" )->item(0)->nodeValue);
 
   $DockerClient = new DockerClient();
-
   $dockerInfo = $DockerClient->getDockerContainers();
-
   $container = searchArray($dockerInfo,"Name",$containerName);
 
 # stop the container
@@ -1673,7 +1567,6 @@ case 'uninstall_docker':
   }
 
   echo $path;
-
   break;
 
 ##################################
@@ -1684,12 +1577,10 @@ case 'uninstall_docker':
 
 case 'remove_appdata':
   $appdata = getPost("appdata","");
-
   $appdata = trim($appdata);
 
   $commandLine = $communityPaths['deleteAppdataScript'].' "'.$appdata.'" > /dev/null | at NOW -M >/dev/null 2>&1';
   exec($commandLine);
-
   break;
 
 
@@ -1700,9 +1591,9 @@ case 'remove_appdata':
 ############################################################
 
 case 'resourceMonitor':
-  $sortKey = getPost("sortBy","Name");
-  $sortDir = getPost("sortDir","Up");
-
+  $sortOrder = getSortOrder(getPostArray('sortOrder'));
+  $sortOrder['sortBy'] = $sortOrder['resourceKey'];  #move the key and dir to the appropriate value for the sort 
+  $sortOrder['sortDir'] = $sortOrder['resourceDir'];
 #get running containers
 
   if ( ! is_dir("/var/lib/docker/containers") ) {
@@ -1734,7 +1625,7 @@ case 'resourceMonitor':
     $container['NetworkMode'] = $docker['NetworkMode'];
     $containerID .= $docker['Id']." ";
     if ( $runningTemplate ) {
-      $container['Icon'] = $templates[$runningTemplate]['IconWeb'];
+      $container['Icon'] = $templates[$runningTemplate]['Icon'];
     } else {
       $container['Icon'] = "/plugins/community.applications/images/question.png";
     }
@@ -1816,9 +1707,7 @@ case 'resourceMonitor':
     }
     $o .= "</tr>";
   }
-
   echo $o;
-
   break;
 
 #################################################
@@ -1849,11 +1738,8 @@ case 'resourceInitialize':
   } else {
     @unlink($communityPaths['cAdvisor']);
   }
-  if ( is_file($communityPaths['calculateAppdataProgress']) ) {
-    $o .= "<script>$('#calculateAppdata').prop('disabled',true);</script>";
-  } else {
-    $o .= "<script>$('#calculateAppdata').prop('disabled',false);</script>";
-  }
+  $o .= ( is_file($communityPaths['calculateAppdataProgress']) ) ? "<script>$('#calculateAppdata').prop('disabled',true);</script>" : "<script>$('#calculateAppdata').prop('disabled',false);</script>";
+
   echo $o;
   break;
 
@@ -1875,11 +1761,7 @@ case 'calculateAppdata':
 ##############################################################
 
 case 'checkCalculations':
-    if ( is_file($communityPaths['calculateAppdataProgress']) ) {
-    $o .= "<script>$('#calculateAppdata').prop('disabled',true);</script>";
-  } else {
-    $o .= "<script>$('#calculateAppdata').prop('disabled',false);</script>";
-  }
+  $o .= ( is_file($communityPaths['calculateAppdataProgress']) ) ? "<script>$('#calculateAppdata').prop('disabled',true);</script>" : "<script>$('#calculateAppdata').prop('disabled',false);</script>";
   echo $o;
   break;
 
@@ -1910,11 +1792,8 @@ case 'autoUpdatePlugins':
   $globalUpdate = getPost("globalUpdate","no");
   $pluginList   = getPost("pluginList","");
 
-  if ( $globalUpdate == "yes" ) {
-    $updateArray['Global'] = "true";
-  } else {
-    $updateArray['Global'] = "false";
-  }
+  $updateArray['Global'] = ( $globalUpdate == "yes" ) ? "true" : "false";
+
   $plugins = explode("*",$pluginList);
   if ( is_array($plugins) ) {
     foreach ($plugins as $plg) {
@@ -2065,7 +1944,6 @@ case "pinApp":
   $repository = getPost("repository","oops");
   
   $pinnedApps = readJsonFile($communityPaths['pinned']);
-  
   if ( $pinnedApps[$repository] ) {
     unset($pinnedApps[$repository]);
   } else {
@@ -2099,6 +1977,4 @@ case "pinnedApps":
   echo "fini!";
   break;  
 }
-
-
 ?>

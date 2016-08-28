@@ -16,7 +16,7 @@
     "table": {
         "header": "<table class='tablesorter' style='table-layout: fixed;'><thead><th style='width:85px'>Application</th><th style='width:30px'></th><th style='width:100px'></th><th style='width:75px'>Downloads</th><th style='width:75px'>Author</th><th style='width:570px'>Description</th><th>Repository</th></tr></thead><tr>",
         "sol": "<tr>",
-        "template": "<td><center><font size=larger>%66$s</font><br>%47$s %46$s %45$s %44$s &nbsp;&nbsp;%43$s <br>%41$s </center><td style='margin:0;padding:0'> %60$s </td><td><center><font color='red'> %58$s </font></center><center> %50$s %51$s %52$s %53$s %54$s %55$s %56$s </center></td><td> %42$s</td><td> %59$s </td><td><span class='desc_readmore' style='display:block' title='Categories: %21$s '>%22$s'</span><br>%39$s %38$s</b></strong><center>%37$s&nbsp;&nbsp;&nbsp;&nbsp;%36$s&nbsp;&nbsp;&nbsp;&nbsp;%48$s&nbsp;&nbsp;&nbsp;&nbsp;%35$s</td><td style='text-align:left'><font size=1px>%40$s </font></td>",
+        "template": "<td><center><font size=larger>%66$s</font><br>%47$s %46$s %45$s %44$s &nbsp;&nbsp;%43$s <br>%41$s </center><td style='margin:0;padding:0'> %60$s </td><td><center><font color='red'> %58$s </font></center><center> %50$s %51$s %52$s %53$s %54$s %55$s %56$s </center></td><td> %42$s</td><td> %59$s </td><td><b>Categories: </b>%21$s<br><br><span class='desc_readmore' style='display:block'>%22$s'</span><br>%39$s %38$s</b></strong><center>%37$s&nbsp;&nbsp;&nbsp;&nbsp;%36$s&nbsp;&nbsp;&nbsp;&nbsp;%48$s&nbsp;&nbsp;&nbsp;&nbsp;%35$s</td><td style='text-align:left'><font size=1px>%40$s </font></td>",
         "eol": "</tr>",
         "footer": "</table>"
     }
