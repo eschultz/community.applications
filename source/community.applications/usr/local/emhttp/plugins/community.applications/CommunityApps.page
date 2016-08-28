@@ -30,7 +30,7 @@ $line_color = $display['theme']=='black' ? '#202020' : '#E8E8E8';
 
 if ( ! $cfg['viewMode'] )         { $cfg['viewMode'] = "detail"; }
 if ( ! $cfg['autoUpdate'] )       { $cfg['autoUpdate'] = "no"; }
-if ( ! $cfg['timeNew'] )          { $cfg['timeNew'] = "- 3 Months"; }
+if ( ! $cfg['timeNew'] )          { $cfg['timeNew'] = "-3 Months"; }
 
 $timeNew = str_replace("-","",$cfg['timeNew']);
 
@@ -415,7 +415,6 @@ function changeDockerView(viewButton) {
     if (data) {
       $('#templates_content').html(data);
       $("#Total").html(totalDisplayed);
-      $("#templates_content").fadeIn("slow");
       readMore();
     }
   });
@@ -687,15 +686,7 @@ function baseName(path) {
 
 function uninstallApp(application,humanName) {
   if ( humanName == "Community Applications" ) {
-    myAlert("AE-35 Error",
-      "<b><font color='red'>Community Applications</font></b> cannot be uninstalled this way.  You must go to the plugins tab and remove it from there.  <em><font color='purple'>But, why would you ever want to uninstall CA?</font></em>",
-      null,
-      null,
-      true,
-      false,
-      true,
-      "error"
-    );
+    myAlert("AE-35 Error","<b><font color='red'>Community Applications</font></b> cannot be uninstalled this way.  You must go to the plugins tab and remove it from there.  <em><font color='purple'>But, why would you ever want to uninstall CA?</font></em>",null,null,true,false,true,"error");
   } else {
     swal({
       title: "Uninstall Application?",
@@ -786,7 +777,6 @@ function appStore() {
   $("#AppStore").prop("disabled",true);
   $("#resourceMonitor,#NetworkCategory,#MediaAppCategory,#MediaServerCategory,#ToolsCategory,#NONE").hide();
   $("#AppsOnly,#templates_content,#MainCategory,#topLevelButton,#topLevelButton").show();
-  
   getContent(true,'INITIALIZE','None Selected');
   $('#searchBox').keyup(function(e) {if(e.which == 13){doSearch(false);}});
   $("#Category").html("None Selected");
@@ -794,13 +784,11 @@ function appStore() {
 
 function Monitor() {
   clearSearchBox();
-
   $(".appButtons").prop("disabled",false);
   $("#monitor").prop("disabled",true);  
   $("#templates_content,.dockerSearch,#AppsOnly,#sortButtons,#Total1").hide();
   $("#templates_content").html("");
   $("#resourceMonitor").show();
-
   $("#resourceBody").html("<center>Initializing</center>");
   $.post(URL,{action:'resourceInitialize'}, function(data) {
     if (data) {
@@ -871,9 +859,7 @@ function pinnedApps(button) {
   $("#templates_content,#resourceMonitor,.dockerSearch,#AppsOnly").hide();
   $("#templates_content").html("<center><font size='3'>Searching</font></center>");
   $("#templates_content,#sortButtons,#Total1,#templateSortButtons").show();
-  
   $("#Category").html("All Pinned Applications");
-
   $.post(URL,{action:'pinnedApps'},function(data) {
     if (data) {
       changeSortOrder(null,null,null);

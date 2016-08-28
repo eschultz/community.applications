@@ -6,7 +6,8 @@
 ###############################################################
 
 require_once("/usr/local/emhttp/plugins/dynamix/include/Wrappers.php");
-
+$unRaidSettings = parse_ini_file($communityPaths['unRaidVersion']);
+$unRaidVersion = $unRaidSettings['version'];
 ###########################################################################
 #                                                                         #
 # Helper function to determine if a plugin has an update available or not #
@@ -380,11 +381,9 @@ function versionCheck($template) {
   if ( $template['MinVer'] ) {
     if ( version_compare($template['MinVer'],$unRaidVersion) > 0 ) { return false; }
   }
-
   if ( $template['MaxVer'] ) {
     if ( version_compare($template['MaxVer'],$unRaidVersion) < 0 ) { return false; }
   }
-
   return true;
 }
 
