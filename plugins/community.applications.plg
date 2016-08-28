@@ -4,7 +4,7 @@
 <!ENTITY author    "Andrew Zawadzki">
 <!ENTITY version   "2016.08.13">
 <!ENTITY md5       "9956f5ce09f3a9d204336f077a00f49f">
-<!ENTITY launch    "Apps">
+<!ENTITY launch    "Settings/PluginSettings">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/community.applications">
 <!ENTITY pluginURL "https://raw.githubusercontent.com/&github;/master/plugins/&name;.plg">

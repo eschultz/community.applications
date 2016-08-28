@@ -226,7 +226,6 @@ function DownloadApplicationFeed() {
       $o['SortName']      = $o['Name'];
     }
     $RepoIndex = searchArray($Repositories,"name",$o['RepoName']);
-
     if ( $RepoIndex != false ) {
       $o['DonateText'] = $Repositories[$RepoIndex]['donatetext'];
       $o['DonateImg']  = $Repositories[$RepoIndex]['donateimg'];
@@ -442,7 +441,6 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
   }
 
   $columnNumber = 0;
-
   foreach ($file as $template) {
     $name = $template['SortName'];
     $appName = str_replace(" ","",$template['SortName']);
@@ -556,7 +554,6 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
     $ct .= $t;
   }
   $ct .= $skin[$viewMode]['footer'];
-
   return $ct;
 }
 
@@ -746,15 +743,12 @@ function displaySearchResults($pageNumber,$viewMode) {
         $t .= "Click container's icon for full description<br><br>";
         $t .= "</td>";
       }
-
       $column = ++$column;
-
       if ( $column == $maxColumn ) {
         $column = 0;
         $t .= "</tr><tr>";
       }
     }
-
     if ( $viewMode == "table" ) {
       $t .= "<tr><td><a href='".$result['DockerHub']."' target='_blank' title='Click to go to the dockerHub website for this container'>";
       $t .= "<img src='".$result['Icon']."' onError='this.src=\"/plugins/$plugin/images/question.png\";' style='width:".$iconSize."px;height:".$iconSize."px;'>";
@@ -770,7 +764,6 @@ function displaySearchResults($pageNumber,$viewMode) {
     }
   }
   $t .= "</table>";
-
   echo $t;
   echo dockerNavigate($num_pages,$pageNumber);
   echo "<script>$('#pageNumber').html('(Page $pageNumber of $num_pages)');</script>";
@@ -1065,7 +1058,7 @@ case 'display_content':
 ########################################################################
 
 case 'change_docker_view':
-  $viewMode = getPost("view","icon");
+  $sortOrder = getSortOrder(getPostArray('sortOrder'));
 
   if ( ! file_exists($communityPaths['dockerSearchResults']) ) {
     break;
@@ -1073,9 +1066,7 @@ case 'change_docker_view':
 
   $file = readJsonFile($communityPaths['dockerSearchResults']);
   $pageNumber = $file['page_number'];
-
-  displaySearchResults($pageNumber,$viewMode);
-
+  displaySearchResults($pageNumber,$sortOrder['viewMode']);
   break;
 
 #######################################################################
@@ -1249,7 +1240,7 @@ case 'convert_docker':
 case 'search_dockerhub':
   $filter     = getPost("filter","");
   $pageNumber = getPost("page","1");
-  $viewMode   = getPost("view","icon");
+  $sortOrder  = getSortOrder(getPostArray('sortOrder'));
   
   $communityTemplates = readJsonFile($communityPaths['community-templates-info']);
 
@@ -1306,7 +1297,7 @@ case 'search_dockerhub':
 
   writeJsonFile($communityPaths['dockerSearchResults'],$dockerFile);
   echo suggestSearch($filter,false);
-  displaySearchResults($pageNumber, $viewMode);
+  displaySearchResults($pageNumber, $sortOrder['viewMode']);
   break;
 
 #####################################################################

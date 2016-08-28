@@ -124,39 +124,11 @@ case 'applyBackupOptions':
   foreach ($rawSettings as $setting) {
     $backupOptions[$setting[0]] = $setting[1];
   }
-  
-/*   $backupOptions['source']      = isset($_POST['source']) ? urldecode(($_POST['source'])) : "";
-  $backupOptions['destinationShare'] = isset($_POST['destinationShare']) ? urldecode(($_POST['destinationShare'])) : "";
-  $backupOptions['destination'] = isset($_POST['destination']) ? urldecode(($_POST['destination'])) : "";
-  $backupOptions['stopScript']  = isset($_POST['stopScript']) ? urldecode(($_POST['stopScript'])) : "";
-  $backupOptions['startScript'] = isset($_POST['startScript']) ? urldecode(($_POST['startScript'])) : "";
-  $backupOptions['rsyncOption'] = isset($_POST['rsyncOption']) ? urldecode(($_POST['rsyncOption'])) : "";
-  $backupOptions['cronSetting'] = isset($_POST['cronSetting']) ? urldecode(($_POST['cronSetting'])) : "";
-  $backupOptions['cronDay']     = isset($_POST['cronDay']) ? urldecode(($_POST['cronDay'])) : "";
-  $backupOptions['cronMonth']   = isset($_POST['cronMonth']) ? urldecode(($_POST['cronMonth'])) : "";
-  $backupOptions['cronHour']    = isset($_POST['cronHour']) ? urldecode(($_POST['cronHour'])) : "";
-  $backupOptions['cronMinute']  = isset($_POST['cronMinute']) ? urldecode(($_POST['cronMinute'])) : "";
-  $backupOptions['cronCustom']  = isset($_POST['cronCustom']) ? urldecode(($_POST['cronCustom'])) : "";
-  $backupOptions['runRsync']    = isset($_POST['runRsync']) ? urldecode(($_POST['runRsync'])) : "";
-  $backupOptions['dockerIMG']   = isset($_POST['dockerIMG']) ? urldecode(($_POST['dockerIMG'])) : "";
-  $backupOptions['notification'] = isset($_POST['notification']) ? urldecode(($_POST['notification'])) : "";
-  $backupOptions['excluded']    = isset($_POST['excluded']) ? urldecode(($_POST['excluded'])) : "";
-  $backupOptions['logBackup']   = isset($_POST['logBackup']) ? urldecode(($_POST['logBackup'])) : "";
-  $backupOptions['datedBackup'] = isset($_POST['datedBackup']) ? urldecode(($_POST['datedBackup'])) : "";
-  $backupOptions['deleteOldBackup'] = isset($_POST['deleteOldBackup']) ? urldecode(($_POST['deleteOldBackup'])) : "";
-  $backupOptions['fasterRsync'] = isset($_POST['fasterRsync']) ? urldecode(($_POST['fasterRsync'])) : "";
-  $backupOptions['backupFlash'] = isset($_POST['backupFlash']) ? urldecode(($_POST['backupFlash'])) : "";
-  $backupOptions['usbDestination'] = isset($_POST['usbDestination']) ?urldecode(($_POST['usbDestination'])) : "";
-   */
   $backupOptions['excluded'] = trim($backupOptions['excluded']);
-  
   $backupOptions['destinationShare'] = str_replace("/mnt/user/","",$backupOptions['destinationShare']);  # make new options conform to old layout of json
   $backupOptions['destinationShare'] = rtrim($backupOptions['destinationShare'],'/');
-  
   writeJsonFile($communityPaths['backupOptions'],$backupOptions);
-    
   exec($communityPaths['addCronScript']);
-       
   break; 
   
 ###########################################

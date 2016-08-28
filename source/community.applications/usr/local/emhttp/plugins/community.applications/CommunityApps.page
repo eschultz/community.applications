@@ -25,29 +25,22 @@ if ( ! is_file("/boot/config/plugins/$plugin/accepted") ) {
 }
 
 $tabMode = $cfg['newWindow'];
-  
 $line_color = $display['theme']=='black' ? '#202020' : '#E8E8E8';
 
 if ( ! $cfg['viewMode'] )         { $cfg['viewMode'] = "detail"; }
-if ( ! $cfg['autoUpdate'] )       { $cfg['autoUpdate'] = "no"; }
 if ( ! $cfg['timeNew'] )          { $cfg['timeNew'] = "-3 Months"; }
 
 $timeNew = str_replace("-","",$cfg['timeNew']);
-
 $categoryTitle = "Recommended Applications";
-
 $viewMode = $cfg['viewMode'];
-
 $execPath = "/plugins/$plugin/scripts";
 $commandArg="?appNumber=";
-$commandExt="";
 
 if ( is_dir("/var/lib/docker/containers") ) {
   $dockerRunning = "true";
 } else {
   $dockerRunning = "false";
 }
-
 ?>
 <style>
 .searchSubmit{font-family:'FontAwesome';width:29px;height:26px;border:1px solid #dadada;border-radius:0px 4px 4px 0px;font-size:11px;position:relative;padding:0px 2px;background:#DADADA;border:none;cursor:pointer;}
@@ -89,11 +82,9 @@ jQuery(document).ready(function() {
   })
 });
 
-
 var URL = "/plugins/<?=$plugin?>/include/exec.php";
 var monitorInterval;
 var last = $('input[name$="tabs"]').length;
-var initialLoad = true;
 
 var categorySub = {
   backup:"backup:",
@@ -164,96 +155,67 @@ var categoryDesc = {
   };
 
 $(function(){
+  if ( "<?=$installedVersion?>" < "<?=$upgradeVersion?>" ) { $('#upgradeAvailable').show(); }
+  if ( "<?=$firstRun?>" == "true" ) { $("#appWarning").show(); }
+  if ( "<?=$dockerRunning?>" == "false" ) { $("#monitor").hide(); }
 
-if ( "<?=$installedVersion?>" < "<?=$upgradeVersion?>" ) {
-  $('#upgradeAvailable').show();
-}
-
-$("#monitor").click(function() {
-  Monitor();
-});
-
-$(".allButtons").click(function() {
-  var description = this.value;
-  var category = this.id;
-
-  clearSearchBox();
+  $("#monitor").click(function() { Monitor(); });
+  $(".viewButton,.sortButton,.dirButton").click(function() { changeSortOrder(this.id,$(this).attr("class")); });
+  $(".resourceSort,.resourceDir").click(function() { changeResource(this.id,$(this).attr("class")); });
+  $("#calculateAppdata").click(function() { calculateAppdataSize(); });
+  $(".initDockerSearch").click(function() { initDockerSearch(); });
+  $(".allButtons").click(function() {
+    var description = this.value;
+    var category = this.id;
+    clearSearchBox();
   
-  $('.allButtons').prop('disabled', false);
-  $(this).prop("disabled",true);
+    $('.allButtons').prop('disabled', false);
+    $(this).prop("disabled",true);
 
-  if ( typeof categorySub[this.id] !== "undefined" ) {
-    category = categorySub[this.id];
-  }
-  if ( typeof categoryDesc[this.id] !== "undefined" ) {
-    description = categoryDesc[this.id];
-  }
-  var newFlag = false;
-  switch (category) {
-    case "network:":
-      $("#network").prop("disabled",true);
-      break;
-    case "MediaApp:":
-      $("#MediaApp").prop("disabled",true);
-      break;
-    case "MediaServer:":
-      $("#MediaServer").prop("disabled",true);
-      break;
-    case "tools:":
-      $("#tools").prop("disabled",true);
-      break;
-    case "New":
-      newFlag = true;
-      break;
-  }
-  
-  getContent(false,category,description,newFlag);
-});
+    if ( typeof categorySub[this.id] !== "undefined" ) {
+      category = categorySub[this.id];
+    }
+    if ( typeof categoryDesc[this.id] !== "undefined" ) {
+      description = categoryDesc[this.id];
+    }
+    var newFlag = false;
+    switch (category) {
+      case "network:":
+        $("#network").prop("disabled",true);
+        break;
+      case "MediaApp:":
+        $("#MediaApp").prop("disabled",true);
+        break;
+      case "MediaServer:":
+        $("#MediaServer").prop("disabled",true);
+        break;
+      case "tools:":
+        $("#tools").prop("disabled",true);
+        break;
+      case "New":
+        newFlag = true;
+        break;
+    }
+    getContent(false,category,description,newFlag);
+  });
+  myAlert("Updating Content","Retrieving the latest application Lists","/plugins/community.applications/images/spinner2.gif","40x40");
+  $.post(URL,{action:'force_update'});
 
-$(".viewButton,.sortButton,.dirButton").click(function() {
-  changeSortOrder(this.id,$(this).attr("class"));
-});
+  if ( "<?=$cfg['viewMode']?>" == "icon" ) $("#viewIcon").prop("disabled",true);
+  if ( "<?=$cfg['viewMode']?>" == "table" ) $("#viewTable").prop("disabled",true);
+  if ( "<?=$cfg['viewMode']?>" == "detail" ) $("#viewDetail").prop("disabled",true);
 
-$(".resourceSort,.resourceDir").click(function() {
-  changeResource(this.id,$(this).attr("class"));
-});
-
-$("#calculateAppdata").click(function() {
-  calculateAppdataSize();
-});
-
-$(".initDockerSearch").click(function() {
-  initDockerSearch();
-});
-
-if ( "<?=$firstRun?>" == "true" ) {
-  $("#appWarning").show();
-}
-
-if ( "<?=$dockerRunning?>" == "false" ) {
-  $("#monitor").hide();
-}
-myAlert("Updating Content","Retrieving the latest application Lists","/plugins/community.applications/images/spinner2.gif","40x40");
-$.post(URL,{action:'force_update'});
-
-if ( "<?=$cfg['viewMode']?>" == "icon" ) $("#viewIcon").prop("disabled",true);
-if ( "<?=$cfg['viewMode']?>" == "table" ) $("#viewTable").prop("disabled",true);
-if ( "<?=$cfg['viewMode']?>" == "detail" ) $("#viewDetail").prop("disabled",true);
-
-
-<?if ($tabbed):?>
-  $('.tabs').append("<span id='searchFilter' class='status vhshift' style='display:none'><input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' id='updateButton' value='Update Applications' title='Updates are automatically downloaded whenever loading CA.  This button will manually force an update' onclick='forceUpdateButton()' disabled></span>");
-  for (var x=1; x<last; x++) $('#tab'+x).bind({click:function(){$('#searchFilter').hide();}});
-  $('#tab'+last).bind({click:function(){$('#searchFilter').show();readMore();}});
-<?else:?>
-  $('div[id=title]').last().append("<span id='searchFilter' class='status vhshift'><input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' id='updateButton' value='Update Applications' title='Updates are automatically downloaded when starting CA.  This button will force an update' onclick='forceUpdateButton()' disabled>");
-<?endif;?>
+  <?if ($tabbed):?>
+    $('.tabs').append("<span id='searchFilter' class='status vhshift' style='display:none'><input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' id='updateButton' value='Update Applications' title='Updates are automatically downloaded whenever loading CA.  This button will manually force an update' onclick='forceUpdateButton()' disabled></span>");
+    for (var x=1; x<last; x++) $('#tab'+x).bind({click:function(){$('#searchFilter').hide();}});
+    $('#tab'+last).bind({click:function(){$('#searchFilter').show();readMore();}});
+  <?else:?>
+    $('div[id=title]').last().append("<span id='searchFilter' class='status vhshift'><input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' id='updateButton' value='Update Applications' title='Updates are automatically downloaded when starting CA.  This button will force an update' onclick='forceUpdateButton()' disabled>");
+  <?endif;?>
 
   getContent(true,'INITIALIZE','None Selected');
   $('#searchBox').keyup(function(e) {if(e.which == 13){doSearch(false);}});
-
 });
-
 
 function myAlert(description,textdescription,textimage,imagesize, outsideClick, showCancel, showConfirm, alertType) {
   if ( !outsideClick ) outsideClick = false;
@@ -406,12 +368,11 @@ function enableButtons() {
 function changeDockerView(viewButton) {
   $("#"+viewButton).prop("disabled",true);
 
-  var sortOrder = new Object();
-  sortOrder = getSortOrder();
+  var sortOrder = getSortOrder();
 
   totalDisplayed = $("#Total").html();
   $("#Total").html("Rendering");
-  $.post(URL,{action:'change_docker_view',view:sortOrder.viewMode},function(data) {
+  $.post(URL,{action:'change_docker_view',sortOrder:sortOrder},function(data) {
     if (data) {
       $('#templates_content').html(data);
       $("#Total").html(totalDisplayed);
@@ -584,11 +545,11 @@ function dockerSearch(pageNumber)
 
   $("#Category").html("DockerHub Search Results For <font color='red'>"+filter+"</font> <span id='pageNumber'></span>");
 
-  sortOrder = getSortOrder();
+  var sortOrder = getSortOrder();
 
   myAlert("Searching dockerHub", "Retrieving <strong><font color=red>"+filter+"</font></strong> page <strong><font color=red>"+pageNumber+"</font></strong>","/plugins/community.applications/images/spinner2.gif","40x40");
 
-  $.post(URL,{action:'search_dockerhub',filter:filter,page:pageNumber,view:sortOrder[0]},function(data) {
+  $.post(URL,{action:'search_dockerhub',filter:filter,page:pageNumber,sortOrder:sortOrder},function(data) {
     if (data) {
       $('#templates_content').html(data);
       readMore();
@@ -970,9 +931,7 @@ Sort Direction:
 <font size='2' color='red'>Note: All Applications listed here are 3rd party additions to unRaid.<br>Neither the authors of Community Applications nor Limetech make any warranty as to the suitability of any applications listed herein</font>
 <br><input type='button' value='Dismiss Warning' onclick='dismissWarning();'></input></center></div>
 </center>
-<a href="#" class="back-to-top" style="display: inline;">
-<img src='/plugins/community.applications/images/up.png' style='width:50px;height:50px' href="#" class="back-to-top"></img>
-</a>
+<a href="#" class="back-to-top" style="display: inline;"><img src='/plugins/community.applications/images/up.png' style='width:50px;height:50px' href="#" class="back-to-top"></img></a>
 <div class='dockerSearch' style='display:none'><center><input type=button class='initDockerSearch' value='Get more results from dockerHub'></input></center></div>
 <center>Last Change To Appfeed: <strong><span id='updateTime'></span></strong></center>
 <a href="Settings/caHelp" target='_blank'>CA Manual</a><a style='float:right;cursor:pointer' onclick='showCredits();'>Credits</a><br><br></span>

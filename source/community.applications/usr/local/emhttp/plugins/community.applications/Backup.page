@@ -189,7 +189,6 @@ $(function() {
   <?endif;?>
   myAlert("Appdata Backup","When a Backup is running (<em>either manually or a scheduled backup</em>), your docker applications will be <b><font color='red'>stopped</font></b> and then <b><font color='red'>restarted</font></b> at the conclusion of the backup","","",false,"",true,"warning");
   
-
   $("#fasterRsync").val("<?=$backupOptions['fasterRsync']?>");
   $("#deleteOldBackup").val("<?=$backupOptions['deleteOldBackup']?>");
   $("#datedBackup").val("<?=$backupOptions['datedBackup']?>");
@@ -411,7 +410,6 @@ function setExcluded() {
     $("#excluded").val(checked);
     validateOptions();
  }
-
 
 function backupNow() {
   var source = $('#source').val();
