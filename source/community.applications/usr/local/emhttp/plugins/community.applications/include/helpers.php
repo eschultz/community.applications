@@ -263,18 +263,12 @@ function fixTemplates($template) {
   $template['Date'] = ( $template['Date'] ) ? strtotime( $template['Date'] ) : 0;
 
   if ( ! $template['MinVer'] ) {
-    if ( $template['Plugin'] ) {
-      $template['MinVer'] = "6.1";
-    } else {
-      $template['MinVer'] = "6.0";
-    }
+    $template['MinVer'] = $template['Plugin'] ? "6.1" : "6.0";
   }
   if ( ! is_string($template['Description']) ) {
     $template['Description'] = "";
   }
-  if ( $template['Category'] == "" ) {
-    $template['Category'] = "Uncategorized";
-  }
+  $template['Category'] = $template['Category'] ? $template['Category'] : "Uncategorized";
 
   if ( !is_string($template['Overview']) ) {
     unset($template['Overview']);
@@ -362,7 +356,6 @@ function changeUpdateTime() {
   } else {
     $appFeedTime['last_updated_timestamp'] = filemtime($communityPaths['community-templates-info']);
   }
-
   $updateTime = date("F d Y H:i",$appFeedTime['last_updated_timestamp']);
 
   return "<script>$('#updateTime').html('$updateTime');</script>";
@@ -469,7 +462,7 @@ function moderateTemplates() {
   
   $templates = readJsonFile($communityPaths['community-templates-info']);
   $moderation = readJsonFile($communityPaths['moderation']);
-  
+  if ( ! $templates ) { return; }
   foreach ($templates as $template) {
     if ( is_array($moderation[$template['Repository']]) ) {
       $o[] = array_merge($template,$moderation[$template['Repository']]);
@@ -559,11 +552,9 @@ function getPostArray($setting) {
   return $_POST[$setting];
 }
 function getSortOrder($sortArray) {
-  $sortOrder['viewMode'] = $sortArray[0];
-  $sortOrder['sortBy'] = $sortArray[1];
-  $sortOrder['sortDir'] = $sortArray[2];
-  $sortOrder['resourceKey'] = $sortArray[3];
-  $sortOrder['resourceDir'] = $sortArray[4];
+  foreach ($sortArray as $sort) {
+    $sortOrder[$sort[0]] = $sort[1];
+  }
   return $sortOrder;
 }
 

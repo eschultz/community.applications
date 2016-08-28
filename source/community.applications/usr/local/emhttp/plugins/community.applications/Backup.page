@@ -244,6 +244,20 @@ function myAlert(description,textdescription,textimage,imagesize, outsideClick, 
   });
 }
 
+function getSettings() {
+  var settings = new Array();
+  
+  $(".setting").each(function() {
+    var value = $(this).val();
+    value = value.trim();
+    $(this).val(value);
+    var newSetting = new Array(this.id,value);
+    
+    settings.push(newSetting);
+  });
+  return settings;
+}
+  
 function changeSource() {
   $('#excludedFoldersList').html(" ");
   var source = $("#source").val();
@@ -260,6 +274,7 @@ function validateOptions(initialization) {
   if (initialization != true ) {
     appliedChanges = true;
   }
+  var settings = getSettings();
   
   var cronSetting = $("#cronSetting").val();
   switch (cronSetting) {
@@ -285,14 +300,9 @@ function validateOptions(initialization) {
   }
   
   var backupFlash = $("#backupFlash").val();
-  var usbDestination = $("#usbDestination").val();
-  var source = $("#source").val();
-  var destination = $("#destination").val();
   var destinationShare = $("#destinationShare").val();
-  var stopScript = $("#stopScript").val();
-  var startScript = $("#startScript").val();
-  var datedBackup = $("#datedBackup").val();
   var deleteOldBackup = $("#deleteOldBackup").val();
+
   if ( deleteOldBackup == 0 ) {
     $("#deleteOldBackup").val("");
   }
@@ -319,10 +329,7 @@ function validateOptions(initialization) {
     $("#fasterRsync").prop("disabled",true);
   }
   
-  stopScript = stopScript.trim();
-  startScript = startScript.trim();
-  
-  $.post(URL,{action:'validateBackupOptions',usbDestination:usbDestination,backupFlash:backupFlash,source:source,destinationShare:destinationShare,destination:destination,stopScript:stopScript,startScript:startScript}, function (data) {
+  $.post(URL,{action:'validateBackupOptions',settings:settings}, function (data) {
     if (data) {
       data = data.trim();
       if ( data == "NONE" ) {
@@ -346,30 +353,13 @@ function validateOptions(initialization) {
 }  
   
 function apply() {
-  
+  var settings = getSettings();  
   var backupFlash = $("#backupFlash").val();
-  var usbDestination = $("#usbDestination").val();
   var source = $("#source").val();
   var destinationShare = $("#destinationShare").val();
   var destination = $("#destination").val();
-  var stopScript = $("#stopScript").val();
-  var startScript = $("#startScript").val();
-  var rsyncOption = $("#rsyncOption").val();
-  var cronSetting = $("#cronSetting").val();
-  var cronDay = $("#cronDay").val();
-  var cronMonth = $("#cronMonth").val();
-  var cronHour = $("#cronHour").val();
-  var cronMinute = $("#cronMinute").val();
-  var cronCustom = $("#cronCustom").val();
-  var runRsync = $("#runRsync").val();
-  var dockerIMG = $("#dockerIMG").val();
-  var notification = $("#notification").val();
   var excluded = $("#excluded").val();
-  var logBackup = $("#logBackup").val();
-  var datedBackup = $("#datedBackup").val();
-  var deleteOldBackup = $("#deleteOldBackup").val();
-  var fasterRsync = $("#fasterRsync").val();
-  
+
   excluded = excluded.trim();
   
   if ( backupFlash == "separate" ) {
@@ -397,11 +387,7 @@ function apply() {
     function() {
       appliedChanges = false;
 
-      rsyncOption = rsyncOption.trim();
-      stopScript = stopScript.trim();
-      startScript = startScript.trim();
-  
-      $.post(URL,{action:'applyBackupOptions',usbDestination:usbDestination,backupFlash:backupFlash,fasterRsync:fasterRsync,deleteOldBackup:deleteOldBackup,datedBackup:datedBackup,logBackup:logBackup,excluded:excluded,notification:notification,dockerIMG:dockerIMG,source:source,destinationShare:destinationShare,destination:destination,stopScript:stopScript,startScript:startScript,rsyncOption:rsyncOption,cronDay:cronDay,cronMonth:cronMonth,cronHour:cronHour,cronMinute:cronMinute,cronCustom:cronCustom,cronSetting:cronSetting,runRsync:runRsync});
+      $.post(URL,{action:'applyBackupOptions',settings:settings});
 
       validateOptions(true);
       changeRestoreOptions();
@@ -511,25 +497,25 @@ jQuery(document).ready(function() {
 <table>
 <tr>
   <td><b>Appdata Share (Source):</b><br>(If your appData share is not listed, consider installing this <a href='http://lime-technology.com/forum/index.php?topic=49992.0' target='_blank'>plugin</a> in conjunction with <a href='http://lime-technology.com/forum/index.php?topic=50416.msg484239#msg484239' target='_blank'>this</a></td>
-  <td><select id='source' onchange='changeSource();'><?=$sourceShares?></select></td>
+  <td><select class='setting' id='source' onchange='changeSource();'><?=$sourceShares?></select></td>
 </tr>
 <tr>
   <td><b>Save To Disk #:</b></td>
-  <td><select id='destination' onchange='validateOptions();'><?=$destinationShares?></select></td>
+  <td><select class='setting' id='destination' onchange='validateOptions();'><?=$destinationShares?></select></td>
 </tr>
 <?=$disksComment?>
 <tr>
   <td><b>Destination Share:</b><br>If using an Unassigned Devices mount as save to Disk #,<br> manually type in the destination folder here</td>
-  <td><input type='text' id="destinationShare" name="shareFolder" value="/mnt/user" data-pickfilter="HIDE_FILES_FILTER" data-pickroot="/mnt/user" data-pickfolders="true" onchange='validateOptions();'></td>
+  <td><input type='text' class='setting' id="destinationShare" name="shareFolder" value="/mnt/user" data-pickfilter="HIDE_FILES_FILTER" data-pickroot="/mnt/user" data-pickfolders="true" onchange='validateOptions();'></td>
 </tr>
 <tr>
   <td><b>Excluded Folders:</b></td>
-  <td><input type='text' id='excluded' value='<?=$backupOptions['excluded']?>'></span></td>
+  <td><input type='text' class='setting' id='excluded' value='<?=$backupOptions['excluded']?>'></span></td>
   <td><center><b>Excluded Folder Browser</b><br><input type='button' value='Exclude Selected' onclick='setExcluded();'><br></center><div id='excludedFoldersList' style='width:305px;max-height:150px;overflow:scroll;position:absolute;z-index:100;'></div><br><center></td>
  </tr>
 <tr>
   <td><b>Backup USB Flash Drive:</b></td>
-  <td><select id='backupFlash' onchange='validateOptions();'>
+  <td><select class='setting' id='backupFlash' onchange='validateOptions();'>
     <option value='appdata'>Same Destination as Appdata</option>
     <option value='separate'>Separate Destination</option>
     <option value='no'>Don't Backup</option>
@@ -538,11 +524,11 @@ jQuery(document).ready(function() {
 </tr>
 <tr>
   <td><b>USB Backup Destination:<b><br>See Manual</td>
-  <td><input type='text' id="usbDestination" name="usb destination" value="" placeholder='select a destination' data-pickfilter="HIDE_FILES_FILTER" data-pickroot="/mnt/" data-pickfolders="true" onchange='validateOptions();'></td>
+  <td><input type='text' class='setting' id="usbDestination" name="usb destination" value="" placeholder='select a destination' data-pickfilter="HIDE_FILES_FILTER" data-pickroot="/mnt/" data-pickfolders="true" onchange='validateOptions();'></td>
 </tr>
 <tr>
   <td><b>Notification Settings:</b></td>
-  <td><select id='notification' onchange='validateOptions();'>
+  <td><select class='setting' id='notification' onchange='validateOptions();'>
     <option value='disabled'>Disabled</option>
     <option value='always'>Start And Stop</option>
     <option value='completion'>Completion Only</option>
@@ -552,19 +538,19 @@ jQuery(document).ready(function() {
 </tr>
 <tr>
   <td><b>Path To Custom Stop Script:</b></td>
-  <td><input onchange='validateOptions();' id='stopScript' type='text' data-pickroot="/" data-pickfolders="true"></input></td>
+  <td><input onchange='validateOptions();' class='setting' id='stopScript' type='text' data-pickroot="/" data-pickfolders="true"></input></td>
 </tr>
 <tr>
   <td><b>Path To Custom Start Script:</b></td>
-  <td><input onchange='validateOptions();' id='startScript' type='text' data-pickroot="/" data-pickfolders="true"></input></td>
+  <td><input onchange='validateOptions();' class='setting' id='startScript' type='text' data-pickroot="/" data-pickfolders="true"></input></td>
 </tr>
 <tr>
   <td><b>Rsync Options:</b><br><font size='0'>Don't change if you don't know what you're doing</font></td>
-  <td><input id='rsyncOption' type='text' value='<?=$backupOptions['rsyncOption']?>' onchange='validateOptions();'></td>
+  <td><input class='setting' id='rsyncOption' type='text' value='<?=$backupOptions['rsyncOption']?>' onchange='validateOptions();'></td>
 </tr>
 <tr>
   <td><b>Run scripts in place of rsync or in addition to:</b></td>
-  <td><select id='runRsync' onchange='validateOptions();'>
+  <td><select class='setting' id='runRsync' onchange='validateOptions();'>
         <option value='true'>In Addition To</option>
         <option value='false'>In replacement of</option>
       </select>
@@ -572,7 +558,7 @@ jQuery(document).ready(function() {
 </tr>
 <tr>
   <td><b>Save Log File to flash?<b></td>
-  <td><select id='logBackup' onchange='validateOptions();'>
+  <td><select class='setting' id='logBackup' onchange='validateOptions();'>
     <option value='no'>No</option>
     <option value='yes'>Yes</option>
     <option value='append'>Yes (and append file)</option>
@@ -580,7 +566,7 @@ jQuery(document).ready(function() {
 </tr>
 <tr>
   <td><b>Scheduled Backup Frequency</b></td>
-  <td><select id='cronSetting' onchange='validateOptions();'>
+  <td><select class='setting' id='cronSetting' onchange='validateOptions();'>
         <option value='disabled'>Disabled</option>
         <option value='daily'>Daily</option>
         <option value='weekly'>Weekly</option>
@@ -591,18 +577,18 @@ jQuery(document).ready(function() {
 </tr>
 <tr>
   <td><b>Put backups into separate dated sub folders?</b></td>
-  <td><select id='datedBackup' onchange='validateOptions();'>
+  <td><select class='setting' id='datedBackup' onchange='validateOptions();'>
     <option value='no'>No</option>
     <option value='yes'>Yes</option>
   </td>
 </tr>
 <tr>
   <td><b>Delete backups after how many days?</b></td>
-  <td><input id='deleteOldBackup' type='number' val='' placeholder='Never Delete' onchange='validateOptions();'></td>
+  <td><input class='setting' id='deleteOldBackup' type='number' val='' placeholder='Never Delete' onchange='validateOptions();'></td>
 </tr>
 <tr>
   <td><b>Attempt faster rsync's (see manual)</b></td>
-  <td><select id='fasterRsync' onchange='validateOptions();'>
+  <td><select class='setting' id='fasterRsync' onchange='validateOptions();'>
     <option value='no'>No (default)</option>
     <option value='yes'>Yes</option>
     </select>
@@ -610,7 +596,7 @@ jQuery(document).ready(function() {
 </tr>
 <tr>
   <td><b>Day of Week:</b></td>
-  <td><select id='cronDay' onchange='validateOptions();'>
+  <td><select class='setting' id='cronDay' onchange='validateOptions();'>
         <option value='0'>Sunday</option>
         <option value='1'>Monday</option>
         <option value='2'>Tuesday</option>
@@ -623,7 +609,7 @@ jQuery(document).ready(function() {
 </tr>
 <tr>
   <td><b>Day of Month:</b></td>
-  <td><select id='cronMonth' onchange='validateOptions();'>
+  <td><select class='setting' id='cronMonth' onchange='validateOptions();'>
         <option value='1'>1st</option>
         <option value='2'>2nd</option>
         <option value='3'>3rd</option>
@@ -660,15 +646,15 @@ jQuery(document).ready(function() {
 </tr>
 <tr>
   <td><b>Hour:</b></td>
-  <td><select id='cronHour' onchange='validateOptions();'><?=$cronHour?></select></td>
+  <td><select class='setting' id='cronHour' onchange='validateOptions();'><?=$cronHour?></select></td>
 </tr>
 <tr>
   <td><b>Minute:</b></td>
-  <td><select id='cronMinute' onchange='validateOptions();'><?=$cronMinute?></select></td>
+  <td><select class='setting' id='cronMinute' onchange='validateOptions();'><?=$cronMinute?></select></td>
 </tr>
 <tr>
   <td><b>Custom Cron Entry:</b></td>
-  <td><input type='text' id='cronCustom' onchange='validateOptions();'></input></td>
+  <td><input type='text' class='setting' id='cronCustom' onchange='validateOptions();'></input></td>
 </tr>
 </table>
 <font size='3' color='red'><b>NOTE: All files</b> within your chosen destinations will be deleted when the backup runs.  Only select a share created <b>SPECIFICALLY<b> for appdata (and USB) backup purposes</font><br>

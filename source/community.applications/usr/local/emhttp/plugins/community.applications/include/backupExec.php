@@ -34,63 +34,61 @@ switch ($_POST['action']) {
 ##############################################################
 
 case 'validateBackupOptions':
-  $source = isset($_POST['source']) ? urldecode(($_POST['source'])) : "";
-  $destination = isset($_POST['destination']) ? urldecode(($_POST['destination'])) : "";
-  $stopScript = isset($_POST['stopScript']) ? urldecode(($_POST['stopScript'])) : "";
-  $startScript = isset($_POST['startScript']) ? urldecode(($_POST['startScript'])) : "";
-  $destinationShare = isset($_POST['destinationShare']) ? urldecode(($_POST['destinationShare'])) : "";
-  $backupFlash = isset($_POST['backupFlash']) ? urldecode(($_POST['backupFlash'])) : "";
-  $usbDestination = isset($_POST['usbDestination']) ?urldecode(($_POST['usbDestination'])) : "";
-  
-  $destinationShare = str_replace("/mnt/user/","",$destinationShare);
+  $rawSettings = getPostArray('settings');
+  foreach ($rawSettings as $setting) {
+    $settings[$setting[0]] = $setting[1];
+  }
+
+  $destinationShare = str_replace("/mnt/user/","",$settings['destinationShare']);
   $destinationShare = rtrim($destinationShare,'/');
-  
-  if ( $source == "" ) {
+
+  if ( $settings['source'] == "" ) {
     $errors .= "Source Must Be Specified<br>";
   }
-  if ( $destination == "" || $destinationShare == "" ) {
+  if ( $settings['destination'] == "" || $destinationShare == "" ) {
     $errors .= "Destination Must Be Specified<br>";
   }
   
-  if ( $source != "" && $source == $destination ) {
+  if ( $settings['source'] != "" && $settings['source'] == $settings['destination'] ) {
     $errors .= "Source and Destination Cannot Be The Same<br>";
   } else {
     $destDir = ltrim($destinationShare,'/');
     $destDirPaths = explode('/',$destDir);
-    if ( basename($source) == $destDirPaths[0] ) {
+    if ( basename($settings['source']) == $destDirPaths[0] ) {
       $errors .= "Destination cannot be a subfolder from source<br>";
     }
   }
   
-  if ( basename($source) == $destinationShare ) {
+  if ( basename($settings['source']) == $destinationShare ) {
     $errors .= "Source and Destination Cannot Be The Same Share<br>";
   }
   
-  if ( $stopScript ) {
-    if ( ! is_file($stopScript) ) {
-      $errors .= "No Script at $stopScript<br>";
+  if ( $settings['stopScript'] ) {
+    if ( ! is_file($settings['stopScript']) ) {
+      $errors .= "No Script at ".$settings['stopScript']."<br>";
     } else {
-      if ( ! is_executable($stopScript) ) {
-        $errors .= "Stop Script $stopScript is not executable<br>";
+      if ( ! is_executable($settings['stopScript']) ) {
+        $errors .= "Stop Script ".$settings['stopScript']." is not executable<br>";
       }
     }
   }
-  if ( $startScript ) {
-    if ( ! is_file($startScript) ) {
-      $errors .= "No Script at $startScript<br>";
+  if ( $settings['startScript'] ) {
+    if ( ! is_file($settings['startScript']) ) {
+      $errors .= "No Script at ".$settings['startScript']."<br>";
     } else {
-        if ( ! is_executable($startScript) ) {
-        $errors .= "Start Script $startScript is not executable<br>";
+        if ( ! is_executable($settings['startScript']) ) {
+        $errors .= "Start Script ".$settings['startScript']." is not executable<br>";
       }
     }
   }
   
-  if ( $backupFlash == "separate" ) {
-    if ( ! $usbDestination ) {
+  if ( $settings['backupFlash'] == "separate" ) {
+    if ( ! $settings['usbDestination'] ) {
       $errors .= "Destination for the USB Backup Must Be Specified<br>";
     } else {
-      $origUSBDestination = $usbDestination;
+      $origUSBDestination = $settings['usbDestination'];
       $availableDisks = parse_ini_file("/var/local/emhttp/disks.ini",true);
+      $usbDestination = $settings['usbDestination'];
       foreach ($availableDisks as $disk) {
         $usbDestination = str_replace("/mnt/".$disk['name']."/","",$usbDestination);
       }
@@ -122,7 +120,12 @@ case 'validateBackupOptions':
 ######################################
 
 case 'applyBackupOptions':
-  $backupOptions['source']      = isset($_POST['source']) ? urldecode(($_POST['source'])) : "";
+  $rawSettings = getPostArray('settings');
+  foreach ($rawSettings as $setting) {
+    $backupOptions[$setting[0]] = $setting[1];
+  }
+  
+/*   $backupOptions['source']      = isset($_POST['source']) ? urldecode(($_POST['source'])) : "";
   $backupOptions['destinationShare'] = isset($_POST['destinationShare']) ? urldecode(($_POST['destinationShare'])) : "";
   $backupOptions['destination'] = isset($_POST['destination']) ? urldecode(($_POST['destination'])) : "";
   $backupOptions['stopScript']  = isset($_POST['stopScript']) ? urldecode(($_POST['stopScript'])) : "";
@@ -144,7 +147,7 @@ case 'applyBackupOptions':
   $backupOptions['fasterRsync'] = isset($_POST['fasterRsync']) ? urldecode(($_POST['fasterRsync'])) : "";
   $backupOptions['backupFlash'] = isset($_POST['backupFlash']) ? urldecode(($_POST['backupFlash'])) : "";
   $backupOptions['usbDestination'] = isset($_POST['usbDestination']) ?urldecode(($_POST['usbDestination'])) : "";
-  
+   */
   $backupOptions['excluded'] = trim($backupOptions['excluded']);
   
   $backupOptions['destinationShare'] = str_replace("/mnt/user/","",$backupOptions['destinationShare']);  # make new options conform to old layout of json

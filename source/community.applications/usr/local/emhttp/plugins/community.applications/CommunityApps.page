@@ -451,25 +451,25 @@ function changeSortOrder(button,buttonClass,previousApps) {
 function getSortOrder() {
   var sortOrder = new Object();
 
-  if ( $("#viewIcon").prop("disabled") )       sortOrder.viewMode = "icon";
-  if ( $("#viewTable").prop("disabled") )      sortOrder.viewMode = "table";
-  if ( $("#viewDetail").prop("disabled") )     sortOrder.viewMode = "detail";
+  if ( $("#viewIcon").prop("disabled") )       sortOrder.viewMode = ["viewMode","icon"];
+  if ( $("#viewTable").prop("disabled") )      sortOrder.viewMode = ["viewMode","table"];
+  if ( $("#viewDetail").prop("disabled") )     sortOrder.viewMode = ["viewMode","detail"];
 
-  if ( $("#Name").prop("disabled") )           sortOrder.sortBy = "Name";
-  if ( $("#RepoName").prop("disabled") )       sortOrder.sortBy = "RepoName";
-  if ( $("#Author").prop("disabled") )         sortOrder.sortBy = "SortAuthor";
-  if ( $("#Date").prop("disabled") )           sortOrder.sortBy = "Date";
-  if ( $("#Downloads").prop("disabled") )      sortOrder.sortBy = "downloads";
+  if ( $("#Name").prop("disabled") )           sortOrder.sortBy = ["sortBy","Name"];
+  if ( $("#RepoName").prop("disabled") )       sortOrder.sortBy = ["sortBy","RepoName"];
+  if ( $("#Author").prop("disabled") )         sortOrder.sortBy = ["sortBy","SortAuthor"];
+  if ( $("#Date").prop("disabled") )           sortOrder.sortBy = ["sortBy","Date"];
+  if ( $("#Downloads").prop("disabled") )      sortOrder.sortBy = ["sortBy","downloads"];
 
-  if ( $("#Up").prop("disabled") )             sortOrder.sortDir = "Up";
-  if ( $("#Down").prop("disabled") )           sortOrder.sortDir = "Down";
+  if ( $("#Up").prop("disabled") )             sortOrder.sortDir = ["sortDir","Up"];
+  if ( $("#Down").prop("disabled") )           sortOrder.sortDir = ["sortDir","Down"];
   
-  if ( $("#resourceName").prop("disabled") )   sortOrder.resourceKey = "Name";
-  if ( $("#resourceCPU").prop("disabled") )    sortOrder.resourceKey = "CPU";
-  if ( $("#resourceMemory").prop("disabled") ) sortOrder.resourceKey = "MemPercent";
+  if ( $("#resourceName").prop("disabled") )   sortOrder.resourceKey = ["resourceKey","Name"];
+  if ( $("#resourceCPU").prop("disabled") )    sortOrder.resourceKey = ["resourceKey","CPU"];
+  if ( $("#resourceMemory").prop("disabled") ) sortOrder.resourceKey = ["resourceKey","MemPercent"];
   
-  if ( $("#resourceUp").prop("disabled") )     sortOrder.resourceDir = "Up";
-  if ( $("#resourceDown").prop("disabled") )   sortOrder.resourceDir = "Down";
+  if ( $("#resourceUp").prop("disabled") )     sortOrder.resourceDir = ["resourceDir","Up"];
+  if ( $("#resourceDown").prop("disabled") )   sortOrder.resourceDir = ["resourceDir","Down"];
   var sort = [sortOrder.viewMode,sortOrder.sortBy,sortOrder.sortDir,sortOrder.resourceKey,sortOrder.resourceDir];
   return sort;
 }
