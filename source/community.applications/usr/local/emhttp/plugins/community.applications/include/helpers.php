@@ -389,7 +389,7 @@ function versionCheck($template) {
 
 function readXmlFile($xmlfile) {
   $doc = new DOMDocument();
-  $doc->load($xmlfile);
+  @$doc->load($xmlfile);
   if ( ! $doc ) { return false; }
   
   $o['Path']        = $xmlfile;
@@ -433,10 +433,10 @@ function readXmlFile($xmlfile) {
   $o['Description'] = preg_replace('#\[([^\]]*)\]#', '<$1>', $o['Description']);
   $o['Overview']    = $doc->getElementsByTagName("Overview")->item(0)->nodeValue;
 
-  $o['Forum'] = $Repo['forum'];
+  $o['Forum']       = $Repo['forum'];
   $o['Support']     = ($doc->getElementsByTagName( "Support" )->length ) ? $doc->getElementsByTagName( "Support" )->item(0)->nodeValue : $Repo['forum'];
   $o['Support']     = $o['Support'];
-  $o['IconWeb']     = stripslashes($doc->getElementsByTagName( "Icon" )->item(0)->nodeValue);
+  $o['Icon']        = stripslashes($doc->getElementsByTagName( "Icon" )->item(0)->nodeValue);
   $o['DonateText']  = $doc->getElementsByTagName("DonateText")->item(0)->nodeValue;
   $o['DonateLink']  = $doc->getElementsByTagName( "DonateLink")->item(0)->nodeValue;
   if ( $doc->getElementsByTagName("DonateImage")->item(0)->nodeValue ) {

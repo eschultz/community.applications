@@ -822,14 +822,14 @@ case 'get_content':
 
     if ($communitySettings['appFeed'] == "false" ) {
       if (!DownloadCommunityTemplates()) {
-        echo "<tr><td colspan='5'><br><center>Download of source file has failed</center></td></tr>";
+        echo "<table><tr><td colspan='5'><br><center>Download of source file has failed</center></td></tr></table>";
         break;
       } else {
         $lastUpdated['last_updated_timestamp'] = time();
         writeJsonFile($communityPaths['lastUpdated-old'],$lastUpdated);
         if (is_file($communityPaths['updateErrors'])) {
-          echo "<td><td colspan='5'><br><center>The following repositories failed to download correctly:<br><br>";
-          echo "<strong>".file_get_contents($communityPaths['updateErrors'])."</strong></center></td></tr>";
+          echo "<table><td><td colspan='5'><br><center>The following repositories failed to download correctly:<br><br>";
+          echo "<strong>".file_get_contents($communityPaths['updateErrors'])."</strong></center></td></tr></table>";
           break;
         }
       }
