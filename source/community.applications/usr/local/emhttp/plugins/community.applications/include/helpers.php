@@ -629,7 +629,7 @@ function toNumericArray($template) {
   $template['display_iconSmall'], #60
   $template['display_iconSelectable'], #61
   $template['display_popupDesc'], #62
-  $template['display_updateAvail'],#63
+  $template['display_updateAvail'],#63  *** no longer used
   $template['display_dateUpdated'],#64
   $template['display_iconClickable'],#65
   $template['display_dockerName'],#66

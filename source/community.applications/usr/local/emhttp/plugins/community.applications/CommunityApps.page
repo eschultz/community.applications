@@ -252,9 +252,6 @@ function showCredits() {
 function showDesc(appNumber,appName) {
   openBox('<?=$execPath?>/showDesc.php<?=$commandArg?>' + appNumber,appName + " Description",550,550);
 }
-function showStats(appNumber,appName) {
-  openBox('<?=$execPath?>/showStats.sh',appName + " Statistics",550,550);
-}
 
 function doSearch(button) {
   var filter = $('#searchBox').val();
@@ -638,10 +635,6 @@ function removeApp(application, humanName) {
    });
 }
 
-function baseName(path) {
-   return path.split('/').reverse()[0];
-}
-
 function uninstallApp(application,humanName) {
   if ( humanName == "Community Applications" ) {
     myAlert("AE-35 Error","<b><font color='red'>Community Applications</font></b> cannot be uninstalled this way.  You must go to the plugins tab and remove it from there.  <em><font color='purple'>But, why would you ever want to uninstall CA?</font></em>",null,null,true,false,true,"error");
@@ -784,7 +777,6 @@ function calculateAppdataSize() {
 }
 
 function installPLGupdate(filename,plgName) {
-  filename = baseName(filename);
   openBox('/plugins/community.applications/scripts/updatePLG.sh&arg1='+filename,'Update '+plgName,600,900,true);
 }
 
