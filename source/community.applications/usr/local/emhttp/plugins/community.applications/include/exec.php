@@ -23,17 +23,6 @@ $DockerTemplates = new DockerTemplates();
 
 $communitySettings = parse_plugin_cfg("$plugin");
 
-if ( ! $communitySettings['timeNew'] )           { $communitySettings['timeNew'] = "-3 Months"; }
-if ( ! $communitySettings['maxColumn'] )         { $communitySettings['maxColumn'] = 5; }
-if ( ! $communitySettings['viewMode'] )          { $communitySettings['viewMode'] = "detail"; }
-if ( ! $communitySettings['iconSize'] )          { $communitySettings['iconSize'] = "96"; }
-if ( ! $communitySettings['dockerSearch'] )      { $communitySettings['dockerSearch'] = "no"; }
-if ( ! $communitySettings['superCategory'] )     { $communitySettings['superCategory'] = "true"; }
-if ( ! $communitySettings['newWindow'] )         { $communitySettings['newWindow'] = "_self"; }
-if ( ! $communitySettings['hideIncompatible'] )  { $communitySettings['hideIncompatible'] = "true"; }
-if ( ! $communitySettings['favourite'] )         { $communitySettings['favourite'] = "None"; }
-if ( ! $communitySettings['separateInstalled'] ) { $communitySettings['separateInstalled'] = "true"; }
-
 if ( $communitySettings['favourite'] != "None" ) {
   $officialRepo = str_replace("*","'",$communitySettings['favourite']);
   $separateOfficial = true;

@@ -27,9 +27,6 @@ if ( ! is_file("/boot/config/plugins/$plugin/accepted") ) {
 $tabMode = $cfg['newWindow'];
 $line_color = $display['theme']=='black' ? '#202020' : '#E8E8E8';
 
-if ( ! $cfg['viewMode'] )         { $cfg['viewMode'] = "detail"; }
-if ( ! $cfg['timeNew'] )          { $cfg['timeNew'] = "-3 Months"; }
-
 $timeNew = str_replace("-","",$cfg['timeNew']);
 $categoryTitle = "Recommended Applications";
 $viewMode = $cfg['viewMode'];
