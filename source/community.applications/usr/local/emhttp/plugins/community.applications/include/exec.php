@@ -542,24 +542,22 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
 #############################
 
 function appOfDay($file) {
-  global $communityPaths;
+  global $communityPaths, $info;
   
   $oldAppDay = @filemtime($communityPaths['appOfTheDay']);
-  if ( ! $oldAppDay ) {
-    $oldAppDay = 1;
-  }
+  $oldAppDay = $oldAppDay ? $oldAppDay : 1;
   $oldAppDay = intval($oldAppDay / 86400);
   $currentDay = intval(time() / 86400);
   if ( $oldAppDay == $currentDay ) {
     $app = readJsonFile($communityPaths['appOfTheDay']);
-    if ( $app ) {
-      return $app;
-    }
+    $flag = $app ? true : false;
   }
   
   while ( true ) {
-    $app[0] = mt_rand(0,count($file) -1);
-    $app[1] = mt_rand(0,count($file) -1);
+    if ( ! $flag ) {
+      $app[0] = mt_rand(0,count($file) -1);
+      $app[1] = mt_rand(0,count($file) -1);
+    }
     if ($app[0] == $app[1]) continue;
     if ( ! $file[$app[0]]['Compatible'] || ! $file[$app[1]]['Compatible'] ) continue;
     if ( $file[$app[0]]['Blacklist'] || $file[$app[1]]['Blacklist'] ) continue;
@@ -771,8 +769,6 @@ case 'get_content':
   $sortOrder = getSortOrder(getPostArray("sortOrder"));
 
   $newAppTime = strtotime($communitySettings['timeNew']);
-
-  $docker_repos = is_file($docker_repos) ? file($docker_repos,FILE_IGNORE_NEW_LINES) : array();
 
   if ( file_exists($communityPaths['addConverted']) ) {
     @unlink($infoFile);
