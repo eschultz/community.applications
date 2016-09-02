@@ -21,7 +21,4 @@ if ( is_file($communityPaths['backupProgress']) || is_file($communityPaths['rest
     posix_kill($rsyncPID,SIGINT);
   }  
 }
-
-
-
 ?>

@@ -20,6 +20,5 @@ $cronFile = randomFile();
 file_put_contents($cronFile,implode("\n",$newCronSettings)."\n");
 exec("crontab $cronFile");
 unlink($cronFile);
-  
 ?>
 

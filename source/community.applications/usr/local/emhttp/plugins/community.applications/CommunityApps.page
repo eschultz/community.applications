@@ -329,7 +329,7 @@ function forceUpdate() {
   $("#updateTime").html("In Progress...");
   $("#Total").html("Updating...");
   clearSearchBox();
-  $.post(URL,{action:'force_update'},function(){getContent(false,'All',"All Applications");});
+  $.post(URL,{action:'force_update'},function(){getContent(true,'INITIALIZE','None Selected');});
 }
 
 function forceUpdateButton() {
@@ -472,7 +472,10 @@ function getContent(init,category,description,newApp) {
     if ( category == "INITIALIZE" ) {
       category = "NONE";
       var initialize = true;
-
+      enableButtons();
+      $("#All").prop("disabled",true);
+      $("#NetworkCategory,#MediaServerCategory,#MediaAppCategory,#NONE,#ToolsCategory").hide();
+      $("#MainCategory,#topLevelButton,#New").show();
       $("#Total1").hide();
     }
     $("#Total").html("Searching...  <img src='/plugins/community.applications/images/spinner2.gif' style='height:30px;width:30px'>");
@@ -487,16 +490,8 @@ function getContent(init,category,description,newApp) {
         $('#templates_content').html(data);
         readMore();
         myCloseAlert();
-        if ( ! initialize )
-        {
-          myCloseAlert();
-        }
       }
-      if (init) {
-        $('#templates_list').tablesorter({sortList:[[1,0]],headers:{0:{sorter:false},3:{sorter:false}}});
-      } else {
-        $('#templates_list').trigger('update',true);
-      }
+
       description = "<?=$categoryTitle?>: <font color='red'>"+description+"</font>";
 
       $("#Category").html(description);
@@ -559,7 +554,6 @@ function authorSearch(author) {
   if ( $("#searchButton").hasClass('fa-search') ) {
     $('#searchButton').toggleClass('fa-search fa-remove');
   }
-
   doSearch();
 }
 

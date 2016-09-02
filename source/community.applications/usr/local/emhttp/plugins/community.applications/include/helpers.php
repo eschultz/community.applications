@@ -47,13 +47,8 @@ function human_filesize($bytes, $decimals = 2) {
 ###################################################################################
 function randomFile() {
   global $communityPaths;
-  while (true) {
-    $filename = $communityPaths['tempFiles']."/".mt_rand().".tmp";
-    if ( ! is_file($filename) ) {
-      break;
-    }
-  }
-  return $filename;
+
+  return tempnam($communityPaths['tempFiles'],"CA-Temp-");
 }
 
 ##################################################################
@@ -145,7 +140,7 @@ function fixDescription($Description) {
 function fixSecurity(&$template) {
   foreach ($template as &$element) {
     if ( is_array($element) ) {
-      fixSecurity ($element);
+      fixSecurity($element);
     } else {
       $element = preg_replace('#<script(.*?)>(.*?)</script>#is','',$element);
     }
@@ -159,7 +154,7 @@ function fixSecurity(&$template) {
 #######################
 
 function mySort($a, $b) {
-  global $sortKey, $sortDir, $sortOrder;
+  global $sortOrder;
 
   if ( $sortOrder['sortBy'] != "downloads" ) {
     $c = strtolower($a[$sortOrder['sortBy']]);
@@ -219,7 +214,6 @@ function findAppdata($volumes) {
   if ( ! is_file("/boot/config/shares/$shareName.cfg") ) { 
     $shareName = "****";
   }
-  file_put_contents("/tmp/test",$defaultShareName);
   if ( is_array($volumes) ) {
     foreach ($volumes as $volume) {
       $temp = explode(":",$volume);
@@ -269,12 +263,12 @@ function fixTemplates($template) {
     $template['Description'] = "";
   }
   $template['Category'] = $template['Category'] ? $template['Category'] : "Uncategorized";
-
-  if ( !is_string($template['Overview']) ) {
-    unset($template['Overview']);
-  }
   if ( ! is_string($template['Category']) ) {
     $template['Category'] = "Uncategorized";
+  }
+  
+  if ( !is_string($template['Overview']) ) {
+    unset($template['Overview']);
   }
   
   if ( strlen($template['Overview']) > 0 ) {
@@ -308,7 +302,6 @@ function fixTemplates($template) {
 
   return $template;
 }
-
 
 ###############################################################
 #                                                             #
@@ -567,73 +560,73 @@ function getSortOrder($sortArray) {
 
 function toNumericArray($template) {
   return array(
-  $template['Repository'],        #1
-  $template['Author'],            #2
-  $template['Name'],              #3
-  $template['DockerHubName'],     #4  
-  $template['Beta'],              #5
-  $template['Changes'],           #6
-  $template['Date'],              #7  
-  $template['RepoName'],          #8
-  $template['Project'],           #9  
-  $template['ID'],                #10 
-  $template['Base'],              #11
-  $template['BaseImage'],         #12
-  $template['SortAuthor'],        #13
-  $template['SortName'],          #14
-  $template['Licence'],           #15
-  $template['Plugin'],            #16
-  $template['PluginURL'],         #17
-  $template['PluginAuthor'],      #18
-  $template['MinVer'],            #19
-  $template['MaxVer'],            #20
-  $template['Category'],          #21
-  $template['Description'],       #22
-  $template['Overview'],          #23
-  $template['Downloads'],         #24
-  $template['Stars'],             #25
-  $template['Announcement'],      #26
-  $template['Support'],           #27
-  $template['IconWeb'],           #28
-  $template['DonateText'],        #29
-  $template['DonateImg'],         #30
-  $template['DonateLink'],        #31
-  $template['PopUpDescription'],  #32
-  $template['ModeratorComment'],  #33
-  $template['Compatible'],        #34
-  $template['display_DonateLink'],#35
-  $template['display_Project'],   #36
-  $template['display_Support'],   #37
-  $template['display_UpdateAvailable'], #38
-  $template['display_ModeratorComment'],#39
-  $template['display_Announcement'],    #40
-  $template['display_Stars'],     #41
-  $template['display_Downloads'], #42
-  $template['display_pinButton'], #43
-  $template['display_Uninstall'], #44
-  $template['display_removable'], #45
-  $template['display_newIcon'],   #46
-  $template['display_changes'],   #47
-  $template['display_webPage'],   #48
-  $template['display_humanDate'], #49
-  $template['display_pluginSettings'], #50
-  $template['display_pluginInstall'],  #51
-  $template['display_dockerDefault'],  #52
-  $template['display_dockerEdit'],#53
-  $template['display_dockerReinstall'],#54
-  $template['display_dockerInstall'],  #55
-  $template['display_dockerDisable'],  #56
-  $template['display_compatible'],#57
-  $template['display_compatibleShort'],#58
-  $template['display_author'],    #59
-  $template['display_iconSmall'], #60
-  $template['display_iconSelectable'], #61
-  $template['display_popupDesc'], #62
-  $template['display_updateAvail'],#63  *** no longer used
-  $template['display_dateUpdated'],#64
-  $template['display_iconClickable'],#65
-  $template['display_dockerName'],#66
-  $template['Path']               #67
+    $template['Repository'],              # 1
+    $template['Author'],                  # 2
+    $template['Name'],                    # 3
+    $template['DockerHubName'],           # 4  
+    $template['Beta'],                    # 5
+    $template['Changes'],                 # 6
+    $template['Date'],                    # 7  
+    $template['RepoName'],                # 8
+    $template['Project'],                 # 9  
+    $template['ID'],                      #10 
+    $template['Base'],                    #11
+    $template['BaseImage'],               #12
+    $template['SortAuthor'],              #13
+    $template['SortName'],                #14
+    $template['Licence'],                 #15
+    $template['Plugin'],                  #16
+    $template['PluginURL'],               #17
+    $template['PluginAuthor'],            #18
+    $template['MinVer'],                  #19
+    $template['MaxVer'],                  #20
+    $template['Category'],                #21
+    $template['Description'],             #22
+    $template['Overview'],                #23
+    $template['Downloads'],               #24
+    $template['Stars'],                   #25
+    $template['Announcement'],            #26
+    $template['Support'],                 #27
+    $template['IconWeb'],                 #28
+    $template['DonateText'],              #29
+    $template['DonateImg'],               #30
+    $template['DonateLink'],              #31
+    $template['PopUpDescription'],        #32
+    $template['ModeratorComment'],        #33
+    $template['Compatible'],              #34
+    $template['display_DonateLink'],      #35
+    $template['display_Project'],         #36
+    $template['display_Support'],         #37
+    $template['display_UpdateAvailable'], #38
+    $template['display_ModeratorComment'],#39
+    $template['display_Announcement'],    #40
+    $template['display_Stars'],           #41
+    $template['display_Downloads'],       #42
+    $template['display_pinButton'],       #43
+    $template['display_Uninstall'],       #44
+    $template['display_removable'],       #45
+    $template['display_newIcon'],         #46
+    $template['display_changes'],         #47
+    $template['display_webPage'],         #48
+    $template['display_humanDate'],       #49
+    $template['display_pluginSettings'],  #50
+    $template['display_pluginInstall'],   #51
+    $template['display_dockerDefault'],   #52
+    $template['display_dockerEdit'],      #53
+    $template['display_dockerReinstall'], #54
+    $template['display_dockerInstall'],   #55
+    $template['display_dockerDisable'],   #56
+    $template['display_compatible'],      #57
+    $template['display_compatibleShort'], #58
+    $template['display_author'],          #59
+    $template['display_iconSmall'],       #60
+    $template['display_iconSelectable'],  #61
+    $template['display_popupDesc'],       #62
+    $template['display_updateAvail'],     #63  *** NO LONGER USED - USE #38 instead
+    $template['display_dateUpdated'],     #64
+    $template['display_iconClickable'],   #65
+    $template['display_dockerName'],      #66
+    $template['Path']                     #67
   );
 }
   

@@ -22,6 +22,7 @@ $DockerTemplates = new DockerTemplates();
 ################################################################################
 
 $communitySettings = parse_plugin_cfg("$plugin");
+$communitySettings['appFeed']    = "true"; # set default for deprecated setting
 
 if ( $communitySettings['favourite'] != "None" ) {
   $officialRepo = str_replace("*","'",$communitySettings['favourite']);
@@ -42,12 +43,6 @@ if ( $communitySettings['dockerRunning'] ) {
   $info = array();
   $dockerRunning = array();
 }
-
-###
-# Set defaults for deprecated settings
-###
-
-$communitySettings['appFeed']    = "true";
 
 exec("mkdir -p ".$communityPaths['tempFiles']);
 exec("mkdir -p ".$communityPaths['persistentDataStore']);
@@ -226,14 +221,9 @@ function DownloadApplicationFeed() {
     $o['DonateLink'] = $file['DonateLink'] ? $file['DonateLink'] : $o['DonateLink'];
 
     if ( ($file['DonateImg']) || ($file['DonateImage']) ) {  #because Sparklyballs can't read the tag documentation
-      if ( $file['DonateImage'] ) {
-        $o['DonateImg'] = $file['DonateImage'];
-      } else {
-        $o['DonateImg']     = $file['DonateImg'];
-      }
+      $o['DonateImg'] = $file['DonateImage'] ? $file['DonateImage'] : $file['DonateImg'];
     }
-    # Apply various fixes to the templates for CA use
-    fixSecurity($o);
+    fixSecurity($o); # Apply various fixes to the templates for CA use
     $o = fixTemplates($o);
 
 # Overwrite any template values with the moderated values
@@ -818,6 +808,7 @@ case 'get_content':
         if (is_file($communityPaths['updateErrors'])) {
           echo "<table><td><td colspan='5'><br><center>The following repositories failed to download correctly:<br><br>";
           echo "<strong>".file_get_contents($communityPaths['updateErrors'])."</strong></center></td></tr></table>";
+          echo "<script>$('#templateSortButtons').hide();$('#sortButtons').hide();</script>";
           break;
         }
       }

@@ -8,12 +8,8 @@
  
 require_once("/usr/local/emhttp/plugins/community.applications/include/paths.php");
 require_once("/usr/local/emhttp/plugins/community.applications/include/helpers.php");
-
-
 require_once("/usr/local/emhttp/plugins/dynamix.docker.manager/include/DockerClient.php");
 require_once("/usr/local/emhttp/plugins/dynamix/include/Wrappers.php");
-
-$communitySettings = parse_plugin_cfg("community.applications");
 
 shell_exec("mkdir -p ".$communityPaths['appdataSize']);
 file_put_contents($communityPaths['calculateAppdataProgress'],getmypid());
@@ -31,9 +27,6 @@ foreach ($dockerRunning as $docker) {
     $size = "<center><font color='red'>Could not determine appdata share</center>";
   }
   file_put_contents($communityPaths['appdataSize'].$docker['Id'],$size);
-  
 }
-
 unlink($communityPaths['calculateAppdataProgress']);
-
 ?>

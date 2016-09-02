@@ -26,7 +26,6 @@ if ( $communitySettings['dockerRunning'] ) {
 } else {
   $info = array();
   $dockerRunning = array();
-  $o = "";
 }
 
 $appNumber =  urldecode($_GET['appNumber']);
@@ -59,7 +58,6 @@ $donateimg = $template['DonateImg'];
 $donatetext = $template['DonateText'];
 
 $name = $template['Name'];
-
 $selected = $info[$name]['template'] && stripos($info[$name]['icon'], $template['Author']) !== false;
 
 if ( $selected ) {

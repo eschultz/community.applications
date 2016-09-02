@@ -42,14 +42,8 @@ function getRsyncReturnValue($returnValue) {
   $returnMessage[30] = "Timeout in data send/receive";
   $returnMessage[35] = "Timeout waiting for daemon connection";
   
-  $return = $returnMessage[$returnValue];
-  if ( ! $return ) {
-    $return = "Unknown Error";
-  }
+  $return = $returnMessage[$returnValue] ? $returnMessage[$returnValue] : "Unknown Error";
   return $return;
-}
-if ( ! is_file($communityPaths['backupOptions']) ) {
-  exit;
 }
 
 if ( is_file($communityPaths['backupProgress']) ) {
@@ -82,9 +76,6 @@ $backupOptions['dockerIMG'] = "exclude";
 if ( ! $backupOptions['backupFlash'] ) { $backupOptions['backupFlash'] = "appdata"; }
 
 $basePathBackup = $backupOptions['destination']."/".$backupOptions['destinationShare'];
-
-  
-
 
 if ( ! $backupOptions['dockerIMG'] )     { $backupOptions['dockerIMG'] = "exclude"; }
 if ( ! $backupOptions['notification'] )  { $backupOptions['notification'] = "always"; }
@@ -181,13 +172,8 @@ if ( $backupOptions['excluded'] ) {
   }
 }
 
-
 if ( $backupOptions['runRsync'] == "true" ) {
-  if ( $restore ) {
-    $logLine = "Restoring ";
-  } else {
-    $logLine = "Backing up ";
-  }
+  $logLine = $restore ? "Restoring " : "Backing Up";
   logger("$logLine appData from $source to $destination");
   $command = '/usr/bin/rsync '.$backupOptions['rsyncOption'].' '.$dockerIMGFilter.' '.$rsyncExcluded.' --log-file="'.$communityPaths['backupLog'].'" "'.$source.'" "'.$destination.'" > /dev/null 2>&1';
   logger('Using command: '.$command);
@@ -245,11 +231,9 @@ switch ($backupOptions['logBackup']) {
     break;
 }
 
-
 if ( ($backupOptions['notification'] == "always") || ($backupOptions['notification'] == "completion") || ( ($backupOptions['notification'] == "errors") && ($type == "warning") )  ) {
   notify("Community Applications","appData $restoreMsg","$restoreMsg of appData complete $status$logMessage",$message,$type);
 }
-
 
 if ( ! $restore && ($backupOptions['datedBackup'] == 'yes') ) {
   if ( $backupOptions['deleteOldBackup'] ) {

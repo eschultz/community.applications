@@ -7,7 +7,6 @@
  
 require_once("/usr/local/emhttp/plugins/community.applications/include/paths.php");
 require_once("/usr/local/emhttp/plugins/community.applications/include/helpers.php");
-
 require_once 'webGui/include/Markdown.php';
 
   $appNumber = urldecode($_GET['appNumber']);
