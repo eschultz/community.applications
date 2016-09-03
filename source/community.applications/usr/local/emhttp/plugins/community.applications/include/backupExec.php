@@ -106,6 +106,33 @@ case 'validateBackupOptions':
   if ( startsWith($usbDestination,$destinationShare) ) {
     $errors .= "USB Destination cannot be a sub-folder of Appdata destination<br>";
   }
+   if ( $settings['backupXML'] == "separate" ) {
+    if ( ! $settings['xmlDestination'] ) {
+      $errors .= "Destination for the XML Backup Must Be Specified<br>";
+    } else {
+      $origXMLDestination = $settings['xmlDestination'];
+      $availableDisks = parse_ini_file("/var/local/emhttp/disks.ini",true);
+      $xmlDestination = $settings['xmlDestination'];
+      foreach ($availableDisks as $disk) {
+        $xmlDestination = str_replace("/mnt/".$disk['name']."/","",$xmlDestination);
+      }
+      $xmlDestination = str_replace("/mnt/user0/","",$xmlDestination);
+      $xmlDestination = str_replace("/mnt/user/","",$xmlDestination);
+      
+      if ( $xmlDestination == "" ) {
+        $errors .= "XML Destination cannot be the root directory of /mnt/user or of a disk<br>";
+      }
+      if ( ! is_dir($origXMLDestination) ) {
+        $errors .= "XML Destination Not A Valid Directory<br>";
+      }
+    }
+  }
+  if ( startsWith($xmlDestination,$destinationShare) ) {
+    $errors .= "XML Destination cannot be a sub-folder of Appdata destination<br>";
+  } 
+  if ( startsWith($xmlDestination,$usbDestination) || startsWith($usbDestination,$xmlDestination) ) {
+    $errors .= "USB/XML Destinations are the same or cannot be sub-folders of each other";
+  }
   if ( ! $errors ) {
     $errors = "NONE";
   }

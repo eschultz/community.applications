@@ -74,6 +74,7 @@ if ( ! $backupOptions ) {
 $backupOptions['dockerIMG'] = "exclude";
 
 if ( ! $backupOptions['backupFlash'] ) { $backupOptions['backupFlash'] = "appdata"; }
+if ( ! $backupOptions['backupXML'] )   { $backupOptions['backupXML'] = "appdata"; }
 
 $basePathBackup = $backupOptions['destination']."/".$backupOptions['destinationShare'];
 
@@ -143,6 +144,12 @@ if ( $restore ) {
   } else {
     $usbDestination = $backupOptions['usbDestination'];
   }
+  if ( $backupOptions['backupXML'] == "appdata" ) {
+    $xmlDestination = $source."Community_Applications_VM_XML_Backup";
+  } else {
+    $xmlDestination = $backupOptions['xmlDestination'];
+  }
+  
   if ( $backupOptions['backupFlash'] != "no" ) {
     logger("Deleting Old USB Backup");
     exec("rm -rf '$usbDestination'");
@@ -158,6 +165,24 @@ if ( $restore ) {
     exec("cp /boot/* '$usbDestination' -R -v");
 
     exec("mv '$usbDestination/config/super.dat' '$usbDestination/config/super.dat.CA_BACKUP'");
+  }
+  if ( $backupOptions['backupXML'] != "no" ) {
+    logger("Deleting Old XML Backup");
+    exec("rm -rf '$xmlDestination'");
+    logger("Backing up VM XML's to $xmlDestination");
+    file_put_contents($communityPaths['backupLog'],"Backing up VM XML's\n",FILE_APPEND);
+    exec("mkdir -p '$xmlDestination'");
+    $xmlList = @scandir("/etc/libvirt/qemu");
+    if ( is_array($xml) ) {
+      foreach ($xmlList as $xml) {
+        if (is_dir("/etc/libvirt/qemu/$xml")) {
+          continue;
+        }
+        if ( stripos($xml,".xml") ) {
+          exec("todos < '/etc/libvirt/qemu/$xml' > '$xmlDestination/$xml'");
+        }
+      }
+    }
   }
 }
 if ( $backupOptions['dockerIMG'] == "exclude" ) {
@@ -254,7 +279,7 @@ if ( ! $restore && ($backupOptions['datedBackup'] == 'yes') ) {
         $age = $interval->format("%R%a");
         if ( $age <= (0 - $backupOptions['deleteOldBackup']) ) {
           logger("Deleting $basePathBackup/$dir");
-          file_put_contents($communityPaths['backupLog'],"Deleting Dated Backup set: $basePathBackup/$dir\n");
+          file_put_contents($communityPaths['backupLog'],"Deleting Dated Backup set: $basePathBackup/$dir\n",FILE_APPEND);
           exec("echo Deleting $basePathBackup/$dir >> ".$communityPaths['backupLog']."\n");
           exec('rm -rf '.escapeshellarg($basePathBackup).'/'.$dir);
         }   

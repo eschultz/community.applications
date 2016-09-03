@@ -29,6 +29,7 @@ if ( ! $backupOptions['datedBackup'] ) { $backupOptions['datedBackup'] = "no"; }
 if ( ! $backupOptions['deleteOldBackup'] ) { $backupOptions['deleteOldBackup'] = "no"; }
 if ( ! $backupOptions['fasterRsync'] )  { $backupOptions['fasterRsync'] = "no"; }
 if ( ! $backupOptions['backupFlash'] ) { $backupOptions['backupFlash'] = "appdata"; }
+if ( ! $backupOptions['backupXML'] ) { $backupOptions['backupXML'] = "appdata"; }
 
 # fix destinationShare for compatibility with initial release
 
@@ -207,11 +208,10 @@ $(function() {
   $("#logBackup").val("<?=$backupOptions['logBackup']?>");
   $("#backupFlash").val("<?=$backupOptions['backupFlash']?>");
   $("#usbDestination").val("<?=$backupOptions['usbDestination']?>");
+  $("#backupXML").val("<?=$backupOptions['backupXML']?>");
+  $("#xmlDestination").val("<?=$backupOptions['xmlDestination']?>");
   
-  $("#destinationShare").fileTreeAttach();
-  $("#startScript").fileTreeAttach();
-  $("#stopScript").fileTreeAttach();
-  $("#usbDestination").fileTreeAttach();
+  $("#destinationShare, #startScript, #stopScript, #usbDestination, #xmlDestination").fileTreeAttach();
 
   var source = $("#source").val();
   $("#excludedFoldersList").fileTree({
@@ -299,6 +299,7 @@ function validateOptions(initialization) {
   }
   
   var backupFlash = $("#backupFlash").val();
+  var backupXML = $("#backupXML").val();
   var destinationShare = $("#destinationShare").val();
   var deleteOldBackup = $("#deleteOldBackup").val();
 
@@ -309,6 +310,11 @@ function validateOptions(initialization) {
     $("#usbDestination").prop("disabled",false);
   } else {
     $("#usbDestination").prop("disabled",true);
+  }
+  if ( backupXML == "separate" ) {
+    $("#xmlDestination").prop("disabled",false);
+  } else {
+    $("#xmlDestination").prop("disabled",true);
   }
 
   var excludeButton = "<input type='button' id='excludedFolders' name='excludedFolders' value='Add' data-pickfilter='HIDE_FILES_FILTER' data-pickmultiselect='true' data-pickroot='/mnt/user' data-pickfolders='true'>";
@@ -354,17 +360,24 @@ function validateOptions(initialization) {
 function apply() {
   var settings = getSettings();  
   var backupFlash = $("#backupFlash").val();
+  var backupXML = $("#backupXML").val();
   var source = $("#source").val();
   var destinationShare = $("#destinationShare").val();
   var destination = $("#destination").val();
   var excluded = $("#excluded").val();
-
+  var usbDestination = $("#usbDestination").val();
+  var xmlDestination = $("#xmlDestination").val();
   excluded = excluded.trim();
   
   if ( backupFlash == "separate" ) {
     var usbText = " and <font color='red'>"+usbDestination+"</font> (Flash Drive Destination) ";
   } else {
     var usbText = "";
+  }
+  if ( backupXML == "separate" ) {
+    var xmlText = " and <font color='red'>"+xmlDestination+"</font> (VM XML Destination) ";
+  } else {
+    var xmlText = "";
   }
   
   var popUpText = "Warning: All files within <font color='red'>" + destinationShare + "</font> ";
@@ -374,6 +387,7 @@ function apply() {
     popUpText = popUpText.concat("(including all folders)");
   }
   popUpText = popUpText.concat(usbText);
+  popUpText = popUpText.concat(xmlText);
   popUpText = popUpText.concat(" will be overwritten / deleted during a backup process!");
   swal({
     title: "Are You Sure?",
@@ -523,6 +537,19 @@ jQuery(document).ready(function() {
 <tr>
   <td><b>USB Backup Destination:<b><br>See Manual</td>
   <td><input type='text' class='setting' id="usbDestination" name="usb destination" value="" placeholder='select a destination' data-pickfilter="HIDE_FILES_FILTER" data-pickroot="/mnt/" data-pickfolders="true" onchange='validateOptions();'></td>
+</tr>
+<tr>
+  <td><b>Backup VM XML's:</b></td>
+  <td><select class='setting' id='backupXML' onchange='validateOptions();'>
+    <option value='appdata'>Same Destination as Appdata</option>
+    <option value='separate'>Separate Destination</option>
+    <option value='no'>Don't Backup</option>
+    </select>
+  </td>
+</tr>
+<tr>
+  <td><b>VM XML Destination:<b><br>See Manual</td>
+  <td><input type='text' class='setting' id="xmlDestination" name="xml destination" value="" placeholder='select a destination' data-pickfilter="HIDE_FILES_FILTER" data-pickroot="/mnt/" data-pickfolders="true" onchange='validateOptions();'></td>
 </tr>
 <tr>
   <td><b>Notification Settings:</b></td>
