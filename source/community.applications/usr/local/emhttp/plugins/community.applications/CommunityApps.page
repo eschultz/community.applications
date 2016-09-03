@@ -214,7 +214,7 @@ $(function(){
   $('#searchBox').keyup(function(e) {if(e.which == 13){doSearch(false);}});
 });
 
-function myAlert(description,textdescription,textimage,imagesize="80x80", outsideClick=false, showCancel=false, showConfirm=false, alertType) {
+function myAlert(description,textdescription,textimage,imagesize, outsideClick, showCancel, showConfirm, alertType) {
   swal({
     title: description,
     text: textdescription,
