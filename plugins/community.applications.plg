@@ -2,8 +2,8 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.applications">
 <!ENTITY author    "Andrew Zawadzki">
-<!ENTITY version   "2016.08.13">
-<!ENTITY md5       "9956f5ce09f3a9d204336f077a00f49f">
+<!ENTITY version   "2016.09.03">
+<!ENTITY md5       "d391e9e51c681439338c58334aff27d1">
 <!ENTITY launch    "Settings/PluginSettings">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/community.applications">
@@ -13,6 +13,14 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
+###2016.09.03###
+- Added in VM XML backups
+- Major rewrite of display engine (faster, far smaller)
+- Fix app of day to not possibly display moderated apps if app feed happened to change during the day
+- Fix various buttons not properly getting disabled when forcing update under certain circumstances
+- Fixed search on author where apps would always display as being installed
+- Far too many coding changes to list
+
 ###2016.08.13###
 - Maintenance Update
 - Added Apps of the day

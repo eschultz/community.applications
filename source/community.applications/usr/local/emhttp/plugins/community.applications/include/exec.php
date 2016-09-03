@@ -575,7 +575,7 @@ function appOfDay($file) {
 ##########################################################################
 
 function suggestSearch($filter,$displayFlag) {
-  $dockerFilter = strtolower(str_replace("_","-",$filter));
+  $dockerFilter = str_replace("_","-",$filter);
   $dockerFilter = str_replace("%20","",$dockerFilter);
   $dockerFilter = str_replace("/","-",$dockerFilter);
   $otherSearch = explode("-",$dockerFilter);
