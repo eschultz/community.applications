@@ -214,12 +214,7 @@ $(function(){
   $('#searchBox').keyup(function(e) {if(e.which == 13){doSearch(false);}});
 });
 
-function myAlert(description,textdescription,textimage,imagesize, outsideClick, showCancel, showConfirm, alertType) {
-  if ( !outsideClick ) outsideClick = false;
-  if ( !showCancel )   showCancel = false;
-  if ( !showConfirm )  showConfirm = false;
-  if ( imagesize == "" ) { imagesize = "80x80"; }
-   
+function myAlert(description,textdescription,textimage,imagesize="80x80", outsideClick=false, showCancel=false, showConfirm=false, alertType) {
   swal({
     title: description,
     text: textdescription,
@@ -308,7 +303,6 @@ function doSearch(button) {
       readMore();
       myCloseAlert();
     }
-    $('#templates_list').trigger('update',true);
     readMore();
 
     if ( "<?=$cfg['dockerSearch']?>" == "yes" ) {
@@ -321,7 +315,6 @@ function dismissWarning() {
   $("#appWarning").hide();
   $.post(URL,{action:'dismiss_warning'});
 }
-
 
 function forceUpdate() {
   $("#updateButton").prop("disabled",true);
@@ -383,8 +376,7 @@ function changeSortOrder(button,buttonClass,previousApps) {
     $("#"+button).prop("disabled", true);
   }
 
-  if ( button == "Date" || button == "Downloads" )
-  {
+  if ( button == "Date" || button == "Downloads" ) {
     $("#Down").prop("disabled", true);
     $("#Up").prop("disabled", false);
   }
@@ -475,9 +467,9 @@ function getContent(init,category,description,newApp) {
       var initialize = true;
       enableButtons();
       $("#All").prop("disabled",true);
-      $("#NetworkCategory,#MediaServerCategory,#MediaAppCategory,#NONE,#ToolsCategory").hide();
+      $("#NetworkCategory,#MediaServerCategory,#MediaAppCategory,#NONE,#ToolsCategory,#Total1").hide();
       $("#MainCategory,#topLevelButton,#New").show();
-      $("#Total1").hide();
+      $(".allButtons").prop("disabled",false);
     }
     $("#Total").html("Searching...  <img src='/plugins/community.applications/images/spinner2.gif' style='height:30px;width:30px'>");
 
