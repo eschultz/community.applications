@@ -4,7 +4,7 @@
 # Community Applications copyright 2015-2016, Andrew Zawadzki #
 #                                                             #
 ###############################################################
-
+require_once("/usr/local/emhttp/plugins/community.applications/include/paths.php");
 require_once("/usr/local/emhttp/plugins/dynamix/include/Wrappers.php");
 $unRaidSettings = parse_ini_file($communityPaths['unRaidVersion']);
 $unRaidVersion = $unRaidSettings['version'];
