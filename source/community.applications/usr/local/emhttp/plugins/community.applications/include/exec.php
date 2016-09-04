@@ -550,14 +550,12 @@ function appOfDay($file) {
   $currentDay = intval(time() / 86400);
   if ( $oldAppDay == $currentDay ) {
     $app = readJsonFile($communityPaths['appOfTheDay']);
-    $flag = $app ? true : false;
+    if ( $app ) return $app;
   }
   
   while ( true ) {
-    if ( ! $flag ) {
-      $app[0] = mt_rand(0,count($file) -1);
-      $app[1] = mt_rand(0,count($file) -1);
-    }
+    $app[0] = mt_rand(0,count($file) -1);
+    $app[1] = mt_rand(0,count($file) -1);
     if ($app[0] == $app[1]) continue;
     if ( ! $file[$app[0]]['Compatible'] || ! $file[$app[1]]['Compatible'] ) continue;
     if ( $file[$app[0]]['Blacklist'] || $file[$app[1]]['Blacklist'] ) continue;
