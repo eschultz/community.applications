@@ -808,6 +808,22 @@ function pinnedApps(button) {
   });
 }
 
+
+function displayTags(leadTemplate) {
+  $.post(URL,{action:'displayTags',leadTemplate:leadTemplate},function(data) {
+    if (data) {
+      swal({
+        title: "Choose A Branch To Install",
+        text: data,
+        html: true,
+        type: "warning",
+        showCancelButton: true,
+        showConfirmButton: false,
+        allowOutsideClick: true
+      });
+    }
+  });
+}
 </script>
 <FORM method="get" id="myForm">
 > For help with this plugin, click here (a new tab will open with the help file)  <strong><font size="2"><a href="Settings/caHelp" target="_blank">HELP</a></font></strong>

@@ -247,23 +247,25 @@ function DownloadApplicationFeed() {
     $o['Category'] = str_replace("Status:Beta","",$o['Category']);    # undo changes LT made to my xml schema for no good reason
     $o['Category'] = str_replace("Status:Stable","",$o['Category']);
     $templateXML = makeXML($file);
-
-#        $o['Path']          = $communityPaths['templates-community']."/".$i.".xml";
+    $myTemplates[$i] = $o;
     if ( is_array($file['Branch']) ) {
-        echo count($file['Branch'])."\n";
+      echo count($file['Branch'])."\n";
       foreach($o['Branch'] as $branch) {
-        $i = ++$i;
         if ( ! is_array($branch) ) { continue; }
+        $i = $i + 1;
         $subBranch = $file;
         $subBranch['Repository'] .= ":".$branch['Tag'];
         $subBranch['BranchName'] = $branch['Tag'];
         $subBranch['BranchDescription'] = $branch['Description'];
         $subBranch['Path'] = $communityPaths['templates-community']."/".$i.".xml";
         $subBranch['Displayable'] = false;
+        $subBranch['ID'] = $i;
+        unset($subBranch['Branch']);
         $myTemplates[$i] = $subBranch;
         $o['BranchID'][] = $i;
         file_put_contents($subBranch['Path'],makeXML($subBranch));
       }
+      
     }
     $myTemplates[$o['ID']] = $o;
     $i = ++$i;
@@ -506,7 +508,8 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
             $template['display_dockerReinstall'] = "<input type='submit' style='margin:0px' title='Click to reinstall the application' value='Reinstall' formtarget='$tabMode' formmethod='post' formaction='AddContainer?xmlTemplate=user:".addslashes($template['MyPath'])."'>";
           } else {
             $template['display_dockerInstall']   = "<input type='submit' style='margin:0px' title='Click to install the application' value='Add' formtarget='$tabMode' formmethod='post' formaction='AddContainer?xmlTemplate=default:".addslashes($template['Path'])."'>";
-          }
+            $template['display_dockerInstall']   = $template['BranchID'] ? "<input type='button' style='margin:0px' title='Click to install the application' value='Add' onclick='displayTags(&quot;$ID&quot;);'>" : $template['display_dockerInstall'];
+            }
         }
       } else {
         $template['display_dockerDisable'] = "<font color='red'>Docker Not Enabled</font>";
@@ -1961,6 +1964,23 @@ case "pinnedApps":
   $displayedApplications['pinnedFlag']  = true;
   writeJsonFile($communityPaths['community-templates-displayed'],$displayedApplications);  
   echo "fini!";
-  break;  
+  break;
+
+case 'displayTags':
+  $leadTemplate = getPost("leadTemplate","oops");
+  $file = readJsonFile($communityPaths['community-templates-info']);
+  $template = $file[$leadTemplate];
+  $childTemplates = $file[$leadTemplate]['BranchID'];
+  if ( ! is_array($childTemplates) ) {
+    echo "Something really went wrong here";
+  } else {
+    echo "<table>";
+    foreach ($childTemplates as $child) {
+      echo "<tr><td><a href='AddContainer?xmlTemplate=default:/var/lib/docker/unraid/templates-community-apps/".$file[$child]['ID'].".xml' target='".$communitySettings['newWindow']."'>".$file[$child]['BranchName']."</a></td><td>".$file[$child]['BranchDescription']."</td></tr>";
+    }
+    echo "</table>";
+  }
+  break;
+  
 }
 ?>
