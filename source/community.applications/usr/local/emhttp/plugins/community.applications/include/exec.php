@@ -131,6 +131,7 @@ function DownloadCommunityTemplates() {
         $o['Forum'] = $Repo['forum'];
         $o['RepoName'] = $Repo['name'];
         $o['ID'] = $i;
+        $o['Displayable'] = true;
         $o['Support'] = $o['Support'] ? $o['Support'] : $o['Forum'];
         $o['DonateText'] = $o['DonateText'] ? $o['DonateText'] : $Repo['donatetext'];
         $o['DonateLink'] = $o['DonateLink'] ? $o['DonateLink'] : $Repo['donatelink'];
@@ -194,6 +195,7 @@ function DownloadApplicationFeed() {
     # Move the appropriate stuff over into a CA data file
     $o = $file;
     $o['ID']            = $i;
+    $o['Displayable']   = true;
     $o['Author']        = preg_replace("#/.*#", "", $o['Repository']);
     $o['DockerHubName'] = strtolower($file['Name']);
     $o['RepoName']      = $file['Repo'];
@@ -244,11 +246,28 @@ function DownloadApplicationFeed() {
     $file['Category'] = $o['Category'];
     $o['Category'] = str_replace("Status:Beta","",$o['Category']);    # undo changes LT made to my xml schema for no good reason
     $o['Category'] = str_replace("Status:Stable","",$o['Category']);
-    $myTemplates[$i] = $o;
     $templateXML = makeXML($file);
-    file_put_contents($o['Path'],$templateXML);
 
+#        $o['Path']          = $communityPaths['templates-community']."/".$i.".xml";
+    if ( is_array($file['Branch']) ) {
+        echo count($file['Branch'])."\n";
+      foreach($o['Branch'] as $branch) {
+        $i = ++$i;
+        if ( ! is_array($branch) ) { continue; }
+        $subBranch = $file;
+        $subBranch['Repository'] .= ":".$branch['Tag'];
+        $subBranch['BranchName'] = $branch['Tag'];
+        $subBranch['BranchDescription'] = $branch['Description'];
+        $subBranch['Path'] = $communityPaths['templates-community']."/".$i.".xml";
+        $subBranch['Displayable'] = false;
+        $myTemplates[$i] = $subBranch;
+        $o['BranchID'][] = $i;
+        file_put_contents($subBranch['Path'],makeXML($subBranch));
+      }
+    }
+    $myTemplates[$o['ID']] = $o;
     $i = ++$i;
+    file_put_contents($o['Path'],$templateXML);
   }
   writeJsonFile($communityPaths['community-templates-info'],$myTemplates);
 
@@ -306,6 +325,7 @@ function getConvertedTemplates() {
         $o = fixTemplates($o);
         $o['RepoName']     = $Repo." Repository";
         $o['ID']           = $i;
+        $o['Displayable']  = true;
         $o['Date']         = ( $o['Date'] ) ? strtotime( $o['Date'] ) : 0;
         $o['SortAuthor']   = $o['Author'];
         $o['Private']      = "true";
@@ -557,6 +577,7 @@ function appOfDay($file) {
     $app[0] = mt_rand(0,count($file) -1);
     $app[1] = mt_rand(0,count($file) -1);
     if ($app[0] == $app[1]) continue;
+    if ( ! $file[$app[0]]['Displayable'] || ! $file[$app[1]]['Displayable'] ) continue;
     if ( ! $file[$app[0]]['Compatible'] || ! $file[$app[1]]['Compatible'] ) continue;
     if ( $file[$app[0]]['Blacklist'] || $file[$app[1]]['Blacklist'] ) continue;
     if ( $file[$app[0]]['ModeratorComment'] || $file[$app[1]]['ModeratorComment'] ) continue;
@@ -833,6 +854,9 @@ case 'get_content':
 
   foreach ($file as $template) {
     if ( $template['Blacklist'] ) {
+      continue;
+    }
+    if ( ! $template['Displayable'] ) {
       continue;
     }
     if ( $communitySettings['hideIncompatible'] == "true" && ! $template['Compatible'] ) {
