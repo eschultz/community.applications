@@ -248,7 +248,7 @@ function DownloadApplicationFeed() {
     $o['Category'] = str_replace("Status:Stable","",$o['Category']);
     $templateXML = makeXML($file);
     $myTemplates[$i] = $o;
-/*     if ( is_array($file['Branch']) ) {
+    if ( is_array($file['Branch']) ) {
       if ( ! $file['Branch'][0] ) {
         $tmp = $file['Branch'];
         unset($file['Branch']);
@@ -270,14 +270,12 @@ function DownloadApplicationFeed() {
         $o['BranchID'][] = $i;
         file_put_contents($subBranch['Path'],makeXML($subBranch));
       }
-      
-    } */
+    }
     $myTemplates[$o['ID']] = $o;
     $i = ++$i;
     file_put_contents($o['Path'],$templateXML);
   }
   writeJsonFile($communityPaths['community-templates-info'],$myTemplates);
-
   return true;
 }
 
