@@ -6,7 +6,7 @@ Icon="settings.png"
 
 function download_url($url, $path = "", $bg = false)
 {
-  exec("curl --max-time 60 --silent --insecure --location --fail ".($path ? " -o '$path' " : "")." $url ".($bg ? ">/dev/null 2>&1 &" : "2>/dev/null"), $out, $exit_code );
+  exec("curl --compressed --max-time 60 --silent --insecure --location --fail ".($path ? " -o '$path' " : "")." $url ".($bg ? ">/dev/null 2>&1 &" : "2>/dev/null"), $out, $exit_code );
   return ($exit_code === 0 ) ? implode("\n", $out) : false;
 }
 
@@ -143,6 +143,14 @@ Hide Incompatible Applications:
   </select>
 
 > This setting will hide applications that are listed as being incompatible with your version of unRaid
+
+Display Random App Of The Day:
+: <select name="appOfTheDay" size="1">
+  <?=mk_option($cfg['appOfTheDay'],"no", "No")?>
+  <?=mk_option($cfg['appOfTheDay'],"yes", "Yes (Default)")?>
+  </select>
+
+> This setting chooses whether to display or not a random "app of the day"
 
 <strong>Docker Hub Searching</strong>
 

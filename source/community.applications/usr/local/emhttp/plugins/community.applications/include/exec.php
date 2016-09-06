@@ -248,7 +248,7 @@ function DownloadApplicationFeed() {
     $o['Category'] = str_replace("Status:Stable","",$o['Category']);
     $templateXML = makeXML($file);
     $myTemplates[$i] = $o;
-    if ( is_array($file['Branch']) ) {
+/*     if ( is_array($file['Branch']) ) {
       if ( ! $file['Branch'][0] ) {
         $tmp = $file['Branch'];
         unset($file['Branch']);
@@ -271,7 +271,7 @@ function DownloadApplicationFeed() {
         file_put_contents($subBranch['Path'],makeXML($subBranch));
       }
       
-    }
+    } */
     $myTemplates[$o['ID']] = $o;
     $i = ++$i;
     file_put_contents($o['Path'],$templateXML);
@@ -844,14 +844,18 @@ case 'get_content':
   if ( $category === "/NONE/i" ) {
     echo "<center><font size=4>Select A Category Above</font></center>";
     echo changeUpdateTime();
-    $displayApplications = array();
-    if ( count($file) > 200) {
-      $appsOfDay = appOfDay($file);
-      $displayApplications['community'] = array($file[$appsOfDay[0]],$file[$appsOfDay[1]]);
-      writeJsonFile($communityPaths['community-templates-displayed'],$displayApplications);
-      echo "<script>$('#templateSortButtons').hide();$('#sortButtons').hide();</script>";
-      echo "<br><center><font size='4' color='purple'><b>Random Apps Of The Day</b></font><br><br>";
-      echo my_display_apps("detail",$displayApplications['community'],$runningDockers,$imagesDocker);
+    if ( $communitySettings['appOfTheDay'] == "yes" ) {
+      $displayApplications = array();
+      if ( count($file) > 200) {
+        $appsOfDay = appOfDay($file);
+        $displayApplications['community'] = array($file[$appsOfDay[0]],$file[$appsOfDay[1]]);
+        writeJsonFile($communityPaths['community-templates-displayed'],$displayApplications);
+        echo "<script>$('#templateSortButtons').hide();$('#sortButtons').hide();</script>";
+        echo "<br><center><font size='4' color='purple'><b>Random Apps Of The Day</b></font><br><br>";
+        echo my_display_apps("detail",$displayApplications['community'],$runningDockers,$imagesDocker);
+        break;
+      }
+    } else {
       break;
     }
   }
