@@ -30,6 +30,7 @@ if ( ! $backupOptions['deleteOldBackup'] ) { $backupOptions['deleteOldBackup'] =
 if ( ! $backupOptions['fasterRsync'] )  { $backupOptions['fasterRsync'] = "no"; }
 if ( ! $backupOptions['backupFlash'] ) { $backupOptions['backupFlash'] = "appdata"; }
 if ( ! $backupOptions['backupXML'] ) { $backupOptions['backupXML'] = "appdata"; }
+if ( ! $backupOptions['logBackup'] ) { $backupOptions['logBackup'] = "no"; }
 
 # fix destinationShare for compatibility with initial release
 
@@ -302,7 +303,8 @@ function validateOptions(initialization) {
   var backupXML = $("#backupXML").val();
   var destinationShare = $("#destinationShare").val();
   var deleteOldBackup = $("#deleteOldBackup").val();
-
+  var datedBackup = $("#datedBackup").val();
+  
   if ( deleteOldBackup == 0 ) {
     $("#deleteOldBackup").val("");
   }

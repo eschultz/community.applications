@@ -249,14 +249,19 @@ function DownloadApplicationFeed() {
     $templateXML = makeXML($file);
     $myTemplates[$i] = $o;
     if ( is_array($file['Branch']) ) {
-      echo count($file['Branch'])."\n";
-      foreach($o['Branch'] as $branch) {
-        if ( ! is_array($branch) ) { continue; }
+      if ( ! $file['Branch'][0] ) {
+        $tmp = $file['Branch'];
+        unset($file['Branch']);
+        $file['Branch'][] = $tmp;
+      }
+      foreach($file['Branch'] as $branch) {
         $i = $i + 1;
         $subBranch = $file;
-        $subBranch['Repository'] .= ":".$branch['Tag'];
+        $masterRepository = explode(":",$subBranch['Repository']);
+        $o['BranchDefault'] = $masterRepository[1];
+        $subBranch['Repository'] = $masterRepository[0].":".$branch['Tag'];
         $subBranch['BranchName'] = $branch['Tag'];
-        $subBranch['BranchDescription'] = $branch['Description'];
+        $subBranch['BranchDescription'] = $branch['Description'] ? $branch['Description'] : $branch['Tag'];
         $subBranch['Path'] = $communityPaths['templates-community']."/".$i.".xml";
         $subBranch['Displayable'] = false;
         $subBranch['ID'] = $i;
@@ -503,7 +508,8 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
         if ( $selected ) {
           $template['display_dockerDefault'] = "<input type='submit' value='Default' style='margin:1px' title='Click to reinstall the application using default values' formtarget='$tabMode' formmethod='post' formaction='AddContainer?xmlTemplate=default:".addslashes($template['Path'])."'>";
           $template['display_dockerEdit']    = "<input type='submit' value='Edit' style='margin:1px' title='Click to edit the application values' formtarget='$tabMode' formmethod='post' formaction='UpdateContainer?xmlTemplate=edit:".addslashes($info[$name]['template'])."'>";
-        } else {
+          $template['display_dockerDefault'] = $template['BranchID'] ? "<input type='button' style='margin:0px' title='Click to reinstall the application using default values' value='Add' onclick='displayTags(&quot;$ID&quot;);'>" : $template['display_dockerDefault'];
+          } else {
           if ( $template['MyPath'] ) {
             $template['display_dockerReinstall'] = "<input type='submit' style='margin:0px' title='Click to reinstall the application' value='Reinstall' formtarget='$tabMode' formmethod='post' formaction='AddContainer?xmlTemplate=user:".addslashes($template['MyPath'])."'>";
           } else {
@@ -1974,9 +1980,11 @@ case 'displayTags':
   if ( ! is_array($childTemplates) ) {
     echo "Something really went wrong here";
   } else {
+    $defaultTag = $template['BranchDefault'] ? $template['BranchDefault'] : "latest";
     echo "<table>";
+    echo "<tr><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td><a href='AddContainer?xmlTemplate=default:/var/lib/docker/unraid/templates-community-apps/$leadTemplate.xml' target='".$communitySettings['newWindow']."'>Default</a></td><td>Install Using The Template's Default Tag (<font color='purple'>:$defaultTag</font>)</td></tr>";
     foreach ($childTemplates as $child) {
-      echo "<tr><td><a href='AddContainer?xmlTemplate=default:/var/lib/docker/unraid/templates-community-apps/".$file[$child]['ID'].".xml' target='".$communitySettings['newWindow']."'>".$file[$child]['BranchName']."</a></td><td>".$file[$child]['BranchDescription']."</td></tr>";
+      echo "<tr><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td><a href='AddContainer?xmlTemplate=default:/var/lib/docker/unraid/templates-community-apps/".$file[$child]['ID'].".xml' target='".$communitySettings['newWindow']."'>".$file[$child]['BranchName']."</a></td><td>".$file[$child]['BranchDescription']."</td></tr>";
     }
     echo "</table>";
   }
