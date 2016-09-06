@@ -168,12 +168,14 @@ if ( $restore ) {
   }
   if ( $backupOptions['backupXML'] != "no" ) {
     logger("Deleting Old XML Backup");
-    exec("rm -rf '$xmlDestination'");
+    if ( is_dir("/etc/libvirt/qemu") ) {
+      exec("rm -rf '$xmlDestination'");
+    }
     logger("Backing up VM XML's to $xmlDestination");
     file_put_contents($communityPaths['backupLog'],"Backing up VM XML's\n",FILE_APPEND);
     exec("mkdir -p '$xmlDestination'");
     $xmlList = @scandir("/etc/libvirt/qemu");
-    if ( is_array($xml) ) {
+    if ( is_array($xmlList) ) {
       foreach ($xmlList as $xml) {
         if (is_dir("/etc/libvirt/qemu/$xml")) {
           continue;
@@ -202,7 +204,7 @@ if ( $backupOptions['runRsync'] == "true" ) {
   logger("$logLine appData from $source to $destination");
   $command = '/usr/bin/rsync '.$backupOptions['rsyncOption'].' '.$dockerIMGFilter.' '.$rsyncExcluded.' --log-file="'.$communityPaths['backupLog'].'" "'.$source.'" "'.$destination.'" > /dev/null 2>&1';
   logger('Using command: '.$command);
-  file_put_contents($communityPaths['backupLog'],"Executing rsync: $command",FILE_APPEND);
+  file_put_contents($communityPaths['backupLog'],"Executing rsync: $command\n",FILE_APPEND);
   exec("mkdir -p ".escapeshellarg($destination));
   exec($command,$output,$returnValue);
   logger("$restoreMsg Complete");
@@ -266,7 +268,7 @@ if ( ! $restore && ($backupOptions['datedBackup'] == 'yes') ) {
       logger("rsync returned errors.  Not deleting old backup sets of appdata");
       file_put_contents($communityPaths['backupLog'],"rsync returned errors.  Not deleting old backup sets of appdata\n",FILE_APPEND);
       logger("Renaming $destination to $destination-error\n");
-      file_put_contents($communityPaths['backupLog'],"Renaming $destination to $destination-error",FILE_APPEND);
+      file_put_contents($communityPaths['backupLog'],"Renaming $destination to $destination-error\n",FILE_APPEND);
       
       exec("mv ".escapeshellarg("$destination")." ".escapeshellarg("$destination-error"));
     } else {
@@ -317,7 +319,16 @@ if ( $returnValue > 0 ) {
 if ( $restore ) {
   unlink($communityPaths['restoreProgress']);
 } else {
+  file_put_contents($communityPaths['backupLog'],"Deleting temporary files\n",FILE_APPEND);
+  if ( $backupOptions['backupFlash'] == "appdata" ) {
+    @unlink($source."Community_Applications_USB_Backup");
+  }
+  if ( $backupOptions['backupXML'] == "appdata" ) {
+    @unlink($source."Community_Applications_VM_XML_Backup");
+  }
   unlink($communityPaths['backupProgress']);
 }
+file_put_contents($communityPaths['backupLog'],"Backup / Restore Completed\n",FILE_APPEND);
+logger("Backup / Restore Completed");
 
 ?>
