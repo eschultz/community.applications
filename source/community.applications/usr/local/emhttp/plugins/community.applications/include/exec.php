@@ -268,7 +268,6 @@ function DownloadApplicationFeed() {
         $subBranch['Displayable'] = false;
         $subBranch['ID'] = $i;
         $replaceKeys = array_diff(array_keys($branch),array("Tag","TagDescription"));
-        print_r($replaceKeys);
         foreach ($replaceKeys as $key) {
           $subBranch[$key] = $branch[$key];
         }
