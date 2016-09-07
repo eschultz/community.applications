@@ -278,6 +278,7 @@ function DownloadApplicationFeed() {
       }
     }
 # end comment block here
+    unset($o['Branch']);
     $myTemplates[$o['ID']] = $o;
     $i = ++$i;
     file_put_contents($o['Path'],$templateXML);
