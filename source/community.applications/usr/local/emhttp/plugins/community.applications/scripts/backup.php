@@ -319,13 +319,6 @@ if ( $returnValue > 0 ) {
 if ( $restore ) {
   unlink($communityPaths['restoreProgress']);
 } else {
-  file_put_contents($communityPaths['backupLog'],"Deleting temporary files\n",FILE_APPEND);
-  if ( $backupOptions['backupFlash'] == "appdata" ) {
-    @unlink($source."Community_Applications_USB_Backup");
-  }
-  if ( $backupOptions['backupXML'] == "appdata" ) {
-    @unlink($source."Community_Applications_VM_XML_Backup");
-  }
   unlink($communityPaths['backupProgress']);
 }
 file_put_contents($communityPaths['backupLog'],"Backup / Restore Completed\n",FILE_APPEND);

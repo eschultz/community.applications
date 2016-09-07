@@ -248,6 +248,7 @@ function DownloadApplicationFeed() {
     $o['Category'] = str_replace("Status:Stable","",$o['Category']);
     $templateXML = makeXML($file);
     $myTemplates[$i] = $o;
+ # start comment block here
     if ( is_array($file['Branch']) ) {
       if ( ! $file['Branch'][0] ) {
         $tmp = $file['Branch'];
@@ -255,22 +256,28 @@ function DownloadApplicationFeed() {
         $file['Branch'][] = $tmp;
       }
       foreach($file['Branch'] as $branch) {
-        $i = $i + 1;
+        $i = ++$i;
         $subBranch = $file;
         $masterRepository = explode(":",$subBranch['Repository']);
         $o['BranchDefault'] = $masterRepository[1];
-        $subBranch['Repository'] = $masterRepository[0].":".$branch['Tag'];
+        $subBranch['Repository'] = $masterRepository[0].":".$branch['Tag']; #This takes place before any xml elements are overwritten by additional entries in the branch, so you can actually change the repo the app draws from
         $subBranch['BranchName'] = $branch['Tag'];
-        $subBranch['BranchDescription'] = $branch['Description'] ? $branch['Description'] : $branch['Tag'];
+        $subBranch['BranchDescription'] = $branch['TagDescription'] ? $branch['TagDescription'] : $branch['Tag'];
         $subBranch['Path'] = $communityPaths['templates-community']."/".$i.".xml";
         $subBranch['Displayable'] = false;
         $subBranch['ID'] = $i;
+        $replaceKeys = array_diff(array_keys($branch),array("Tag","TagDescription"));
+        print_r($replaceKeys);
+        foreach ($replaceKeys as $key) {
+          $subBranch[$key] = $branch[$key];
+        }
         unset($subBranch['Branch']);
         $myTemplates[$i] = $subBranch;
         $o['BranchID'][] = $i;
         file_put_contents($subBranch['Path'],makeXML($subBranch));
       }
     }
+# end comment block here
     $myTemplates[$o['ID']] = $o;
     $i = ++$i;
     file_put_contents($o['Path'],$templateXML);
