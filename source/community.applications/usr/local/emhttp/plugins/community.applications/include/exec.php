@@ -247,7 +247,6 @@ function DownloadApplicationFeed() {
     $file['Category'] = $o['Category'];
     $o['Category'] = str_replace("Status:Beta","",$o['Category']);    # undo changes LT made to my xml schema for no good reason
     $o['Category'] = str_replace("Status:Stable","",$o['Category']);
-    $templateXML = makeXML($file);
     $myTemplates[$i] = $o;
  # start comment block here
     if ( is_array($file['Branch']) ) {
@@ -278,9 +277,10 @@ function DownloadApplicationFeed() {
       }
     }
 # end comment block here
-    unset($o['Branch']);
+    unset($file['Branch']);
     $myTemplates[$o['ID']] = $o;
     $i = ++$i;
+    $templateXML = makeXML($file);
     file_put_contents($o['Path'],$templateXML);
   }
   writeJsonFile($communityPaths['community-templates-info'],$myTemplates);
