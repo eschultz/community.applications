@@ -148,6 +148,7 @@ function DownloadCommunityTemplates() {
         }
         $o['Category'] = str_replace("Status:Beta","",$o['Category']);    # undo changes LT made to my xml schema for no good reason
         $o['Category'] = str_replace("Status:Stable","",$o['Category']);
+
         $myTemplates[$i] = $o;
         $i = ++$i;
       }
