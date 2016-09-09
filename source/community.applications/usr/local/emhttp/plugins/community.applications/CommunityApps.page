@@ -203,11 +203,11 @@ $(function(){
   if ( "<?=$cfg['viewMode']?>" == "detail" ) $("#viewDetail").prop("disabled",true);
 
   <?if ($tabbed):?>
-    $('.tabs').append("<span id='searchFilter' class='status vhshift' style='display:none'><input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' id='updateButton' value='Update Applications' title='Updates are automatically downloaded whenever loading CA.  This button will manually force an update' onclick='forceUpdateButton()' disabled></span>");
+    $('.tabs').append("<span id='searchFilter' class='status vhshift' style='display:none'><input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' id='updateButton' value='Legacy Mode' title='Switches CA to Legacy Mode (until the next appfeed update) - Not recommended' onclick='forceUpdateButton()' disabled></span>");
     for (var x=1; x<last; x++) $('#tab'+x).bind({click:function(){$('#searchFilter').hide();}});
     $('#tab'+last).bind({click:function(){$('#searchFilter').show();readMore();}});
   <?else:?>
-    $('div[id=title]').last().append("<span id='searchFilter' class='status vhshift'><input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' id='updateButton' value='Update Applications' title='Updates are automatically downloaded when starting CA.  This button will force an update' onclick='forceUpdateButton()' disabled>");
+    $('div[id=title]').last().append("<span id='searchFilter' class='status vhshift'><input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' id='updateButton' value='Legacy Mode' title='Switches CA to Legacy Mode (until the next appfeed update) - Not recommended' onclick='forceUpdateButton()' disabled>");
   <?endif;?>
 
   getContent(true,'INITIALIZE','None Selected');
@@ -332,8 +332,8 @@ function forceUpdate() {
 
 function forceUpdateButton() {
   swal({
-    title: "Update Application Lists?",
-    text: "<strong>Normally there is no reason to manually update the application lists as Community Applications automatically downloads the latest application list whenever it starts up (updated every two hours)</strong><br><br><font color='red'>This process once begun cannot be aborted and will take 2-3 minutes</font>",
+    title: "Switch To Legacy Mode?",
+    text: "<strong>This will force CA to manually download the application XML's.  Normally there is no reason to do this as CA automatically downloads the latest application list whenever it starts up (updated every two hours)</strong><br><br><font color='red'>This process once begun cannot be aborted and will take 2-3 minutes</font>",
     type: "warning",
     confirmButtonColor: "#DD6B55",
     confirmButtonText: "Update Lists",

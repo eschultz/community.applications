@@ -311,8 +311,14 @@ function fixTemplates($template) {
 ###############################################################
 
 function makeXML($template) {
+  # ensure its a v2 template if the Config entries exist
+  if ( $template['Config'] ) {
+    if ( ! $template['@attributes'] ) {
+      $template['@attributes'] = array("version"=>2);
+    }
+  }
+
   # handle the case where there is only a single <Config> entry
-  
   if ( $template['Config']['@attributes'] ) {
     $template['Config'][0]['@attributes'] = $template['Config']['@attributes'];
     unset($template['Config']['@attributes']);
@@ -350,7 +356,7 @@ function changeUpdateTime() {
     $appFeedTime['last_updated_timestamp'] = filemtime($communityPaths['community-templates-info']);
   }
   $updateTime = date("F d Y H:i",$appFeedTime['last_updated_timestamp']);
-
+  $updateTime = ( is_file($communityPaths['LegacyMode']) ) ? "<font color=&quot;purple&quot;>N/A - Legacy Mode Active</font>" : $updateTime;
   return "<script>$('#updateTime').html('$updateTime');</script>";
 }
 
@@ -381,10 +387,32 @@ function versionCheck($template) {
 ###############################################
 
 function readXmlFile($xmlfile) {
-  $doc = new DOMDocument();
+  $xml = file_get_contents($xmlfile);
+  $o = TypeConverter::xmlToArray($xml,TypeConverter::XML_GROUP);
+  if ( ! $o ) { return false; }
+  $o['Path']        = $xmlfile;
+  $o['Author']      = preg_replace("#/.*#", "", $o['Repository']);
+  $o['DockerHubName'] = strtolower($o['Name']);
+  $o['Base'] = $o['BaseImage'];
+  $o['SortAuthor']  = $o['Author'];
+  $o['SortName']    = $o['Name'];
+  $o['Forum']       = $Repo['forum'];
+# configure the config attributes to same format as appfeed
+# handle the case where there is only a single <Config> entry
+  
+  if ( $o['Config']['@attributes'] ) {
+    $o['Config'] = array('@attributes'=>$o['Config']['@attributes'],'value'=>$o['Config']['value']);
+  }
+    
+  return $o;
+  
+/*   $doc = new DOMDocument();
   @$doc->load($xmlfile);
   if ( ! $doc ) { return false; }
-  
+
+  if ($doc->getElementsByTagName( "Branch" )->item(0)->nodeValue) {
+    var_dump($doc->getElementsByTagName("Branch"));
+  }
   $o['Path']        = $xmlfile;
   $o['Repository']  = stripslashes($doc->getElementsByTagName( "Repository" )->item(0)->nodeValue);
   $o['Author']      = preg_replace("#/.*#", "", $o['Repository']);
@@ -436,8 +464,7 @@ function readXmlFile($xmlfile) {
     $o['DonateImg'] = $doc->getElementsByTagName( "DonateImage")->item(0)->nodeValue;
   } else {
     $o['DonateImg']   = $doc->getElementsByTagName( "DonateImg")->item(0)->nodeValue;
-  }
-  
+  } */
   return $o;
 }
 

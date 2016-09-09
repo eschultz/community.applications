@@ -1,4 +1,5 @@
 <?PHP
+
 ###############################################################
 #                                                             #
 # Community Applications copyright 2015-2016, Andrew Zawadzki #
@@ -106,7 +107,7 @@ function DownloadCommunityTemplates() {
     $friendlyName = str_replace("/","",$friendlyName);
 
     if ( ! $downloaded = $DockerTemplates->downloadTemplates($communityPaths['templates-community']."/templates/$friendlyName", $downloadURL) ){
-      file_put_contents($communityPaths['updateErrors'],$downloadRepo['name']." ".$downloadRepo['url']."<br>",FILE_APPEND);
+      file_put_contents($communityPaths['updateErrors'],"Failed to download ".$downloadRepo['name']." ".$downloadRepo['url']."<br>",FILE_APPEND);
       @unlink($downloadURL);
     } else {
       $templates = array_merge($templates,$downloaded);
@@ -123,11 +124,15 @@ function DownloadCommunityTemplates() {
     foreach ($templates[$Repo['url']] as $file) {
       if (is_file($file)){
         $o = readXmlFile($file);
+        if ( ! $o ) {
+          file_put_contents($communityPaths['updateErrors'],"Failed to parse $file (errors in XML file?)<br>",FILE_APPEND);
+        }
         if ( ! $o['Repository'] ) {
           if ( ! $o['Plugin'] ) {
             continue;
           }
         }
+        
         $o['Forum'] = $Repo['forum'];
         $o['RepoName'] = $Repo['name'];
         $o['ID'] = $i;
@@ -148,14 +153,46 @@ function DownloadCommunityTemplates() {
         }
         $o['Category'] = str_replace("Status:Beta","",$o['Category']);    # undo changes LT made to my xml schema for no good reason
         $o['Category'] = str_replace("Status:Stable","",$o['Category']);
+        $myTemplates[$o['ID']] = $o;
+        if ( is_array($o['Branch']) ) {
+          if ( ! $o['Branch'][0] ) {
+            $tmp = $o['Branch'];
+            unset($o['Branch']);
+            $o['Branch'][] = $tmp;
+          }
+          foreach($o['Branch'] as $branch) {
 
-        $myTemplates[$i] = $o;
-        $i = ++$i;
+            $i = $i + 1;
+            $subBranch = $o;
+            $masterRepository = explode(":",$subBranch['Repository']);
+            $o['BranchDefault'] = $masterRepository[1];
+            $subBranch['Repository'] = $masterRepository[0].":".$branch['Tag']; #This takes place before any xml elements are overwritten by additional entries in the branch, so you can actually change the repo the app draws from
+            $subBranch['BranchName'] = $branch['Tag'];
+            $subBranch['BranchDescription'] = $branch['TagDescription'] ? $branch['TagDescription'] : $branch['Tag'];
+            $subBranch['Path'] = $communityPaths['templates-community']."/".$i.".xml";
+            $subBranch['Displayable'] = false;
+            $subBranch['ID'] = $i;
+            $replaceKeys = array_diff(array_keys($branch),array("Tag","TagDescription"));
+            foreach ($replaceKeys as $key) {
+              $subBranch[$key] = $branch[$key];
+            }
+            unset($subBranch['Branch']);
+            $myTemplates[$i] = $subBranch;
+            $o['BranchID'][] = $i;
+            file_put_contents($subBranch['Path'],makeXML($subBranch));
+          }
+          unset($o['Branch']);
+          $o['Path'] = $communityPaths['templates-community']."/".$o['ID'].".xml";
+          file_put_contents($o['Path'],makeXML($o));
+          $myTemplates[$o['ID']] = $o;
+        }
+        $i = $i + 1;
       }
     }
   }
+ # var_dump($myTemplates);
   writeJsonFile($communityPaths['community-templates-info'],$myTemplates);
-
+  file_put_contents($communityPaths['LegacyMode'],"active");
   return true;
 }
 
@@ -834,9 +871,10 @@ case 'get_content':
         $lastUpdated['last_updated_timestamp'] = time();
         writeJsonFile($communityPaths['lastUpdated-old'],$lastUpdated);
         if (is_file($communityPaths['updateErrors'])) {
-          echo "<table><td><td colspan='5'><br><center>The following repositories failed to download correctly:<br><br>";
-          echo "<strong>".file_get_contents($communityPaths['updateErrors'])."</strong></center></td></tr></table>";
-          echo "<script>$('#templateSortButtons').hide();$('#sortButtons').hide();</script>";
+          echo "<table><td><td colspan='5'><br><center>The following errors occurred:<br><br>";
+          echo "<strong><font color='purple'>".file_get_contents($communityPaths['updateErrors'])."</font></strong></center></td></tr></table>";
+          echo "<script>$('#templateSortButtons,#total1').hide();$('#sortButtons').hide();</script>";
+          echo changeUpdateTime();
           break;
         }
       }
@@ -1992,9 +2030,9 @@ case 'displayTags':
   } else {
     $defaultTag = $template['BranchDefault'] ? $template['BranchDefault'] : "latest";
     echo "<table>";
-    echo "<tr><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td><a href='AddContainer?xmlTemplate=default:/var/lib/docker/unraid/templates-community-apps/$leadTemplate.xml' target='".$communitySettings['newWindow']."'>Default</a></td><td>Install Using The Template's Default Tag (<font color='purple'>:$defaultTag</font>)</td></tr>";
+    echo "<tr><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td><a href='AddContainer?xmlTemplate=default:".$template['Path']."' target='".$communitySettings['newWindow']."'>Default</a></td><td>Install Using The Template's Default Tag (<font color='purple'>:$defaultTag</font>)</td></tr>";
     foreach ($childTemplates as $child) {
-      echo "<tr><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td><a href='AddContainer?xmlTemplate=default:/var/lib/docker/unraid/templates-community-apps/".$file[$child]['ID'].".xml' target='".$communitySettings['newWindow']."'>".$file[$child]['BranchName']."</a></td><td>".$file[$child]['BranchDescription']."</td></tr>";
+      echo "<tr><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td><a href='AddContainer?xmlTemplate=default:".$file[$child]['Path']."' target='".$communitySettings['newWindow']."'>".$file[$child]['BranchName']."</a></td><td>".$file[$child]['BranchDescription']."</td></tr>";
     }
     echo "</table>";
   }

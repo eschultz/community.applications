@@ -57,6 +57,7 @@ $communityPaths['pinnedRam']                     = $communityPaths['tempFiles'].
 $communityPaths['pinned']                        = "/boot/config/plugins/community.applications/pinned_apps.json"; # stored on flash instead of docker.img so it will work without docker running
 $communityPaths['appOfTheDay']                   = $communityPaths['persistentDataStore']."/appOfTheDay.json";
 $communityPaths['defaultSkin']                   = "/usr/local/emhttp/plugins/community.applications/skins/default.skin";
+$communityPaths['LegacyMode']                    = $communityPaths['templates-community']."/legacyModeActive";
 $infoFile                                        = $communityPaths['community-templates-info'];
 $docker_repos                                    = $communityPaths['template-repos'];
 
