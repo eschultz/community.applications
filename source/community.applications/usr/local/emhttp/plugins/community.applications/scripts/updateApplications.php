@@ -38,7 +38,9 @@ foreach ($pluginsInstalled  as $plugin) {
       exec("logger Auto Updating $plugin");
       exec("/usr/local/emhttp/plugins/dynamix.plugin.manager/scripts/plugin check $plugin");
       exec("/usr/local/emhttp/plugins/dynamix.plugin.manager/scripts/plugin update $plugin");
-      notify("Community Applications","Application Auto Update",$plugin." Automatically Updated");
+      if ( $appList['notify'] != "no" ) {
+        notify("Community Applications","Application Auto Update",$plugin." Automatically Updated");
+      }
     } else {
       exec("logger Update available for $plugin - Skipping Auto Update");
     }

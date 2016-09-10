@@ -13,7 +13,7 @@ $pluginsFolder = scandir("/var/log/plugins");
 # get the settings already selected
 
 $updateSettings = json_decode(@file_get_contents("/boot/config/plugins/community.applications/AutoUpdate.json"),true);
-
+if ( ! $updateSettings['notify'] ) { $updateSettings['notify'] = "yes"; }
 if ( ! $updateSettings ) {
   $updateSettings['community.applications.plg'] = "true";
   $updateSettings['fix.common.problems.plg'] = "true";
@@ -90,6 +90,7 @@ var URL = "/plugins/<?=$plugin?>/include/exec.php";
 
 $(function() {
   changeGlobal();
+  $("#notify").val('<?=$updateSettings['notify']?>');
 });
 
 function apply() {
@@ -101,8 +102,8 @@ function apply() {
     }
   });
   var globalUpdate = $("#allPlugins").val();
-  
-  $.post(URL,{action:'autoUpdatePlugins',globalUpdate:globalUpdate,pluginList:myvalue});
+  var notify = $("#notify").val();
+  $.post(URL,{action:'autoUpdatePlugins',globalUpdate:globalUpdate,pluginList:myvalue,notify:notify});
   $(".applyButton").prop("disabled",true);
 }
 
@@ -127,6 +128,12 @@ function changeApply() {
 > <center><font color='red'>For autoupdating to work, you <b>must</b> have <em>Plugin Version Notifications</em> enabled (ideally at least once per day) enabled within unRaid's Settings / Notification Settings.  Community Applications will check the plugin status daily (adjustable via the Dynamix Fixed Schedules Plugin) and upgrade any applicable plugins</font></center>
 
 <center>
+<strong>Send Notifications On Update?</strong>
+<select id='notify' size='1' onchange='changeApply();'>
+  <option value='yes'>Yes</option>
+  <option value='no'>No</option>
+</select>
+<br><br>
 <strong>Auto Update All Plugins?</strong>
 <select id='allPlugins' size='1' onchange='changeGlobal();'>
   <option value='no'>No</option>

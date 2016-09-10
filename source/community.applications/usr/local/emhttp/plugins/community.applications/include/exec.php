@@ -83,16 +83,6 @@ function DownloadCommunityTemplates() {
   $appCount = 0;
   $myTemplates = array();
 
-  if (file_exists($communityPaths['special-repos'])) {
-    if ( $communitySettings['appFeed'] == "true" ) {
-      $myTemplates = readJsonFile($communityPaths['community-templates-info']);
-      $appCount = count($myTemplates);
-      $Repos = readJsonFile($communityPaths['special-repos']);
-    } else {
-      $Repos = array_merge($Repos,readJsonFile($communityPaths['special-repos']));
-    }
-  }
-
   exec("rm -rf '{$communityPaths['templates-community']}'");
   @unlink($communityPaths['updateErrors']);
 
@@ -190,7 +180,6 @@ function DownloadCommunityTemplates() {
       }
     }
   }
- # var_dump($myTemplates);
   writeJsonFile($communityPaths['community-templates-info'],$myTemplates);
   file_put_contents($communityPaths['LegacyMode'],"active");
   return true;
@@ -321,6 +310,7 @@ function DownloadApplicationFeed() {
     file_put_contents($o['Path'],$templateXML);
   }
   writeJsonFile($communityPaths['community-templates-info'],$myTemplates);
+  @unlink($communityPaths['LegacyMode']);
   return true;
 }
 
@@ -622,12 +612,15 @@ function appOfDay($file) {
   $currentDay = intval(time() / 86400);
   if ( $oldAppDay == $currentDay ) {
     $app = readJsonFile($communityPaths['appOfTheDay']);
-    if ( $app ) return $app;
+    if ( $app ) $flag = true;
   }
   
   while ( true ) {
-    $app[0] = mt_rand(0,count($file) -1);
-    $app[1] = mt_rand(0,count($file) -1);
+    if ( ! $flag ) {
+      $app[0] = mt_rand(0,count($file) -1);
+      $app[1] = mt_rand(0,count($file) -1);
+    }
+    $flag = false;
     if ($app[0] == $app[1]) continue;
     if ( ! $file[$app[0]]['Displayable'] || ! $file[$app[1]]['Displayable'] ) continue;
     if ( ! $file[$app[0]]['Compatible'] || ! $file[$app[1]]['Compatible'] ) continue;
@@ -856,10 +849,6 @@ case 'get_content':
         $communitySettings['appFeed'] = "false";
         echo "<tr><td colspan='5'><br><center>Download of appfeed failed.  Reverting to legacy mode</center></td></tr>";
         @unlink($infoFile);
-      } else {
-        if ( file_exists($communityPaths['special-repos'] )) {
-          DownloadCommunityTemplates();
-        }
       }
     }
 
@@ -1832,10 +1821,12 @@ case 'startCadvisor':
 #################################################
 
 case 'autoUpdatePlugins':
-  $globalUpdate = getPost("globalUpdate","no");
-  $pluginList   = getPost("pluginList","");
-
+  $globalUpdate          = getPost("globalUpdate","no");
+  $pluginList            = getPost("pluginList","");
+  $updateArray['notify'] = getPost("notify","yes");
+  
   $updateArray['Global'] = ( $globalUpdate == "yes" ) ? "true" : "false";
+
 
   $plugins = explode("*",$pluginList);
   if ( is_array($plugins) ) {

@@ -31,7 +31,6 @@ $communityPaths['dockerSearchResults']           = $communityPaths['tempFiles'].
 $communityPaths['dockerfilePage']                = $communityPaths['tempFiles']."/dockerfilePage";                     /* the downloaded webpage to scrape the dockerfile from */
 $communityPaths['moderationURL']                 = "https://raw.githubusercontent.com/Squidly271/Community-Applications-Moderators/master/Moderation.json";
 $communityPaths['moderation']                    = $communityPaths['persistentDataStore']."/moderation.json";          /* json file that has all of the moderation */
-$communityPaths['special-repos']                 = "/boot/config/plugins/community.applications/private.repositories.json";
 $communityPaths['unRaidVersion']                 = "/etc/unraid-version";
 $communityPaths['logos']                         = $communityPaths['tempFiles']."/logos.json";
 $communityPaths['deleteAppdataScript']           = "/usr/local/emhttp/plugins/community.applications/scripts/deleteAppData.sh";
