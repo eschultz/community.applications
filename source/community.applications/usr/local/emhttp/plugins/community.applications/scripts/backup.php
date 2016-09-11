@@ -93,7 +93,7 @@ if ( $restore ) {
 
     if ( $backupOptions['fasterRsync'] == "yes" ) {
       $currentDate = date_create(now);
-      $dirContents = array_diff(scandir($basePathBackup),array(".",".."));
+      $dirContents = dirContents($basePathBackup);
       foreach ($dirContents as $dir) {
         $folderDate = date_create_from_format("Y-m-d@G.i",$dir);
         if ( ! $folderDate ) { continue; }
@@ -273,7 +273,7 @@ if ( ! $restore && ($backupOptions['datedBackup'] == 'yes') ) {
       exec("mv ".escapeshellarg("$destination")." ".escapeshellarg("$destination-error"));
     } else {
       $currentDate = date_create(now);
-      $dirContents = array_diff(scandir($basePathBackup),array(".",".."));
+      $dirContents = dirContents($basePathBackup);
       foreach ($dirContents as $dir) {
         $folderDate = date_create_from_format("Y-m-d@G.i",$dir);
         if ( ! $folderDate ) { continue; }

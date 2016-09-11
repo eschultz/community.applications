@@ -339,7 +339,7 @@ function getConvertedTemplates() {
   if ( ! is_dir($communityPaths['convertedTemplates']) ) {
     return;
   }
-  $Repos = array_diff(scandir($communityPaths['convertedTemplates']),array(".",".."));
+  $Repos = dirContents($communityPaths['convertedTemplates']);
 
   foreach ($Repos as $Repo) {
     if ( ! is_dir($communityPaths['convertedTemplates'].$Repo) ) {
@@ -349,7 +349,7 @@ function getConvertedTemplates() {
     unset($privateTemplates);
     $repoPath = $communityPaths['convertedTemplates'].$Repo."/";
 
-    $privateTemplates = array_diff(scandir($repoPath),array(".",".."));
+    $privateTemplates = dirContents($repoPath);
     if ( empty($privateTemplates) ) {
       continue;
     }
@@ -1393,7 +1393,7 @@ case 'previous_apps':
         }
       }
     }
-    $all_files = @array_diff(@scandir("/boot/config/plugins/dockerMan/templates-user"),array(".",".."));
+    $all_files = dirContents("/boot/config/plugins/dockerMan/templates-user");
 
 # handle renamed containers
     foreach ($all_files as $xmlfile) {
@@ -1454,7 +1454,7 @@ case 'previous_apps':
   } else {
 # now get the old not installed docker apps
 
-    $all_files = @array_diff(@scandir("/boot/config/plugins/dockerMan/templates-user"),array(".",".."));
+    $all_files = dirContents("/boot/config/plugins/dockerMan/templates-user");
 
     foreach ($all_files as $xmlfile) {
       if ( pathinfo($xmlfile,PATHINFO_EXTENSION) == "xml" ) {
@@ -1519,7 +1519,7 @@ case 'previous_apps':
       }
     }
   } else {
-    $all_plugs = @array_diff(@scandir("/boot/config/plugins-removed/"),array(".",".."));
+    $all_plugs = dirContents("/boot/config/plugins-removed/");
 
     foreach ($all_plugs as $oldplug) {
       foreach ($file as $template) {
@@ -1843,7 +1843,7 @@ case 'autoUpdatePlugins':
 #########################################
 
 case 'getOrphanAppdata':
-  $all_files = @array_diff(@scandir("/boot/config/plugins/dockerMan/templates-user"),array(".",".."));
+  $all_files = dirContents("/boot/config/plugins/dockerMan/templates-user");
   if ( is_dir("/var/lib/docker/tmp") ) {
     $DockerClient = new DockerClient();
     $info = $DockerClient->getDockerContainers();

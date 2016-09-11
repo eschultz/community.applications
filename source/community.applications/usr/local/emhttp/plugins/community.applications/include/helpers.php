@@ -8,6 +8,7 @@ require_once("/usr/local/emhttp/plugins/community.applications/include/paths.php
 require_once("/usr/local/emhttp/plugins/dynamix/include/Wrappers.php");
 $unRaidSettings = parse_ini_file($communityPaths['unRaidVersion']);
 $unRaidVersion = $unRaidSettings['version'];
+
 ###########################################################################
 #                                                                         #
 # Helper function to determine if a plugin has an update available or not #
@@ -28,6 +29,22 @@ function checkPluginUpdate($filename) {
     return false;
   }
 }
+
+#############################################################
+#                                                           #
+# Helper function to return an array of directory contents. #
+# Returns an empty array if the directory does not exist    #
+#                                                           #
+#############################################################
+
+function dirContents($path) {
+  $dirContents = @scandir($path);
+  if ( ! $dirContents ) {
+    $dirContents = array();
+  }
+  return array_diff($dirContents,array(".",".."));
+}
+
 ###################################################
 #                                                 #
 # Converts a file size to a human readable string #
