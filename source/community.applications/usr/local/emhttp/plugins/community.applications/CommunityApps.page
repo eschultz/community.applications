@@ -331,26 +331,33 @@ function forceUpdate() {
 }
 
 function forceUpdateButton() {
-  swal({
-    title: "Switch To Legacy Mode?",
-    text: "<strong>This will force CA to manually download the application XML's.  Normally there is no reason to do this as CA automatically downloads the latest application list whenever it starts up (updated every two hours)</strong><br><br><font color='red'>This process once begun cannot be aborted and will take 2-3 minutes</font>",
-    type: "warning",
-    confirmButtonColor: "#DD6B55",
-    confirmButtonText: "Update Lists",
-    showCancelButton: true,
-    showConfirmButton: true,
-    closeOnConfirm: false,
-    allowOutsideClick: true,
-    showLoaderOnConfirm: true,
-    html: true
-  },
-  function(isConfirm) {
-    if (isConfirm) {
-      $.post(URL,{action:'force_update_button'});
-      swal("Updating Applications","This will take a few minutes","info");
-      forceUpdate();
-    }
-  });
+  var mode = $('#updateButton').val();
+  if ( mode == 'appFeed Mode' ) {
+    $.post(URL,{action:'force_update_button'});
+    myAlert("Updating Content","Retrieving the latest application Lists","/plugins/community.applications/images/spinner2.gif","40x40");
+    forceUpdate();
+  } else {
+    swal({
+      title: "Switch To Legacy Mode?",
+      text: "<strong>This will force CA to manually download the application XML's.  Normally there is no reason to do this as CA automatically downloads the latest application list whenever it starts up (updated every two hours)</strong><br><br><font color='red'>This process once begun cannot be aborted and will take 2-3 minutes</font>",
+      type: "warning",
+      confirmButtonColor: "#DD6B55",
+      confirmButtonText: "Update Lists",
+      showCancelButton: true,
+      showConfirmButton: true,
+      closeOnConfirm: false,
+      allowOutsideClick: true,
+      showLoaderOnConfirm: true,
+      html: true
+    },
+    function(isConfirm) {
+      if (isConfirm) {
+        $.post(URL,{action:'force_update_button'});
+        swal("Updating Applications","This will take a few minutes","info");
+        forceUpdate();
+      }
+    });
+  }
 }
 
 function enableButtons() {

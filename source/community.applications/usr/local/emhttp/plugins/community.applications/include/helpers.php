@@ -248,7 +248,9 @@ function fixTemplates($template) {
   if ( is_array($template['Support']) ) {
     unset($template['Support']);
   }
-  
+  if ( ! is_string($template['Name'])  ) $template['Name']=" ";
+  if ( ! is_string($template['Author']) ) $template['Author']=" ";
+  if ( ! is_string($template['Description']) ) $template['Description']=" "; 
   if ( is_array($template['Beta']) ) {
     $template['Beta'] = "false";
   } else {
@@ -468,7 +470,6 @@ function readXmlFile($xmlfile) {
   return $o;
 }
 
-
 ###################################################################
 #                                                                 #
 # Function To Merge Moderation into templates array               #
@@ -576,6 +577,19 @@ function getSortOrder($sortArray) {
     $sortOrder[$sort[0]] = $sort[1];
   }
   return $sortOrder;
+}
+
+#################################################
+#                                               #
+# Sets the updateButton to the appropriate Mode #
+#                                               #
+#################################################
+
+function caGetMode() {
+  global $communityPaths;
+  
+  $caMode = ( is_file($communityPaths['LegacyMode']) ) ? "appFeed Mode" : "Legacy Mode";
+  return "<script>$('#updateButton').val('$caMode');</script>";
 }
 
 ############################################################################

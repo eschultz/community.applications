@@ -97,7 +97,7 @@ function DownloadCommunityTemplates() {
     $friendlyName = str_replace("/","",$friendlyName);
 
     if ( ! $downloaded = $DockerTemplates->downloadTemplates($communityPaths['templates-community']."/templates/$friendlyName", $downloadURL) ){
-      file_put_contents($communityPaths['updateErrors'],"Failed to download ".$downloadRepo['name']." ".$downloadRepo['url']."<br>",FILE_APPEND);
+      file_put_contents($communityPaths['updateErrors'],"Failed to download <font color='purple'>".$downloadRepo['name']."</font> ".$downloadRepo['url']."<br>",FILE_APPEND);
       @unlink($downloadURL);
     } else {
       $templates = array_merge($templates,$downloaded);
@@ -115,7 +115,7 @@ function DownloadCommunityTemplates() {
       if (is_file($file)){
         $o = readXmlFile($file);
         if ( ! $o ) {
-          file_put_contents($communityPaths['updateErrors'],"Failed to parse $file (errors in XML file?)<br>",FILE_APPEND);
+          file_put_contents($communityPaths['updateErrors'],"Failed to parse <font color='purple'>$file</font> (errors in XML file?)<br>",FILE_APPEND);
         }
         if ( ! $o['Repository'] ) {
           if ( ! $o['Plugin'] ) {
@@ -151,8 +151,7 @@ function DownloadCommunityTemplates() {
             $o['Branch'][] = $tmp;
           }
           foreach($o['Branch'] as $branch) {
-
-            $i = $i + 1;
+            $i = ++$i;
             $subBranch = $o;
             $masterRepository = explode(":",$subBranch['Repository']);
             $o['BranchDefault'] = $masterRepository[1];
@@ -176,7 +175,7 @@ function DownloadCommunityTemplates() {
           file_put_contents($o['Path'],makeXML($o));
           $myTemplates[$o['ID']] = $o;
         }
-        $i = $i + 1;
+        $i = ++$i;
       }
     }
   }
@@ -274,7 +273,7 @@ function DownloadApplicationFeed() {
     $o['Category'] = str_replace("Status:Beta","",$o['Category']);    # undo changes LT made to my xml schema for no good reason
     $o['Category'] = str_replace("Status:Stable","",$o['Category']);
     $myTemplates[$i] = $o;
- # start comment block here
+ 
     if ( is_array($file['Branch']) ) {
       if ( ! $file['Branch'][0] ) {
         $tmp = $file['Branch'];
@@ -302,7 +301,6 @@ function DownloadApplicationFeed() {
         file_put_contents($subBranch['Path'],makeXML($subBranch));
       }
     }
-# end comment block here
     unset($file['Branch']);
     $myTemplates[$o['ID']] = $o;
     $i = ++$i;
@@ -318,7 +316,6 @@ function getConvertedTemplates() {
   global $communityPaths, $infoFile, $plugin, $communitySettings;
 
 # Start by removing any pre-existing private (converted templates)
-
   $templates = readJsonFile($communityPaths['community-templates-info']);
 
   foreach ($templates as $template) {
@@ -594,6 +591,7 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
     $ct .= $t;
   }
   $ct .= $skin[$viewMode]['footer'];
+  $ct .= caGetMode();
   return $ct;
 }
 
@@ -861,9 +859,10 @@ case 'get_content':
         writeJsonFile($communityPaths['lastUpdated-old'],$lastUpdated);
         if (is_file($communityPaths['updateErrors'])) {
           echo "<table><td><td colspan='5'><br><center>The following errors occurred:<br><br>";
-          echo "<strong><font color='purple'>".file_get_contents($communityPaths['updateErrors'])."</font></strong></center></td></tr></table>";
+          echo "<strong>".file_get_contents($communityPaths['updateErrors'])."</strong></center></td></tr></table>";
           echo "<script>$('#templateSortButtons,#total1').hide();$('#sortButtons').hide();</script>";
           echo changeUpdateTime();
+          echo caGetMode();
           break;
         }
       }
@@ -950,10 +949,6 @@ case 'get_content':
     if ( $category && ! preg_match($category,$template['Category'])) { continue; }
 
     if ($filter) {
-      if ( ! is_string($template['Name'])  ) $template['Name']=" ";
-      if ( ! is_string($template['Author']) ) $template['Author']=" ";
-      if ( ! is_string($template['Description']) ) $template['Description']=" ";
-
       if (preg_match("#$filter#i", $template['Name']) || preg_match("#$filter#i", $template['Author']) || preg_match("#$filter#i", $template['Description']) || preg_match("#$filter#i", $template['Repository'])) {
         $template['Description'] = highlight($filter, $template['Description']);
         $template['Author'] = highlight($filter, $template['Author']);
@@ -1072,7 +1067,9 @@ case 'force_update':
 ####################################################################################################
 
 case 'force_update_button':
-  file_put_contents($communityPaths['appFeedOverride'],"dunno");
+  if ( ! is_file($communityPaths['LegacyMode']) ) {
+    file_put_contents($communityPaths['appFeedOverride'],"dunno");
+  }
   @unlink($infoFile);
   break;
 
