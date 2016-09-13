@@ -249,6 +249,12 @@ function getSettings() {
   
   $(".setting").each(function() {
     var value = $(this).val();
+    if ( (typeof value != "string" ) ) {
+      var value = "something really went wrong here";
+    }
+    if ( (value == null) ) {
+      value = " ";
+    }
     value = value.trim();
     $(this).val(value);
     var newSetting = new Array(this.id,value);
