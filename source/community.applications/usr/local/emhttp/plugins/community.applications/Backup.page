@@ -257,6 +257,9 @@ function getSettings() {
     }
     value = value.trim();
     $(this).val(value);
+    if ( ! this.id ) {
+      this.id = 'unknownID';
+    }
     var newSetting = new Array(this.id,value);
     
     settings.push(newSetting);
