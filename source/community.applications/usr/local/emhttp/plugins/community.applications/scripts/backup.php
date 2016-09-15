@@ -80,7 +80,7 @@ $basePathBackup = $backupOptions['destination']."/".$backupOptions['destinationS
 
 if ( ! $backupOptions['dockerIMG'] )     { $backupOptions['dockerIMG'] = "exclude"; }
 if ( ! $backupOptions['notification'] )  { $backupOptions['notification'] = "always"; }
-if ( $backupOptions['deleteOldBackup'] == 0 ) { $backupOptions['deleteOldBackup'] = ""; }
+if ( ( $backupOptions['deleteOldBackup'] == "" ) || ( $backupOptions['deleteOldBackup'] == "0" ) ) { $backupOptions['fasterRsync'] = "no"; }
 
 if ( $restore ) {
   if ( $backupOptions['datedBackup'] == "yes" ) {
