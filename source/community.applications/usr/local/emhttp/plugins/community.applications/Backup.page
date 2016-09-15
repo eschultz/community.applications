@@ -32,6 +32,12 @@ if ( ! isset($backupOptions['backupFlash']) ) { $backupOptions['backupFlash'] = 
 if ( ! isset($backupOptions['backupXML']) ) { $backupOptions['backupXML'] = "appdata"; }
 if ( ! isset($backupOptions['logBackup']) ) { $backupOptions['logBackup'] = "no"; }
 
+# fix logBackup due to my oops
+
+if ( $backupOptions['logBackup'] != "no" && $backupOptions['logBackup'] != "yes" && $backupOptions['logBackup'] != "append" ) {
+  $backupOptions['logBackup'] = "no";
+}
+
 # fix destinationShare for compatibility with initial release
 
 $backupOptions['destinationShare'] = "/mnt/user/".$backupOptions['destinationShare'].'/';
@@ -258,9 +264,11 @@ function getSettings() {
     value = value.trim();
     $(this).val(value);
     if ( ! this.id ) {
-      this.id = 'unknownID';
+      var ID = 'unknownID';
+    } else {
+      var ID = this.id;
     }
-    var newSetting = new Array(this.id,value);
+    var newSetting = new Array(ID,value);
     
     settings.push(newSetting);
   });

@@ -248,14 +248,15 @@ switch ($backupOptions['logBackup']) {
     toDOS($communityPaths['backupLog'],"/boot/config/plugins/community.applications/backup.log",true);
     $logMessage = " - Log is available on the flash drive at /config/plugins/community.applications/backup.log";
     break;
-  default:
-    $logMessage = "";
-    logger("Rsync log to flash drive disabled");
-    break;
   case 'no':
     $logMessage = "";
     logger("Rsync log to flash drive disabled");
     break;
+  default:
+    $logMessage = "";
+    logger("Rsync log to flash drive disabled");
+    break;
+
 }
 
 if ( ($backupOptions['notification'] == "always") || ($backupOptions['notification'] == "completion") || ( ($backupOptions['notification'] == "errors") && ($type == "warning") )  ) {

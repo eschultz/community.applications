@@ -46,7 +46,7 @@ require_once 'webGui/include/Markdown.php';
   if ( ($donatelink) && ($donateimg) ) {
     $appInformation .= "<br><center><font size='0'>$donatetext</font><br><a href='$donatelink' target='_blank'><img src='$donateimg' style='max-height:25px;'></a>";
     if ( $template['RepoName'] != "Squid's plugin Repository" ) {
-      $templateDescription .= "<br><font size='0'>The above link is set by the author of the template, not the author of Community Applications</font></center>";
+      $appInformation .= "<br><font size='0'>The above link is set by the author of the template, not the author of Community Applications</font></center>";
     }
   }
   $appInformation = "<style>body { margin-left:20px;margin-right:20px }</style>$appInformation";
