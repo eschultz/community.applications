@@ -50,7 +50,7 @@ $destinationShareList = array();
 $udList = array();
 $sharesList = array();
 $disksList = array();
-$userSharesAllowed = version_compare($unRaidVersion,"6.2.0-rc3",">=");
+$userSharesAllowed = version_compare($unRaidVersion,"6.2.0-rc3",">=") || version_compare($unRaidVersion,"6.2",">=");
 
 if ( $userSharesAllowed ) {
   $disksDisallowed = array(".","..","user0","disks","cache");
