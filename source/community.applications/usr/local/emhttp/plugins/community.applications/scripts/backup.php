@@ -311,8 +311,9 @@ if ( ! startsWith($destination,"/mnt/user") ) {
 if ( $returnValue > 0 ) {
   logger("Rsync Errors Occurred: $message");
   logger("Possible rsync errors:");
-  exec("cat ".$communityPaths['backupLog']." | grep rsync",$rsyncLog);
+  exec("cat ".$communityPaths['backupLog']." | grep rsync -m 10",$rsyncLog);
   foreach ($rsyncLog as $logLine) {
+    ++$line;
     logger($logLine);
     file_put_contents($communityPaths['backupLog'],$logLine,FILE_APPEND);
   }
