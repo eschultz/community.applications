@@ -2,8 +2,8 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.applications">
 <!ENTITY author    "Andrew Zawadzki">
-<!ENTITY version   "2016.09.07c">
-<!ENTITY md5       "090a9e676db3d93733b577d7859efb07">
+<!ENTITY version   "2016.09.15">
+<!ENTITY md5       "5cef55d5e37035e4fa3c6f9b17aa86cb">
 <!ENTITY launch    "Settings/PluginSettings">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/community.applications">
@@ -13,6 +13,19 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
+###2016.09.15###
+- Fixed minor compatibilty issues with 6.2 Final
+- Changed: Only log maximum 10 rsync errors in backup module
+- Fixed: disallow faster rsync option if days to keep backup sets is disabled (or set to 0)
+- Fixed: backup to flashdrive setting (entry could have been possibly corrupted under 2016.09.03)
+- Added: Script to delete old dated backups in addition to ALL backups and error backups only
+- Changed: Update Apps now called Legacy Mode.  Selecting again goes back to appFeed mode
+- Removed: Private Repositories via a GitHub repo.
+- Added: Selectable notifications on autoupdates of plugins
+- Added: XML Branch support while in Legacy Mode
+- Fixed: Display aberrations while in legacy mode if some repositories didn't download
+- Added: Legacy mode will now display any XML's which failed to parse
+
 ###2016.09.07###
 - Fixed VM XML's not backing up under certain circumstances
 - Do not delete XML backups if source is no longer available
