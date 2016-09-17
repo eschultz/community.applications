@@ -8,6 +8,7 @@ require_once("/usr/local/emhttp/plugins/community.applications/include/paths.php
 require_once("/usr/local/emhttp/plugins/dynamix/include/Wrappers.php");
 $unRaidSettings = parse_ini_file($communityPaths['unRaidVersion']);
 $unRaidVersion = $unRaidSettings['version'];
+if ($unRaidVersion == "6.2") $unRaidVersion = "6.2.0";
 
 ###########################################################################
 #                                                                         #

@@ -6,6 +6,8 @@
 #                                                             #
 ###############################################################
 
+$_SERVER['DOCUMENT_ROOT'] = "/usr/local/emhttp";
+
 require_once("/usr/local/emhttp/plugins/community.applications/include/paths.php");
 require_once("/usr/local/emhttp/plugins/community.applications/include/helpers.php");
 require_once("/usr/local/emhttp/plugins/dynamix.docker.manager/include/DockerClient.php");
