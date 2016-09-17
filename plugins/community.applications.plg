@@ -2,8 +2,8 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.applications">
 <!ENTITY author    "Andrew Zawadzki">
-<!ENTITY version   "2016.09.15">
-<!ENTITY md5       "5cef55d5e37035e4fa3c6f9b17aa86cb">
+<!ENTITY version   "2016.09.17">
+<!ENTITY md5       "ae4625a1f8d42eaa74beda2015c4dccd">
 <!ENTITY launch    "Settings/PluginSettings">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/community.applications">
@@ -13,6 +13,9 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
+###2016.09.17###
+- Compatibility fix for dynamix.bleeding.edge.plg
+
 ###2016.09.15###
 - Fixed minor compatibilty issues with 6.2 Final
 - Changed: Only log maximum 10 rsync errors in backup module
