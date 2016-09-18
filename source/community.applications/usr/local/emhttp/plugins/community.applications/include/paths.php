@@ -57,6 +57,8 @@ $communityPaths['pinned']                        = "/boot/config/plugins/communi
 $communityPaths['appOfTheDay']                   = $communityPaths['persistentDataStore']."/appOfTheDay.json";
 $communityPaths['defaultSkin']                   = "/usr/local/emhttp/plugins/community.applications/skins/default.skin";
 $communityPaths['LegacyMode']                    = $communityPaths['templates-community']."/legacyModeActive";
+$communityPaths['autoUpdateKillSwitch']          = "/usr/local/emhttp/plugins/community.applications/autoUpdateKill";
+
 $infoFile                                        = $communityPaths['community-templates-info'];
 $docker_repos                                    = $communityPaths['template-repos'];
 
