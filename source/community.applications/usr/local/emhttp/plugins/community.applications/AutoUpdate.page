@@ -3,7 +3,6 @@ Title="Auto Update Settings"
 Icon="update.png"
 ---
 <?
-$_SERVER['DOCUMENT_ROOT'] = "/usr/local/emhttp";
 require_once("/usr/local/emhttp/plugins/dynamix.plugin.manager/include/PluginHelpers.php");
 
 $plugin = "community.applications";

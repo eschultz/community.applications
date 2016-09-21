@@ -17,18 +17,24 @@ if ($unRaidVersion == "6.2") $unRaidVersion = "6.2.0";
 ###########################################################################
 
 function checkPluginUpdate($filename) {
+  global $unRaidVersion;
+
   $filename = basename($filename);
-  $installedVersion = exec("/usr/local/emhttp/plugins/dynamix.plugin.manager/scripts/plugin version /var/log/plugins/$filename");
+  $installedVersion = plugin("version","/var/log/plugins/$filename");
   if ( is_file("/tmp/plugins/$filename") ) {
-    $upgradeVersion = exec("/usr/local/emhttp/plugins/dynamix.plugin.manager/scripts/plugin version /tmp/plugins/$filename");
+    $upgradeVersion = plugin("version","/tmp/plugins/$filename");
   } else {
     $upgradeVersion = "0";
   }
   if ( $installedVersion < $upgradeVersion ) {
-    return true;
-  } else {
-    return false;
+    $unRaid = plugin("unRAID","/tmp/plugins/$filename");
+    if ( $unRaid === false || version_compare($unRaidVersion['version'],$unRaid,">=") ) {
+      return true;
+    } else {
+      return false;
+    }
   }
+  return false;
 }
 
 #############################################################

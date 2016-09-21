@@ -14,8 +14,6 @@ if ( $argv[1] == "restore" ) {
   $restoreMsg = "Backup";
 }
 
-$_SERVER['DOCUMENT_ROOT'] = "/usr/local/emhttp";
-
 require_once("/usr/local/emhttp/plugins/dynamix.docker.manager/include/DockerClient.php");
 require_once("/usr/local/emhttp/plugins/community.applications/include/paths.php");
 require_once("/usr/local/emhttp/plugins/community.applications/include/helpers.php");

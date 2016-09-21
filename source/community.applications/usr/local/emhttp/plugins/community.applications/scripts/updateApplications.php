@@ -1,6 +1,5 @@
 #!/usr/bin/php
 <?PHP
-$_SERVER['DOCUMENT_ROOT'] = "/usr/local/emhttp";
 require_once("/usr/local/emhttp/plugins/dynamix.plugin.manager/include/PluginHelpers.php");
 require_once("/usr/local/emhttp/plugins/community.applications/include/paths.php");
 
