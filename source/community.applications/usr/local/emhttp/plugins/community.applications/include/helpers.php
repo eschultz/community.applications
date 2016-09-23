@@ -429,7 +429,13 @@ function readXmlFile($xmlfile) {
   if ( $o['Config']['@attributes'] ) {
     $o['Config'] = array('@attributes'=>$o['Config']['@attributes'],'value'=>$o['Config']['value']);
   }
-    
+  if ( $o['Plugin'] ) {
+    $o['Author']     = $o['PluginAuthor'];
+    $o['Repository'] = getRedirectedURL($o['PluginURL']);
+    $o['Category']   .= " Plugins: ";
+    $o['SortAuthor'] = $o['Author'];
+    $o['SortName']   = $o['Name'];
+  }
   return $o;
   
 /*   $doc = new DOMDocument();
@@ -614,6 +620,22 @@ function caGetMode() {
   
   $caMode = ( is_file($communityPaths['LegacyMode']) ) ? "appFeed Mode" : "Legacy Mode";
   return "<script>$('#updateButton').val('$caMode');</script>";
+}
+
+################################################
+#                                              #
+# Returns the actual URL after any redirection #
+#                                              #
+################################################
+
+function getRedirectedURL($url) {
+  $ch = curl_init();
+  curl_setopt($ch, CURLOPT_URL, $url);
+  curl_setopt($ch, CURLOPT_HEADER, true);
+  curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  $a = curl_exec($ch);
+  return curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
 }
 
 ############################################################################

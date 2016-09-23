@@ -232,7 +232,8 @@ function DownloadApplicationFeed() {
     $o['Path']          = $communityPaths['templates-community']."/".$i.".xml";
     if ( $o['Plugin'] ) {
       $o['Author']        = $o['PluginAuthor'];
-      $o['Repository']    = $o['PluginURL'];
+      $o['Repository']    = getRedirectedURL($o['PluginURL']);
+      $o['PluginURL']     = $o['Repository'];
       $o['Category']      .= " Plugins: ";
       $o['SortAuthor']    = $o['Author'];
       $o['SortName']      = $o['Name'];
@@ -1505,17 +1506,17 @@ case 'previous_apps':
       $filename = pathinfo($template['Repository'],PATHINFO_BASENAME);
 
       if ( file_exists("/var/log/plugins/$filename") ) {
-        $localURL = parse_url(plugin("pluginURL","/var/log/plugins/$filename"));
-        $remoteURL = parse_url($template['PluginURL']);
-
-        if ( $localURL['path'] == $remoteURL['path'] ) {
+        $localURL = plugin("pluginURL","/var/log/plugins/$filename");
+        $remoteURL = $template['PluginURL'];
+        if ( $localURL != $remoteURL ) { $localURL = getRedirectedURL($localURL); $remoteURL = getRedirectedURL($remoteURL);} # Get the redirected URL just incase that's the problem
+        if ( $localURL == $remoteURL ) {
           $template['MyPath'] = "/var/log/plugins/$filename";
           $template['Uninstall'] = true;
           if ( checkPluginUpdate($filename) ) {
             $template['UpdateAvailable'] = true;
           }
           $displayed[] = $template;
-       }
+        }
       }
     }
   } else {
