@@ -11,12 +11,12 @@ $pluginsFolder = scandir("/var/log/plugins");
 
 # get the settings already selected
 
-$updateSettings = json_decode(@file_get_contents("/boot/config/plugins/community.applications/AutoUpdate.json"),true);
-if ( ! $updateSettings['notify'] ) { $updateSettings['notify'] = "yes"; }
+$updateSettings = json_decode(@file_get_contents("/boot/config/plugins/community.applications/AutoUpdateSettings.json"),true);
 if ( ! $updateSettings ) {
   $updateSettings['community.applications.plg'] = "true";
   $updateSettings['fix.common.problems.plg'] = "true";
 }
+if ( ! $updateSettings['notify'] ) { $updateSettings['notify'] = "yes"; }
 
 if ( $updateSettings['Global'] == "true" ) {
   $globalUpdate = "selected";
