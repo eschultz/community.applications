@@ -3,6 +3,11 @@
 require_once("/usr/local/emhttp/plugins/dynamix.plugin.manager/include/PluginHelpers.php");
 require_once("/usr/local/emhttp/plugins/community.applications/include/paths.php");
 
+function logger($string) {
+  $string = escapeshellarg($string);
+  shell_exec("logger $string");
+}
+
 function checkPluginUpdate($filename) {
   global $unRaidVersion;
   
@@ -34,12 +39,16 @@ if ( ! $appList ) {
   $appList['community.applications.plg'] = "true";
   $appList['fix.common.problems.plg'] = "true";
 }
+if ( ! $appList['delay'] ) {
+  $appList['delay'] = 5;
+}
 
 $pluginsInstalled = array("community.applications.plg") + array_diff(scandir("/var/log/plugins"),array(".","..","community.applications.plg"));
 exec("logger Community Applications Auto Update Running");
+$currentDate = date_create(now);
 foreach ($pluginsInstalled  as $plugin) {
   if ( is_file($communityPaths['autoUpdateKillSwitch']) ) {
-    exec("logger Auto Update Kill Switch Activated.  Most likely details why on the forums");
+    logger("Auto Update Kill Switch Activated.  Most likely details why on the forums");
     notify("Community Applications","AutoUpdate Kill Switch has been activated.  See Forum for details","","error");
     break;
   }
@@ -49,14 +58,32 @@ foreach ($pluginsInstalled  as $plugin) {
   if ( $plugin == "unRAIDServer.plg" ) { continue; }
   if ( checkPluginUpdate($plugin) ) {
     if ( $appList['Global'] == "true" || $appList[$plugin] ) {
-      exec("logger Auto Updating $plugin");
       exec("/usr/local/emhttp/plugins/dynamix.plugin.manager/scripts/plugin check '$plugin'");
-      exec("/usr/local/emhttp/plugins/dynamix.plugin.manager/scripts/plugin update '$plugin'");
-      if ( $appList['notify'] != "no" ) {
-        notify("Community Applications","Application Auto Update",$plugin." Automatically Updated");
+      $pluginVersion = plugin("version","/tmp/plugins/$plugin");
+      $installedVersion = plugin("version","/var/log/plugins/$plugin");
+      if ( $pluginVersion == $installedVersion) continue;
+      if ( ! $pluginVersion ) continue;
+      $pluginVersion = preg_replace('/[^0-9.]+/', "", $pluginVersion); # get rid of any alphabetic suffixes on the version date
+      $pluginDate = date_create_from_format("Y.m.d",$pluginVersion);
+      if ( ! $pluginDate ) {
+        logger("$plugin has a non-conforming version string.  Cannot autoupdate");
+        continue;
+      }
+      $interval = date_diff($currentDate,$pluginDate);
+      $age = $interval->format("$R%a");
+      if ( ($age >= $appList['delay']) || ($appList['delay'] == 0) ) {
+        logger("Auto Updating $plugin");
+        exec("mkdir -p /boot/config/plugins-updated");
+        exec("cp '/var/log/plugins/$plugin' '/boot/config/plugins-updated'");
+        exec("/usr/local/emhttp/plugins/dynamix.plugin.manager/scripts/plugin update '$plugin'");
+        if ( $appList['notify'] != "no" ) {
+          notify("Community Applications","Application Auto Update",$plugin." Automatically Updated");
+        }
+      } else {
+        logger("$plugin version $pluginVersion does not meet age requirements to update");
       }
     } else {
-      exec("logger Update available for $plugin - Skipping Auto Update");
+      logger("Update available for $plugin (Not set to Auto Update)");
     }
   }
 }

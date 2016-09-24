@@ -17,7 +17,7 @@ if ( ! $updateSettings ) {
   $updateSettings['fix.common.problems.plg'] = "true";
 }
 if ( ! $updateSettings['notify'] ) { $updateSettings['notify'] = "yes"; }
-
+if ( ! $updateSettings['delay'] ) { $updateSettings['delay'] = 5; }
 if ( $updateSettings['Global'] == "true" ) {
   $globalUpdate = "selected";
 } 
@@ -90,6 +90,7 @@ var URL = "/plugins/<?=$plugin?>/include/exec.php";
 $(function() {
   changeGlobal();
   $("#notify").val('<?=$updateSettings['notify']?>');
+  $("#delay").val('<?=$updateSettings['delay']?>');
 });
 
 function apply() {
@@ -102,7 +103,8 @@ function apply() {
   });
   var globalUpdate = $("#allPlugins").val();
   var notify = $("#notify").val();
-  $.post(URL,{action:'autoUpdatePlugins',globalUpdate:globalUpdate,pluginList:myvalue,notify:notify});
+  var delay = $("#delay").val();
+  $.post(URL,{action:'autoUpdatePlugins',globalUpdate:globalUpdate,pluginList:myvalue,notify:notify,delay:delay});
   $(".applyButton").prop("disabled",true);
 }
 
@@ -132,6 +134,9 @@ function changeApply() {
   <option value='yes'>Yes</option>
   <option value='no'>No</option>
 </select>
+<br><br>
+<strong>Delay in days before updating applications:</strong>
+<input type='number' id='delay' style='width:20px' oninput='changeApply();'>
 <br><br>
 <strong>Auto Update All Plugins?</strong>
 <select id='allPlugins' size='1' onchange='changeGlobal();'>

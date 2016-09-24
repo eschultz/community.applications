@@ -529,7 +529,9 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
       $pluginName = basename($template['PluginURL']);
       if ( file_exists("/var/log/plugins/$pluginName") ) {
         $pluginSettings = getPluginLaunch($pluginName);
-        $template['display_pluginSettings'] = $pluginSettings ? "<input type='submit' style='margin:0px' value='Settings' formtarget='$tabMode' formaction='$pluginSettings' formmethod='post'>" : "";
+        $tmpVar = $pluginSettings ? "" : " disabled ";
+        $template['display_pluginSettings'] = "<input type='submit' $tmpVar style='margin:0px' value='Settings' formtarget='$tabMode' formaction='$pluginSettings' formmethod='post'>";
+
       } else {
         $buttonTitle = $template['MyPath'] ? "Reinstall Plugin" : "Install Plugin";
         $template['display_pluginInstall'] = "<input type='button' value='$buttonTitle' style='margin:0px' title='Click to install this plugin' onclick=installPlugin('".$template['PluginURL']."');>";
@@ -1822,7 +1824,7 @@ case 'autoUpdatePlugins':
   $globalUpdate          = getPost("globalUpdate","no");
   $pluginList            = getPost("pluginList","");
   $updateArray['notify'] = getPost("notify","yes");
-  
+  $updateArray['delay']  = getPost("delay","5");
   $updateArray['Global'] = ( $globalUpdate == "yes" ) ? "true" : "false";
 
 
