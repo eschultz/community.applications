@@ -13,7 +13,6 @@ function checkPluginUpdate($filename) {
   } else {
     $upgradeVersion = "0";
   }
-  exec("logger $installedVersion");
   if ( $installedVersion < $upgradeVersion ) {
     $unRaid = plugin("unRAID","/tmp/plugins/$filename");
     if ( $unRaid === false || version_compare($unRaidVersion['version'],$unRaid,">=") ) {
@@ -30,7 +29,7 @@ function notify($event,$subject,$description,$message="",$type="normal") {
   shell_exec($command);
 }
 $unRaidVersion = parse_ini_file("/etc/unraid-version");
-$appList = json_decode(@file_get_contents("/boot/config/plugins/community.applications/AutoUpdate.json"),true);
+$appList = json_decode(@file_get_contents($communityPaths['autoUpdateSettings']),true);
 if ( ! $appList ) {
   $appList['community.applications.plg'] = "true";
   $appList['fix.common.problems.plg'] = "true";

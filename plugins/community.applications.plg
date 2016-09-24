@@ -2,8 +2,8 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.applications">
 <!ENTITY author    "Andrew Zawadzki">
-<!ENTITY version   "2016.09.21">
-<!ENTITY md5       "772ac3c227b10ded7cc9dbe329f4b7da">
+<!ENTITY version   "2016.09.23">
+<!ENTITY md5       "83c102228e26fb103f360c82c3947e0f">
 <!ENTITY launch    "Settings/PluginSettings">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/community.applications">
@@ -13,6 +13,12 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
+###2016.09.23###
+- NOTE: All auto update settings will be reset back to defaults with this update.  IE: Only CA and FCP will autoupdate
+- Fixed: CA under certain circumstances would show as not autoupdating in settings when in fact it would
+- Fixed: Under very specific circumstances, some plugins set to not autoupdate could in fact auto update
+- Fixed: PhAzE plugins would not show up as installed if they were
+
 ###2016.09.21###
 - Extra security tests on auto updates
 - Implement autoupdate kill switch
