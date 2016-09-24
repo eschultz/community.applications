@@ -225,54 +225,43 @@ Create a folder called <strong>/boot/config/plugins/community.applications/repos
 
 Within this folder, place any custom / private templates you might have.  (If using the dockerHub conversion section of this plugin, a folder will be automatically created here called <strong>dockerHub</strong><br>
 
-Or alternatively,
 
-Create a GitHub repository, and then on your flash drive, create a file called <strong>/boot/config/plugins/community.applications/private.repositories.json</strong>
-<br>This file has the following format:
-<blockquote>
-[<br>
-&nbsp;&nbsp;{<br>
-&nbsp;&nbsp;&nbsp;&nbsp;"name": "Whatever you want to call the repository",<br>
-&nbsp;&nbsp;&nbsp;&nbsp;"url":&nbsp;&nbsp;"the full URL to the GitHub repository"<br>
-&nbsp;&nbsp;}<br>
-]
-</blockquote>
+The templates contained in the private repository will be flagged when displayed as <font color="red">Private</font>
 
-
-In either case, the templates contained in the private repository will be flagged when displayed as <font color="red">Private</font>
-
-<strong>NOTE:</strong> Storing the private templates on the flash drive is the recommended way of creating a private repository</strong>
 <hr>
 <font size="3" color="red"><p id='settings'>General Settings</p></font>
 
 Within unRaid's Settings tab, there is a section called <em>Community Applications</em>.  A program called <em>General Settings</em> allows you to fine tune the operation of Community Applications as detailed below:
 
 
-<font color="purple">Time to display applications as new / updated</font><br>
+<font color="purple"><b>Time to display applications as new / updated</b></font><br>
 This option dictates the amount of time that a new or updated application will be flagged as new and displayed under the <strong>New / Updated</strong> category.  Defaults to 3 Months
 
-<font color="purple">Initial View Mode</font><br>
+<font color="purple"><b>Initial View Mode</b></font><br>
 This option sets the initial view mode when you first load the plugin.  Defaults to Icons
 
-<font color="purple">Favourite Repository</font><br>
+<font color="purple"><b>Favourite Repository</b></font><br>
 This option allows you to set a "favourite" repository.  If set, then applications from that repository will display before all others.  Defaults to None
 
-<font color="purple">Icon Size</font><br>
+<font color="purple"><b>Icon Size</b></font><br>
 This option only applies to view modes Icons and Icon Details.  It sets the displaying of the icons to be either large or small (Defaults to Large)
 
-<font color="purple">Number of Columns</font><br>
+<font color="purple"><b>Number of Columns</b></font><br>
 This option only applies to Icon mode.  It will set the number of columns of applications displayed per line.  Useful on mobile devices.  Defaults to 5
 
-<font color="purple">Group Beta and Private Apps into Super Categories</font><br>
+<font color="purple"><b>Group Beta and Private Apps into Super Categories</b></font><br>
 This option separates Private and Beta applications into their own sections on any displayed result
 
-<font color="purple">Open Add / Edit / Settings in new Tab</font></br>
+<font color="purple"><b>Open Add / Edit / Settings in new Tab</b></font></br>
 This option determines whether or not a new tab will open when you add or edit or go to an app's settings.  Defaults to the same tab.
 
-<font color="purple">Hide Incompatible Applications</font><br>
+<font color="purple"><b>Hide Incompatible Applications</b></font><br>
 If CA thinks that an application is incompatible with the version of unRaid that you are using, by default it will not display the application.
 
-<font color="purple">Enable additional search results from dockerHub</font><br>
+<font color='purple'><b>Display Random App Of The Day</b></font><br>
+Enables/disables the displaying of 2 random apps of the day when entering the Apps tab
+
+<font color="purple"><b>Enable additional search results from dockerHub</b></font><br>
 This option enables the plugin to perform additional searches from dockerHub when looking for an application.  See above (Advanced - dockerHub integration for more details) Default: No
 
 
@@ -283,6 +272,12 @@ Within the Community Applications section of <em>Settings</em> there is a progra
 To utilize this option, then you must first configure the dynamix UI to check for plugin settings.  This is done via <em>Settings - Notification Settings - Plugin Version Notification</em>  Set this value to be whatever you desire (I recommend at least once per day).  Community Applications will then automatically install any available updates.  Note that you should still keep the Notifcation method of Browser / Email / Agents enabled simply to let unRaid inform you of any updates to the OS itself.  However if you keep Browser notifications active, you will still have to acknowledge the alert even if the plugin has already been updated by Community Applications.
 
 unRaid's syslog will have some additional entries as Community Applications installs or skips (if the plugin is set to not autoupdate).
+ 
+<font color='purple'><b>Send Notifications On Update</b></font><br> 
+Defaults to Yes.  This will send a notification whenever an application has been updated
+
+<font color='purple'><b>Delay In Days Before Updating Applications</b></font><br>
+Set this to the number of days after an application has been updated before autoupdating the application.  (Setting this to 0 will update the applications the same day they are released)  Defaults to 3 days. 
  
 <font color='red'><strong>Note:</strong></font> Community Applications will NOT automatically install any unRaid OS updates.
 
@@ -295,51 +290,52 @@ Within the Community Applications section of <em>Settings</em> there is a progra
 
 The settings are as follows:
 
-<font color="purple">Appdata Share (Source)</font><br>
+<font color="purple"><b>Appdata Share (Source)</b></font><br>
 This is the cache-only share where all of your docker appdata is stored (usually /mnt/cache/appdata).  Note that if your appdata folder is <em>not</em> listed here, then this module will not function for you.
 
-<font color="purple">Save to Disk#</font><br>
+<font color="purple"><b>Save to Disk#</b></font><br>
 This sets which disk on your array to save the backup to (see notes below)
 
-<font color="purple">Destination Share</font><br>
+<font color="purple"><b>Destination Share</b></font><br>
 This sets which share (and subfolder if chosen) to store the backup to (see notes below)
 
-<font color="purple">Excluded Folders</font><br>
+<font color="purple"><b>Excluded Folders</b></font><br>
 Use the excluded folder browser to select which folders within your appdata share to <em>not</em> include in the backup (ie: if you are also storing VM images within the appdata folder)
 
-<font color='purple'>Backup USB Flash Drive</font><br>
+<font color='purple'><b>Backup USB Flash Drive</b></font><br>
 This will backup up your USB flash drive.  Settings are (Same folder as appdata, separate folder, don't backup).  An additional file is automatically added to the config folder of the backup (and on the flash drive) called DISK ASSIGNMENTS.txt)  This contains all of the drive assignments (Parity, cache, disk1, etc) current as of the backup time.  /boot/config/super.dat is renamed just in case of a hardware change happening inbetween backups (ie: the parity disk at the backup was exchanged and the original placed into the array) which can cause data loss.<br>
 Also, note that in the case of the destination being placed on the array (pretty much guaranteed in the case of same folder as appdata), then in the event of a complete flash failure, you cannot gain access to any of the backed up settings until you assign all of the disks back.  For the ultimate in protection, use the unassigned devices plugin and set the destination to be a SMB share from your desktop computer.
 
-<font color="purple">Notification Settings</font><br>
+<font color="purple"><b>Notification Settings</b></font><br>
 This determines under what circumstances a notification (set up via Settings - Notification Settings) is sent:  (Disabled, Start And Stop, Completion Only, Errors Only)
 
-<font color="purple">Path To Custom Stop / Start Script</font>
+<font color="purple"><b>Path To Custom Stop / Start Script</b></font>
 These two options allow you to run a custom script to run prior to the backup (and after the backup is completed) in order to perform any maintenance tasks, shut down plugins (if you want them backed up), etc
 
-<font color="purple">Rsync Options</font><br>
+<font color="purple"><b>Rsync Options</b></font><br>
 This entry will allow you to add any custom options to the rsync command that the backup operation uses.  If you don't know what you're doing, don't touch this entry!
 
-<font color="purple">Run Scripts in place of or in addition to</font><br>
-Setting this to "in place of" effectively disabled the backup command, and allows the custom scripts to perform the actual backup.
+<font color="purple"><b>Run Scripts in place of or in addition to</b></font><br>
+Setting this to "in place of" effectively disabled the backup command, and allows the custom scripts to perform the actual backup.  Note that CA will still automatically stop and start the docker applications for you.
 
-<font color="purple">Scheduled Backup Frequency</font><br>
+<font color="purple"><b>Scheduled Backup Frequency</b></font><br>
 Set these options to determine how often to run a scheduled backup operation (or include a custom CRON entry to manually make the schedule yourself)
 
-<font color="purple">Put backups into separate dated subfolders?</font><br>
+<font color="purple"><b>Put backups into separate dated subfolders?</b></font><br>
 Setting this will create a separate folder (date and time) each time you run the backup.
 
-<font color="purple">Delete backups after how many days?</font><br>
+<font color="purple"><b>Delete backups after how many days?</b></font><br>
 This is available when creating separate folders for each backup.  It will automatically delete backups that are older than the number of days you specify.  After a successful backup, then the old backups will be deleted.   In the event of a failed backup, no old backup sets will be deleted.
 
-<font color="purple">Attempt faster rsyncs?</font><br>
+<font color="purple"><b>Attempt faster rsyncs?</b></font><br>
 This option is available when creating separate foldersfor each backup.  When it is set to "no (default)", the backup (rsync) command will have to copy ALL of the files over.  If you set it to "yes", then prior to copying, one of the backups which are slated to be deleted will be renamed to be the same date and time as the backup that is about to run.  This will allow the rsync command to only have to copy the files which are changed over.  This can result in significantly faster backup times.  The downside is that in the event of the backup failing (for whatever reason), you will have lost the previously made backup.
 
 NOTES:
 
 <font size='3'><b>All files within your chosen destination folder will be deleted during a backup process</b></font>
 
-Destinations have to be sent to a share <b>and</b> to a disk.  The reasons for this is due to symlinks (which is a subject unto itself), but the net result is that the only way to guarantee a successful backup / restore is to send the backup to a disk share.
+When using unRaid 6.1.x, destinations have to be sent to a share <b>and</b> to a disk.  The reasons for this is due to hardlinks (which is a subject unto itself), but the net result is that the only way to guarantee a successful backup / restore is to send the backup to a disk share.
+<br>Using 6.2+, destinations can be set to a user share (select <b>user</b> as the disk #), as 6.2 properly supports hardlinks on user shares.  The share you select however should be set to not use the cache drive however.
 
 <hr>
 <p id='restoreAppdata'></p>
