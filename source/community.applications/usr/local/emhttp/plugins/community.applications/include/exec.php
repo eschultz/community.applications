@@ -232,7 +232,7 @@ function DownloadApplicationFeed() {
     $o['Path']          = $communityPaths['templates-community']."/".$i.".xml";
     if ( $o['Plugin'] ) {
       $o['Author']        = $o['PluginAuthor'];
-      $o['Repository']    = getRedirectedURL($o['PluginURL']);
+      $o['Repository']    = $o['PluginURL'];
       $o['PluginURL']     = $o['Repository'];
       $o['Category']      .= " Plugins: ";
       $o['SortAuthor']    = $o['Author'];
