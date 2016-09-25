@@ -1824,7 +1824,7 @@ case 'autoUpdatePlugins':
   $globalUpdate          = getPost("globalUpdate","no");
   $pluginList            = getPost("pluginList","");
   $updateArray['notify'] = getPost("notify","yes");
-  $updateArray['delay']  = getPost("delay","5");
+  $updateArray['delay']  = getPost("delay","3");
   $updateArray['Global'] = ( $globalUpdate == "yes" ) ? "true" : "false";
 
 

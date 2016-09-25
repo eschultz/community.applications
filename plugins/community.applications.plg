@@ -2,8 +2,8 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.applications">
 <!ENTITY author    "Andrew Zawadzki">
-<!ENTITY version   "2016.09.23">
-<!ENTITY md5       "83c102228e26fb103f360c82c3947e0f">
+<!ENTITY version   "2016.09.25">
+<!ENTITY md5       "fe00a16e03b6a50dfc47fafc340fb350">
 <!ENTITY launch    "Settings/PluginSettings">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/community.applications">
@@ -13,6 +13,11 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
+###2016.09.25###
+- Added: Selectable delay in days before autoupdating a plugin
+- Added: Backup of old .plg files prior to backup to support edge-case rollbacks if needed
+- Updated: Manual
+
 ###2016.09.23###
 - NOTE: All auto update settings will be reset back to defaults with this update.  IE: Only CA and FCP will autoupdate
 - Fixed: CA under certain circumstances would show as not autoupdating in settings when in fact it would

@@ -17,7 +17,7 @@ if ( ! $updateSettings ) {
   $updateSettings['fix.common.problems.plg'] = "true";
 }
 if ( ! $updateSettings['notify'] ) { $updateSettings['notify'] = "yes"; }
-if ( ! $updateSettings['delay'] ) { $updateSettings['delay'] = 5; }
+if ( ! isset($updateSettings['delay']) ) { $updateSettings['delay'] = "3"; }
 if ( $updateSettings['Global'] == "true" ) {
   $globalUpdate = "selected";
 } 

@@ -39,8 +39,8 @@ if ( ! $appList ) {
   $appList['community.applications.plg'] = "true";
   $appList['fix.common.problems.plg'] = "true";
 }
-if ( ! $appList['delay'] ) {
-  $appList['delay'] = 5;
+if ( ! isset($appList['delay']) ) {
+  $appList['delay'] = 3;
 }
 
 $pluginsInstalled = array("community.applications.plg") + array_diff(scandir("/var/log/plugins"),array(".","..","community.applications.plg"));
@@ -58,8 +58,9 @@ foreach ($pluginsInstalled  as $plugin) {
   if ( $plugin == "unRAIDServer.plg" ) { continue; }
   if ( checkPluginUpdate($plugin) ) {
     if ( $appList['Global'] == "true" || $appList[$plugin] ) {
-      exec("/usr/local/emhttp/plugins/dynamix.plugin.manager/scripts/plugin check '$plugin'");
+      exec("/usr/local/emhttp/plugins/dynamix.plugin.manager/scripts/plugin check '$plugin'"); # in case of multiple releases, get the latest one.
       $pluginVersion = plugin("version","/tmp/plugins/$plugin");
+      $pluginVersionOriginal = $pluginVersion;
       $installedVersion = plugin("version","/var/log/plugins/$plugin");
       if ( $pluginVersion == $installedVersion) continue;
       if ( ! $pluginVersion ) continue;
@@ -73,14 +74,21 @@ foreach ($pluginsInstalled  as $plugin) {
       $age = $interval->format("$R%a");
       if ( ($age >= $appList['delay']) || ($appList['delay'] == 0) ) {
         logger("Auto Updating $plugin");
-        exec("mkdir -p /boot/config/plugins-updated");
-        exec("cp '/var/log/plugins/$plugin' '/boot/config/plugins-updated'");
-        exec("/usr/local/emhttp/plugins/dynamix.plugin.manager/scripts/plugin update '$plugin'");
-        if ( $appList['notify'] != "no" ) {
-          notify("Community Applications","Application Auto Update",$plugin." Automatically Updated");
+        exec("mkdir -p /boot/config/plugins-old-versions/$plugin/$installedVersion");
+        copy("/var/log/plugins/$plugin","/boot/config/plugins-old-versions/$plugin/$installedVersion/$plugin");
+        unset($output);
+        exec("/usr/local/emhttp/plugins/dynamix.plugin.manager/scripts/plugin update '$plugin'",$output,$error);
+        if ( ! $error ) {
+          if ( $appList['notify'] != "no" ) {
+            notify("Community Applications","Application Auto Update",$plugin." Automatically Updated");
+          }
+        } else {
+          foreach ($output as $line) {
+            logger($line);
+          }
         }
       } else {
-        logger("$plugin version $pluginVersion does not meet age requirements to update");
+        logger("$plugin version $pluginVersionOriginal does not meet age requirements to update");
       }
     } else {
       logger("Update available for $plugin (Not set to Auto Update)");
