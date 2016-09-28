@@ -121,8 +121,8 @@ if ( $backupOptions['notification'] == "always" ) {
   
 if ( $backupOptions['stopScript'] ) {
   logger("executing custom stop script ".$backupOptions['stopScript']);
-  file_put_contents($communityPaths['backupLog'],"Executing custom stop script",FILE_APPEND);
-  shell_exec($backupOptions['stopScript']);
+  file_put_contents($communityPaths['backupLog'],"Executing custom stop script\n",FILE_APPEND);
+  shell_exec($backupOptions['stopScript']." >> ".$communityPaths['backupLog']);
 }
 if ( is_array($dockerRunning) ) {
   foreach ($dockerRunning as $docker) {
@@ -222,7 +222,7 @@ if ( is_array($dockerRunning) ) {
 if ( $backupOptions['startScript'] ) {
   logger("Executing custom start script ".$backupOptions['startScript']);
   file_put_contents($communityPaths['backupLog'],"Executing custom start script\n",FILE_APPEND);
-  shell_exec($backupOptions['startScript']);
+  shell_exec($backupOptions['startScript']." >> ".$communityPaths['backupLog']);
 }
 logger('#######################');
 logger("appData $restoreMsg complete");

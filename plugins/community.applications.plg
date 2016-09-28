@@ -2,8 +2,8 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.applications">
 <!ENTITY author    "Andrew Zawadzki">
-<!ENTITY version   "2016.09.25a">
-<!ENTITY md5       "53d4f5500513ee2e971d7da30f411955">
+<!ENTITY version   "2016.09.28">
+<!ENTITY md5       "4b25629a242aabfcafa90179365d87f1">
 <!ENTITY launch    "Settings/PluginSettings">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/community.applications">
@@ -13,7 +13,10 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
-###2015.09.25a###
+###2016.09.28###
+- Force redirection of additional backup scripts output console
+
+###2016.09.25a###
 - Speed up appfeed download
 
 ###2016.09.25###
