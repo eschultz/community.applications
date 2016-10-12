@@ -347,7 +347,11 @@ function makeXML($template) {
   # handle the case where there is only a single <Config> entry
   if ( $template['Config']['@attributes'] ) {
     $template['Config'][0]['@attributes'] = $template['Config']['@attributes'];
+    if ( $template['Config']['value']) {
+      $template['Config'][0]['@value'] = $template['Config']['value'];
+    }
     unset($template['Config']['@attributes']);
+    unset($template['Config']['value']);
   }
 
   # hack to fix differing schema in the appfeed vs what Array2XML class wants
