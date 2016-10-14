@@ -348,7 +348,7 @@ function makeXML($template) {
   if ( $template['Config']['@attributes'] ) {
     $template['Config'][0]['@attributes'] = $template['Config']['@attributes'];
     if ( $template['Config']['value']) {
-      $template['Config'][0]['@value'] = $template['Config']['value'];
+      $template['Config'][0]['value'] = $template['Config']['value'];
     }
     unset($template['Config']['@attributes']);
     unset($template['Config']['value']);
