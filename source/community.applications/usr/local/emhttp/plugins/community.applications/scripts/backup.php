@@ -55,7 +55,7 @@ if ( is_file($communityPaths['restoreProgress']) ) {
   exit;
 }
 @unlink($communityPaths['backupLog']);
-$dockerSettings = @parse_ini_file($communityPaths['unRaidDockerSettings']);
+$dockerSettings = @my_parse_ini_file($communityPaths['unRaidDockerSettings']);
 
 if ( $restore ) {
   file_put_contents($communityPaths['restoreProgress'],getmypid());
@@ -156,7 +156,7 @@ if ( $restore ) {
     logger("Backing up USB Flash drive config folder to $usbDestination");
     file_put_contents($communityPaths['backupLog'],"Backing up USB Flash Drive\n",FILE_APPEND);
     exec("mkdir -p '$usbDestination'");
-    $availableDisks = parse_ini_file("/var/local/emhttp/disks.ini",true);
+    $availableDisks = my_parse_ini_file("/var/local/emhttp/disks.ini",true);
     $txt .= "Disk Assignments as of ".date(DATE_RSS)."\r\n";
     foreach ($availableDisks as $Disk) {
       $txt .= "Disk: ".$Disk['name']."  Device: ".$Disk['id']."  Status: ".$Disk['status']."\r\n";

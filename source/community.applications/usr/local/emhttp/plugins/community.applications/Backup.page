@@ -12,6 +12,20 @@ function logger($string) {
   shell_exec("logger 'CA Backup: $string'");
 }
 
+####################################################################################################
+#                                                                                                  #
+# 2 Functions because unRaid includes comments in .cfg files starting with # in violation of PHP 7 #
+#                                                                                                  #
+####################################################################################################
+
+function my_parse_ini_file($file,$mode=false,$scanner_mode=INI_SCANNER_NORMAL) {
+  return parse_ini_string(preg_replace('/^#.*\\n/m', "", @file_get_contents($file)),$mode,$scanner_mode);
+}
+
+function my_parse_ini_string($string, $mode=false,$scanner_mode=INI_SCANNER_NORMAL) {
+  return parse_ini_string(preg_replace('/^#.*\\n/m', "", $string),$mode,$scanner_mode);
+}
+
 $plugin = "community.applications";
 
 $backupOptions = json_decode(@file_get_contents("/boot/config/plugins/community.applications/BackupOptions.json"),true);
@@ -41,7 +55,7 @@ if ( $backupOptions['logBackup'] != "no" && $backupOptions['logBackup'] != "yes"
 # fix destinationShare for compatibility with initial release
 
 $backupOptions['destinationShare'] = "/mnt/user/".$backupOptions['destinationShare'].'/';
-$vars = parse_ini_file("/var/local/emhttp/var.ini");
+$vars = my_parse_ini_file("/var/local/emhttp/var.ini");
 $unRaidVersion = $var['version'];
 
 
@@ -53,10 +67,7 @@ $disksList = array();
 $userSharesAllowed = version_compare($unRaidVersion,"6.2.0-rc3",">=") || version_compare($unRaidVersion,"6.2",">=");
 
 if ( $userSharesAllowed ) {
-  $disksDisallowed = array(".","..","user0","disks","cache");
-  $disksComment = "<tr><td><font color='red' size='0'>Note that using a user share as a source (or user as a destination disk) is a new feature in 6.2 allowing hardlinks on user shares.  This feature may or not be completely debugged.  While in testing I have discovered no issues, as of this moment, only cache-only shares as sources, and disks as destinations are guaranteed to provide a trouble free backup/restore</font></td></tr>";
-} else {
-  $disksDisallowed = array(".","..","user","user0","disks","cache");
+  $disksDisallowed = $userSharesAllowed ? array(".","..","user0","disks","cache") : array(".","..","user","user0","disks","cache");
 }
 
 if ( is_dir("/mnt/user") )  { $destinationShareList = array_diff(scandir("/mnt/user"),array(".","..")); }
@@ -93,7 +104,7 @@ if ( $userSharesAllowed ) {
       $flag = true;
     }
     if ( is_file("/boot/config/shares/$addShare.cfg") ) {
-      $shareCfg = parse_ini_file("/boot/config/shares/$addShare.cfg");
+      $shareCfg = my_my_parse_ini_file("/boot/config/shares/$addShare.cfg");
       if ( $shareCfg['shareUseCache'] == "yes" ) {
         $basePath = "/mnt/user/";
         $shareComment = "(user share)";
@@ -109,7 +120,6 @@ if ( $userSharesAllowed ) {
     } else {
       $cacheShares .= "<option value='$basePath$addShare' $selected>$addShare $shareComment</option>";
     }
-#    $sourceShares .= "<option value='$basePath$addShare' $selected>$addShare $shareComment</option>";
   }
   $sourceShares .= $cacheShares.$userShares;
 } else {
@@ -219,7 +229,7 @@ $(function() {
   $("#xmlDestination").val("<?=$backupOptions['xmlDestination']?>");
   
   $("#destinationShare, #startScript, #stopScript, #usbDestination, #xmlDestination").fileTreeAttach();
-
+$('#source').fileTreeAttach();
   var source = $("#source").val();
   $("#excludedFoldersList").fileTree({
     root: source,
@@ -526,15 +536,15 @@ jQuery(document).ready(function() {
 <font color='red'>Note:</font> If you are attempting to restore your appdata, then you shouldn't need to set any of the following settings if they appear correctly under the restore tab.<br><br><br>
 
 <table>
+
 <tr>
   <td><b>Appdata Share (Source):</b><br>(If your appData share is not listed, consider installing this <a href='http://lime-technology.com/forum/index.php?topic=49992.0' target='_blank'>plugin</a> in conjunction with <a href='http://lime-technology.com/forum/index.php?topic=50416.msg484239#msg484239' target='_blank'>this</a></td>
-  <td><select class='setting' id='source' onchange='changeSource();'><?=$sourceShares?></select></td>
+  <td><input type='text' class='setting' id="source" name="shareFolder" value="/mnt/user" data-pickfilter="HIDE_FILES_FILTER" data-pickroot="/mnt/user" data-pickfolders="true" onchange='changeSource();'></td>
 </tr>
 <tr>
-  <td><b>Save To Disk #:</b></td>
+  <td><b>Save To Disk # or User Share:</b></td>
   <td><select class='setting' id='destination' onchange='validateOptions();'><?=$destinationShares?></select></td>
 </tr>
-<?=$disksComment?>
 <tr>
   <td><b>Destination Share:</b><br>If using an Unassigned Devices mount as save to Disk #,<br> manually type in the destination folder here</td>
   <td><input type='text' class='setting' id="destinationShare" name="shareFolder" value="/mnt/user" data-pickfilter="HIDE_FILES_FILTER" data-pickroot="/mnt/user" data-pickfolders="true" onchange='validateOptions();'></td>

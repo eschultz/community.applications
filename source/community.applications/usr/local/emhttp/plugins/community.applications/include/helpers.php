@@ -6,9 +6,23 @@
 ###############################################################
 require_once("/usr/local/emhttp/plugins/community.applications/include/paths.php");
 require_once("/usr/local/emhttp/plugins/dynamix/include/Wrappers.php");
-$unRaidSettings = parse_ini_file($communityPaths['unRaidVersion']);
+$unRaidSettings = my_parse_ini_file($communityPaths['unRaidVersion']);
 $unRaidVersion = $unRaidSettings['version'];
 if ($unRaidVersion == "6.2") $unRaidVersion = "6.2.0";
+
+####################################################################################################
+#                                                                                                  #
+# 2 Functions because unRaid includes comments in .cfg files starting with # in violation of PHP 7 #
+#                                                                                                  #
+####################################################################################################
+
+function my_my_parse_ini_file($file,$mode=false,$scanner_mode=INI_SCANNER_NORMAL) {
+  return parse_ini_string(preg_replace('/^#.*\\n/m', "", @file_get_contents($file)),$mode,$scanner_mode);
+}
+
+function my_parse_ini_string($string, $mode=false,$scanner_mode=INI_SCANNER_NORMAL) {
+  return parse_ini_string(preg_replace('/^#.*\\n/m', "", $string),$mode,$scanner_mode);
+}
 
 ###########################################################################
 #                                                                         #
@@ -231,7 +245,7 @@ function searchArray($array,$key,$value) {
 
 function findAppdata($volumes) {
   $path = false;
-  $dockerOptions = @parse_ini_file("/boot/config/docker.cfg");
+  $dockerOptions = @my_parse_ini_file("/boot/config/docker.cfg");
   $defaultShareName = basename($dockerOptions['DOCKER_APP_CONFIG_PATH']);
   $shareName = str_replace("/mnt/user/","",$defaultShareName);
   $shareName = str_replace("/mnt/cache/","",$defaultShareName);

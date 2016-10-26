@@ -1758,7 +1758,7 @@ case 'resourceInitialize':
   if ( $cadvisor !== false ) {
     if ( $dockerRunning[$cadvisor]['Running'] ) {
       $cadvisorPort = $dockerRunning[$cadvisor]['Ports'][0]['PublicPort'];
-      $unRaidVars = parse_ini_file($communityPaths['unRaidVars']);
+      $unRaidVars = my_parse_ini_file($communityPaths['unRaidVars']);
       $unRaidIP = $unRaidVars['IPADDR'];
       $cAdvisorPath = "//$unRaidIP:$cadvisorPort";
       $o = "<a href='$cAdvisorPath' target='".$communitySettings['newWindow']."'>here</a> or click on the icon for the application";  

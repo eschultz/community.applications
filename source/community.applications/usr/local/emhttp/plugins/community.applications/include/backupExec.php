@@ -87,7 +87,7 @@ case 'validateBackupOptions':
       $errors .= "Destination for the USB Backup Must Be Specified<br>";
     } else {
       $origUSBDestination = $settings['usbDestination'];
-      $availableDisks = parse_ini_file("/var/local/emhttp/disks.ini",true);
+      $availableDisks = my_parse_ini_file("/var/local/emhttp/disks.ini",true);
       $usbDestination = $settings['usbDestination'];
       foreach ($availableDisks as $disk) {
         $usbDestination = str_replace("/mnt/".$disk['name']."/","",$usbDestination);
@@ -111,7 +111,7 @@ case 'validateBackupOptions':
       $errors .= "Destination for the XML Backup Must Be Specified<br>";
     } else {
       $origXMLDestination = $settings['xmlDestination'];
-      $availableDisks = parse_ini_file("/var/local/emhttp/disks.ini",true);
+      $availableDisks = my_parse_ini_file("/var/local/emhttp/disks.ini",true);
       $xmlDestination = $settings['xmlDestination'];
       foreach ($availableDisks as $disk) {
         $xmlDestination = str_replace("/mnt/".$disk['name']."/","",$xmlDestination);

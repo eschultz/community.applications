@@ -69,7 +69,7 @@ if ( $selected ) {
   if ( $cadvisor !== false ) {
     if ( $dockerRunning[$cadvisor]['Running'] ) {
       $cadvisorPort = $dockerRunning[$cadvisor]['Ports'][0]['PublicPort'];
-      $unRaidVars = parse_ini_file($communityPaths['unRaidVars']);
+      $unRaidVars = my_parse_ini_file($communityPaths['unRaidVars']);
       $unRaidIP = $unRaidVars['IPADDR'];
       $cAdvisorPath = "//$unRaidIP:$cadvisorPort/docker/".$fullImage[0];
       $o = "<a href='$cAdvisorPath' target='_blank'>More Details</a>";  
