@@ -2,8 +2,8 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.applications">
 <!ENTITY author    "Andrew Zawadzki">
-<!ENTITY version   "2016.10.13">
-<!ENTITY md5       "200c0e474d0b87d79cda60aeb31fa9f4">
+<!ENTITY version   "2016.10.26">
+<!ENTITY md5       "855d5ad24eaed2d3a78bbad5f5e65ecd">
 <!ENTITY launch    "Settings/PluginSettings">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/community.applications">
@@ -13,6 +13,10 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
+###2016.10.26###
+- Allow appdata backup source to be any folder on system
+- Updated routines to handle potential incompatibility with PHP and unRaid's generated comments
+
 ###2016.10.12###
 - Handle edge case template creation by dockerMan
 

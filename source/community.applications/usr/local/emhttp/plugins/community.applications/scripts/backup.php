@@ -71,6 +71,8 @@ $backupOptions = readJsonFile($communityPaths['backupOptions']);
 if ( ! $backupOptions ) {
   exit;
 }
+
+$backupOptions['source'] = rtrim($backupOptions['source'],"/");
 $backupOptions['dockerIMG'] = "exclude";
 
 if ( ! $backupOptions['backupFlash'] ) { $backupOptions['backupFlash'] = "appdata"; }

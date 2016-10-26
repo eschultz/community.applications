@@ -16,7 +16,7 @@ if ($unRaidVersion == "6.2") $unRaidVersion = "6.2.0";
 #                                                                                                  #
 ####################################################################################################
 
-function my_my_parse_ini_file($file,$mode=false,$scanner_mode=INI_SCANNER_NORMAL) {
+function my_parse_ini_file($file,$mode=false,$scanner_mode=INI_SCANNER_NORMAL) {
   return parse_ini_string(preg_replace('/^#.*\\n/m', "", @file_get_contents($file)),$mode,$scanner_mode);
 }
 

@@ -104,7 +104,7 @@ if ( $userSharesAllowed ) {
       $flag = true;
     }
     if ( is_file("/boot/config/shares/$addShare.cfg") ) {
-      $shareCfg = my_my_parse_ini_file("/boot/config/shares/$addShare.cfg");
+      $shareCfg = my_parse_ini_file("/boot/config/shares/$addShare.cfg");
       if ( $shareCfg['shareUseCache'] == "yes" ) {
         $basePath = "/mnt/user/";
         $shareComment = "(user share)";
@@ -207,6 +207,7 @@ $(function() {
   <?endif;?>
   myAlert("Appdata Backup","When a Backup is running (<em>either manually or a scheduled backup</em>), your docker applications will be <b><font color='red'>stopped</font></b> and then <b><font color='red'>restarted</font></b> at the conclusion of the backup","","",false,"",true,"warning");
   
+  $("#source").val("<?=$backupOptions['source']?>");
   $("#fasterRsync").val("<?=$backupOptions['fasterRsync']?>");
   $("#deleteOldBackup").val("<?=$backupOptions['deleteOldBackup']?>");
   $("#datedBackup").val("<?=$backupOptions['datedBackup']?>");
