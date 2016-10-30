@@ -18,12 +18,16 @@ function logger($string) {
 #                                                                                                  #
 ####################################################################################################
 
-function my_parse_ini_file($file,$mode=false,$scanner_mode=INI_SCANNER_NORMAL) {
-  return parse_ini_string(preg_replace('/^#.*\\n/m', "", @file_get_contents($file)),$mode,$scanner_mode);
+if ( ! function_exists('my_parse_ini_file') ) {
+  function my_parse_ini_file($file,$mode=false,$scanner_mode=INI_SCANNER_NORMAL) {
+    return parse_ini_string(preg_replace('/^#.*\\n/m', "", @file_get_contents($file)),$mode,$scanner_mode);
+  }
 }
 
-function my_parse_ini_string($string, $mode=false,$scanner_mode=INI_SCANNER_NORMAL) {
-  return parse_ini_string(preg_replace('/^#.*\\n/m', "", $string),$mode,$scanner_mode);
+if ( ! function_exists('my_parse_ini_string') ) {
+  function my_parse_ini_string($string, $mode=false,$scanner_mode=INI_SCANNER_NORMAL) {
+    return parse_ini_string(preg_replace('/^#.*\\n/m', "", $string),$mode,$scanner_mode);
+  }
 }
 
 $plugin = "community.applications";
@@ -712,7 +716,7 @@ jQuery(document).ready(function() {
   <td><input type='text' class='setting' id='cronCustom' onchange='validateOptions();'></input></td>
 </tr>
 </table>
-<font size='3' color='red'><b>NOTE: All files</b> within your chosen destinations will be deleted when the backup runs.  Only select a share created <b>SPECIFICALLY<b> for appdata (and USB) backup purposes</font><br>
+<font size='3' color='red'><b>NOTE: All files</b> within your chosen destinations will be deleted when the backup runs.  Only select a share/folder created <b>SPECIFICALLY<b> for appdata (and USB) backup purposes</font><br>
 
 <input type='button' value='Apply' id='Apply' onclick='apply();'><input type='button' value='Backup Now' id='Backup' onclick='backupNow();'><span class='statusLines'></span>
 </div><br>

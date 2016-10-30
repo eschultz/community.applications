@@ -2,8 +2,8 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.applications">
 <!ENTITY author    "Andrew Zawadzki">
-<!ENTITY version   "2016.10.26">
-<!ENTITY md5       "855d5ad24eaed2d3a78bbad5f5e65ecd">
+<!ENTITY version   "2016.10.30">
+<!ENTITY md5       "b8dbe69bf4bda93f34a9313ac4abcef7">
 <!ENTITY launch    "Settings/PluginSettings">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/community.applications">
@@ -13,6 +13,9 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
+###2016.10.30###
+- Fixed: Dynamix Bleeding Edge 2016.10.29c compatibility
+
 ###2016.10.26###
 - Allow appdata backup source to be any folder on system
 - Updated routines to handle potential incompatibility with PHP and unRaid's generated comments
