@@ -528,7 +528,7 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
     if ( $template['Plugin'] ) {
       $pluginName = basename($template['PluginURL']);
       if ( file_exists("/var/log/plugins/$pluginName") ) {
-        $pluginSettings = getPluginLaunch($pluginName);
+        $pluginSettings = isset($template['CAlink']) ? $template['CAlink'] : getPluginLaunch($pluginName);
         $tmpVar = $pluginSettings ? "" : " disabled ";
         $template['display_pluginSettings'] = "<input type='submit' $tmpVar style='margin:0px' value='Settings' formtarget='$tabMode' formaction='$pluginSettings' formmethod='post'>";
 
@@ -2027,6 +2027,21 @@ case 'displayTags':
     }
     echo "</table>";
   }
+  break;
+case 'populateModules':
+  $file = readJsonFile($communityPaths['community-templates-info']);
+  foreach ($file as $template) {
+    if ($template['CA']) {
+      $filename = basename($template['PluginURL']);
+      if ( is_file("/var/log/plugins/$filename") ) {
+        $template['MyPath'] = "/var/log/plugins/$filename";
+        $template['Uninstall'] = true;
+      }
+      $displayed['community'][] = $template;
+    }
+  }
+  writeJsonFile($communityPaths['community-templates-displayed'],$displayed);  
+  echo "done";
   break;
   
 }

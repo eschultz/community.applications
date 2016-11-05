@@ -161,6 +161,8 @@ $(function(){
   $(".resourceSort,.resourceDir").click(function() { changeResource(this.id,$(this).attr("class")); });
   $("#calculateAppdata").click(function() { calculateAppdataSize(); });
   $(".initDockerSearch").click(function() { initDockerSearch(); });
+  $(".moduleButton").click(function() { caModules(); });
+  
   $(".allButtons").click(function() {
     var description = this.value;
     var category = this.id;
@@ -203,16 +205,31 @@ $(function(){
   if ( "<?=$cfg['viewMode']?>" == "detail" ) $("#viewDetail").prop("disabled",true);
 
   <?if ($tabbed):?>
-    $('.tabs').append("<span id='searchFilter' class='status vhshift' style='display:none'><input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' id='updateButton' value='Legacy Mode' title='Switches CA to Legacy Mode (until the next appfeed update) - Not recommended' onclick='forceUpdateButton()' disabled></span>");
+    $('.tabs').append("<span id='searchFilter' class='status vhshift' style='display:none'><input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' id='updateButton' value='Legacy Mode' title='Switches CA to Legacy Mode (until the next appfeed update) - Not recommended' onclick='forceUpdateButton()' disabled><input type='button' value='CA Modules' onclick='caModules();'></span>");
     for (var x=1; x<last; x++) $('#tab'+x).bind({click:function(){$('#searchFilter').hide();}});
     $('#tab'+last).bind({click:function(){$('#searchFilter').show();readMore();}});
   <?else:?>
-    $('div[id=title]').last().append("<span id='searchFilter' class='status vhshift'><input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' id='updateButton' value='Legacy Mode' title='Switches CA to Legacy Mode (until the next appfeed update) - Not recommended' onclick='forceUpdateButton()' disabled>");
+    $('div[id=title]').last().append("<span id='searchFilter' class='status vhshift'><input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' id='updateButton' value='Legacy Mode' title='Switches CA to Legacy Mode (until the next appfeed update) - Not recommended' onclick='forceUpdateButton()' disabled><input type='button' value='CA Modules' onclick='caModules();'>");
   <?endif;?>
 
   getContent(true,'INITIALIZE','None Selected');
   $('#searchBox').keyup(function(e) {if(e.which == 13){doSearch(false);}});
 });
+
+function caModules() {
+  $(".appButtons,#monitor").prop("disabled",false);
+  clearTimeout(monitorInterval);  
+  clearSearchBox();
+  $("#templates_content,#resourceMonitor,.dockerSearch,#AppsOnly").hide();
+  $("#templates_content").html("<center><font size='3'>Searching</font></center>");
+  $("#templates_content,#sortButtons,#Total1,#templateSortButtons").show();
+  $("#Category").html("All Community Application Modules");
+  $.post(URL,{action:'populateModules'},function(data) {
+    if (data) {
+      changeSortOrder(null,null,null);
+    }
+  });
+}
 
 function myAlert(description,textdescription,textimage,imagesize, outsideClick, showCancel, showConfirm, alertType) {
   if ( !outsideClick ) outsideClick = false;
@@ -634,7 +651,7 @@ function removeApp(application, humanName) {
 }
 
 function uninstallApp(application,humanName) {
-  if ( humanName == "Community Applications" ) {
+  if ( humanName == "Community Applications" || humanName == "CA Resource Monitor" || humanName == "CA Appdata Backup/Restore" || humanName == "CA Appdata Cleanup" || humanName == "CA Auto Update" ) {
     myAlert("AE-35 Error","<b><font color='red'>Community Applications</font></b> cannot be uninstalled this way.  You must go to the plugins tab and remove it from there.  <em><font color='purple'>But, why would you ever want to uninstall CA?</font></em>",null,null,true,false,true,"error");
   } else {
     swal({

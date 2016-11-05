@@ -58,6 +58,8 @@ $communityPaths['appOfTheDay']                   = $communityPaths['persistentDa
 $communityPaths['defaultSkin']                   = "/usr/local/emhttp/plugins/community.applications/skins/default.skin";
 $communityPaths['LegacyMode']                    = $communityPaths['templates-community']."/legacyModeActive";
 $communityPaths['autoUpdateKillSwitch']          = "/usr/local/emhttp/plugins/community.applications/autoUpdateKill";
+$communityPaths['caModulesURL']                  = "https://raw.githubusercontent.com/Squidly271/Community-Applications-Moderators/master/CA-Modules.json";
+$communityPaths['caModules']                     = $communityPaths['tempFiles']."/caModules.json";
 
 $infoFile                                        = $communityPaths['community-templates-info'];
 $docker_repos                                    = $communityPaths['template-repos'];
