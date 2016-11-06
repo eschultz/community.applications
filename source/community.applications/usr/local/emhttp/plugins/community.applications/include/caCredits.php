@@ -55,6 +55,6 @@ $caCredits = "
     <br><center><a href='http://lime-technology.com/forum/index.php?topic=40262.0' target='_blank'>Plugin Support Thread</a></center>
   ";
   getLineCount("/usr/local/emhttp/plugins/community.applications");
-  $caCredits .= "$lineCount Lines of code and counting!";
+  $caCredits .= "<center>$lineCount Lines of code and counting!</center>";
   $caCredits = str_replace("\n","",$caCredits);
 ?>

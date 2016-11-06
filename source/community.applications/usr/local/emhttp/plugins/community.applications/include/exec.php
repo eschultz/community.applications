@@ -1035,7 +1035,6 @@ case 'force_update':
       $latestUpdate['last_updated_timestamp'] = time();
       writeJsonFile($communityPaths['lastUpdated-old'],$latestUpdate);
     }
-
     break;
   }
 
@@ -1127,7 +1126,6 @@ case 'convert_docker':
 
   if ( ! $docker['Official'] ) {
     $dockerURL = $docker['DockerHub']."~/dockerfile/";
-
     download_url($dockerURL,$communityPaths['dockerfilePage']);
 
     $mystring = file_get_contents($communityPaths['dockerfilePage']);
@@ -1175,7 +1173,6 @@ case 'convert_docker':
         $dockerLine = str_replace("]", " ", $dockerLine);
         $dockerLine = str_replace(",", " ", $dockerLine);
         $dockerLine = str_replace('"', " ", $dockerLine);
-
         $ports[] = $dockerLine;
       }
     }
@@ -1269,7 +1266,6 @@ case 'convert_docker':
   file_put_contents($xmlFile,$dockerXML);
   file_put_contents($communityPaths['addConverted'],"Dante");
   echo $xmlFile;
-
   break;
 
 #########################################################
@@ -1284,11 +1280,8 @@ case 'search_dockerhub':
   $sortOrder  = getSortOrder(getPostArray('sortOrder'));
   
   $communityTemplates = readJsonFile($communityPaths['community-templates-info']);
-
   $filter = str_replace(" ","%20",$filter);
-
   $jsonPage = shell_exec("curl -s -X GET 'https://registry.hub.docker.com/v1/search?q=$filter\&page=$pageNumber'");
-
   $pageresults = json_decode($jsonPage,true);
   $num_pages = $pageresults['num_pages'];
 
@@ -1360,13 +1353,9 @@ case 'dismiss_warning':
 case 'previous_apps':
   $installed = getPost("installed","");
   $dockerUpdateStatus = readJsonFile($communityPaths['dockerUpdateStatus']);
-  
-  if ( is_file($communityPaths['moderation']) ) {
-    $moderation = readJsonFile($communityPaths['moderation']);
-  } else {
-    $moderation = array();
-  }
 
+  $moderation = ( is_file($communityPaths['moderation']) ) ? readJsonFile($communityPaths['moderation']) : array();
+  
   $DockerClient = new DockerClient();
   $info = $DockerClient->getDockerContainers();
   $file = readJsonFile($communityPaths['community-templates-info']);
@@ -1615,7 +1604,6 @@ case 'remove_appdata':
   exec($commandLine);
   break;
 
-
 ############################################################
 #                                                          #
 # Displays a table of basic stats for runnings docker apps #
@@ -1656,11 +1644,7 @@ case 'resourceMonitor':
     $container['Image'] = $docker['Image'];
     $container['NetworkMode'] = $docker['NetworkMode'];
     $containerID .= $docker['Id']." ";
-    if ( $runningTemplate ) {
-      $container['Icon'] = $templates[$runningTemplate]['Icon'];
-    } else {
-      $container['Icon'] = "/plugins/community.applications/images/question.png";
-    }
+    $container['Icon'] = $runningTemplate ? $templates[$runningTemplate]['Icon'] : "/plugins/community.applications/images/question.png";
     $running[] = $container;
   }
 
@@ -1681,14 +1665,8 @@ case 'resourceMonitor':
       $display['CPU'] = round($containerStats[1] / $numCPU,2);
       $display['Memory'] = $containerStats[2];
       $display['MemPercent'] = str_replace("%","",$containerStats[3]);
-
-      if ( $running[$container]['NetworkMode'] == "host" ) {
-        $display['IO'] = "<em><font color='red'>Unable to determine</font></em>";
-      } else {
-        $display['IO'] = $containerStats[4];
-      }
+      $display['IO'] = ( $running[$container]['NetworkMode'] == "host" ) ? "<em><font color='red'>Unable to determine</font></em>" : $containerStats[4];
       $display['ID'] = $running[$container]['ID'];
-
       $containerRepo = explode(":",$running[$container]['Image']);
       $imageSizes = explode("\n",shell_exec("docker images $containerRepo[0]"));
       $statsLine = explode(" ",preg_replace('!\s+!', ' ', $imageSizes[1]));
@@ -1759,7 +1737,7 @@ case 'resourceInitialize':
     if ( $dockerRunning[$cadvisor]['Running'] ) {
       $cadvisorPort = $dockerRunning[$cadvisor]['Ports'][0]['PublicPort'];
       $unRaidVars = my_parse_ini_file($communityPaths['unRaidVars']);
-      $unRaidIP = $unRaidVars['IPADDR'];
+      $unRaidIP = $unRaidVars['NAME'];
       $cAdvisorPath = "//$unRaidIP:$cadvisorPort";
       $o = "<a href='$cAdvisorPath' target='".$communitySettings['newWindow']."'>here</a> or click on the icon for the application";  
       file_put_contents($communityPaths['cAdvisor'],$cAdvisorPath);
@@ -1813,161 +1791,7 @@ case 'startCadvisor':
   sleep (5);
   echo "done";
   break;
-  
-#################################################
-#                                               #
-# Setup the json file for the cron autoupdating #
-#                                               #
-#################################################
 
-case 'autoUpdatePlugins':
-  $globalUpdate          = getPost("globalUpdate","no");
-  $pluginList            = getPost("pluginList","");
-  $updateArray['notify'] = getPost("notify","yes");
-  $updateArray['delay']  = getPost("delay","3");
-  $updateArray['Global'] = ( $globalUpdate == "yes" ) ? "true" : "false";
-
-
-  $plugins = explode("*",$pluginList);
-  if ( is_array($plugins) ) {
-    foreach ($plugins as $plg) {
-      if (is_file("/var/log/plugins/$plg") ) {
-        $updateArray[$plg] = "true";
-      }
-    }
-  }
-  writeJsonFile($communityPaths['autoUpdateSettings'],$updateArray);
-  break;
-
-#########################################
-#                                       #
-# Displays the orphaned appdata folders #
-#                                       #
-#########################################
-
-case 'getOrphanAppdata':
-  $all_files = dirContents("/boot/config/plugins/dockerMan/templates-user");
-  if ( is_dir("/var/lib/docker/tmp") ) {
-    $DockerClient = new DockerClient();
-    $info = $DockerClient->getDockerContainers();
-  } else {
-    $info = array();
-  }
-
-  # Get the list of appdata folders used by all of the my* templates
-  
-  foreach ($all_files as $xmlfile) {
-    if ( pathinfo($xmlfile,PATHINFO_EXTENSION) == "xml" ) {
-      $o = XML2Array::createArray(file_get_contents("/boot/config/plugins/dockerMan/templates-user/$xmlfile"));
-      reset($o);
-      $first_key = key($o);
-      $o = $o[$first_key]; # get the name of the first key (root of the xml)
-      if ( isset($o['Data']['Volume']) ) {
-        if ( $o['Data']['Volume'][0] ) {
-          $volumes = $o['Data']['Volume'];
-        } else {
-          unset($volumes);
-          $volumes[] = $o['Data']['Volume'];
-        }
-        foreach ( $volumes as $volumeArray ) {
-          $volumeList[0] = $volumeArray['HostDir'].":".$volumeArray['ContainerDir'];
-          if ( findAppdata($volumeList) ) {
-            $temp['Name'] = $o['Name'];
-            $temp['HostDir'] = $volumeArray['HostDir'];
-            $availableVolumes[$volumeArray['HostDir']] = $temp;
-          }
-        }
-      } 
-    }
-  }
-
-  # remove from the list the folders used by installed docker apps
-  
-  foreach ($info as $installedDocker) {
-    if ( ! is_array($installedDocker['Volumes']) ) {
-      continue;
-    }
-     foreach ($installedDocker['Volumes'] as $volume) {
-       $folders = explode(":",$volume);
-       $cacheFolder = str_replace("/mnt/user/","/mnt/cache/",$folders[0]);
-       $userFolder = str_replace("/mnt/cache/","/mnt/user/",$folders[0]);
-       unset($availableVolumes[$cacheFolder]);
-       unset($availableVolumes[$userFolder]);
-     }
-  }
-  
-  # remove from list any folders which don't actually exist
-  
-  $temp = $availableVolumes;
-  foreach ($availableVolumes as $volume) {
-    $userFolder = str_replace("/mnt/cache/","/mnt/user/",$volume['HostDir']);
-    
-    if ( ! is_dir($userFolder) ) {
-      unset($temp[$volume['HostDir']]);
-    }
-  }
-  $availableVolumes = $temp;
-
-  # remove from list any folders which are equivalent 
-  $tempArray = $availableVolumes;
-  foreach ( $availableVolumes as $volume ) {
-    $flag = false;
-    foreach ( $availableVolumes as $testVolume ) {
-      if ( $testVolume['HostDir'] == $volume['HostDir'] ) {
-        continue; # ie: its the same index in the array;
-      }
-     $cacheFolder = str_replace("/mnt/user/","/mnt/cache/",$volume['HostDir']);
-     $userFolder = str_replace("/mnt/cache/","/mnt/user/",$volume['HostDir']);
-      if ( startswith($testVolume['HostDir'],$cacheFolder) || startsWith($testVolume['HostDir'],$userFolder) ) {
-        $flag = true;
-        break;
-      }
-    }
-    if ( $flag ) {
-      unset($tempArray[$volume['HostDir']]);
-    }
-  }
-  $availableVolumes = $tempArray;
-  
-  foreach ($tempArray as $testVolume) {
-    if ( ! $installedDocker['Volumes'] ) {
-      continue;
-    }
-    foreach ($installedDocker['Volumes'] as $volume) {
-      $folders = explode(":",$volume);
-      $cacheFolder = str_replace("/mnt/user/","/mnt/cache/",$folders[0]);
-      $userFolder = str_replace("/mnt/cache/","/mnt/user/",$folders[0]);
-      if ( startswith($cacheFolder,$testVolume['HostDir']) || startsWith($userFolder,$testVolume['HostDir']) ) {
-        unset($availableVolumes[$testVolume['HostDir']]);
-      }
-    }
-  }
-  
-  if ( empty($availableVolumes) ) {
-    echo "No orphaned appdata folders found <script>$('#selectAll').prop('disabled',true);</script>";
-  } else {
-    foreach ($availableVolumes as $volume) {
-      echo "<input type='checkbox' class='appdata' value='".$volume['HostDir']."' onclick='$(&quot;#deleteButton&quot;).prop(&quot;disabled&quot;,false);'>".$volume['Name'].":  <b>".$volume['HostDir']."</b><br>";
-    }
-  }
-  break;
-  
-########################################
-#                                      #
-# Deletes the selected appdata folders #
-#                                      #
-########################################
-
-case "deleteAppdata":
-  $paths = getPost("paths","no");
-  $paths = explode("*",$paths);
-  foreach ($paths as $path) {
-    $userPath = str_replace("/mnt/cache/","/mnt/user/",$path);
-    exec ("rm -rf ".escapeshellarg($userPath));
-  }
-  echo "deleted";
-  break;
-  
 ##################################################
 #                                                #
 # Pins / Unpins an application for later viewing #
@@ -1976,7 +1800,6 @@ case "deleteAppdata":
 
 case "pinApp":
   $repository = getPost("repository","oops");
-  
   $pinnedApps = readJsonFile($communityPaths['pinned']);
   if ( $pinnedApps[$repository] ) {
     unset($pinnedApps[$repository]);
@@ -2011,6 +1834,12 @@ case "pinnedApps":
   echo "fini!";
   break;
 
+################################################
+#                                              #
+# Displays the possible branch tags for an app #
+#                                              #
+################################################
+
 case 'displayTags':
   $leadTemplate = getPost("leadTemplate","oops");
   $file = readJsonFile($communityPaths['community-templates-info']);
@@ -2028,6 +1857,13 @@ case 'displayTags':
     echo "</table>";
   }
   break;
+  
+################################################
+#                                              #
+# Specialized search for additional CA Modules #
+#                                              #
+################################################
+
 case 'populateModules':
   $file = readJsonFile($communityPaths['community-templates-info']);
   foreach ($file as $template) {

@@ -41,7 +41,6 @@ $communityPaths['calculateAppdataProgress']      = $communityPaths['tempFiles'].
 $communityPaths['cAdvisor']                      = $communityPaths['tempFiles']."/cAdvisorURL";                         /* URL of cadvisor (if installed) */
 $communityPaths['updateErrors']                  = $communityPaths['tempFiles']."/updateErrors.txt";
 $communityPaths['dockerUpdateStatus']            = "/var/lib/docker/unraid-update-status.json";
-$communityPaths['autoUpdateSettings']            = "/boot/config/plugins/community.applications/AutoUpdateSettings.json";
 $communityPaths['backupOptions']                 = "/boot/config/plugins/community.applications/BackupOptions.json";
 $communityPaths['backupProgress']                = $communityPaths['tempFiles']."/backupInProgress";
 $communityPaths['restoreProgress']               = $communityPaths['tempFiles']."/restoreInProgress";
@@ -57,9 +56,6 @@ $communityPaths['pinned']                        = "/boot/config/plugins/communi
 $communityPaths['appOfTheDay']                   = $communityPaths['persistentDataStore']."/appOfTheDay.json";
 $communityPaths['defaultSkin']                   = "/usr/local/emhttp/plugins/community.applications/skins/default.skin";
 $communityPaths['LegacyMode']                    = $communityPaths['templates-community']."/legacyModeActive";
-$communityPaths['autoUpdateKillSwitch']          = "/usr/local/emhttp/plugins/community.applications/autoUpdateKill";
-$communityPaths['caModulesURL']                  = "https://raw.githubusercontent.com/Squidly271/Community-Applications-Moderators/master/CA-Modules.json";
-$communityPaths['caModules']                     = $communityPaths['tempFiles']."/caModules.json";
 
 $infoFile                                        = $communityPaths['community-templates-info'];
 $docker_repos                                    = $communityPaths['template-repos'];
