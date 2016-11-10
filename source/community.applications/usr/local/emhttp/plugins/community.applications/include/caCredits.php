@@ -36,7 +36,7 @@ $caCredits = "
       <tr>
         <td><img src='http://fanart.tv/ftv_128.jpg' height='48px' width='48px'></td>
         <td><strong>Kode</strong></td>
-        <td>Application Feed</td>
+        <td>Application Feed<br>(Hosted by Linuxserver.io)</td>
       </tr>
       <tr>
         <td><img src='http://i.imgur.com/VFMJTol.jpg' width='48px' height='48px'></td>
