@@ -2,8 +2,8 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.applications">
 <!ENTITY author    "Andrew Zawadzki">
-<!ENTITY version   "2016.11.05">
-<!ENTITY md5       "e4d51ef979cbb11bc076ff8e0c7084b9">
+<!ENTITY version   "2016.11.11">
+<!ENTITY md5       "ff6e9788095753f3823814e21d57fda3">
 <!ENTITY launch    "Settings/PluginSettings">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/community.applications">
@@ -13,6 +13,9 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
+###2016.11.11###
+- Allow separate installs / removal of included modules
+
 ###2016.11.05###
 - Infrastructure changes to ultimately allow separate module installation / deinstallation
 
@@ -556,6 +559,9 @@ THIS IS A REQUIRED UPDATE
     echo "********************************************************************\n";
     exit(1);
   }
+  echo "Cleaning Up Old Versions\n";
+  @exec("/usr/local/emhttp/plugins/community.applications/scripts/removeCron.php");
+  @exec("rm -rf /usr/local/emhttp/plugins/community.applications");
 ?>
 ]]>
 </INLINE>
@@ -568,10 +574,6 @@ rm -f $(ls /boot/config/plugins/&name;/&name;*.txz 2>/dev/null|grep -v '&version
 if [[ -d /boot/config/plugins/repo.update ]]; then rm -rf /boot/config/plugins/repo.update; fi
 if [[ -d /usr/local/emhttp/plugins/repo.update ]]; then rm -rf /usr/local/emhttp/plugins/repo.update; fi
 if [[ -n $(ls /boot/config/plugins/repo.update*.plg 2>/dev/null) ]]; then rm /boot/config/plugins/repo.update*.plg; fi
-#FIX DOCKER PAGE ORDER
-sed -i -e 's/Menu="Docker"/Menu="Docker:1"/' /usr/local/emhttp/plugins/dynamix.docker.manager/DockerContainers.page
-sed -i -e 's/Menu="Docker"/Menu="Docker:2"/' /usr/local/emhttp/plugins/dynamix.docker.manager/DockerRepositories.page
-sed -i -e 's/Menu="Docker"/Menu="Docker:3"/' /usr/local/emhttp/plugins/dynamix.docker.manager/DockerSettings.page
 
 if [[ -e /tmp/community.applications/tempFiles/templates.json ]]; then rm /tmp/community.applications/tempFiles/templates.json; fi
 </INLINE>
@@ -595,9 +597,6 @@ mkdir -p /var/lib/docker/unraid/templates-community-apps
 mkdir -p /var/lib/docker/unraid/community.applications.datastore
 mkdir -p /tmp/community.applications/tempFiles
 mkdir -p /boot/config/plugins/community.applications
-cp /usr/local/emhttp/plugins/community.applications/scripts/updateApplications.sh /etc/cron.daily/updateApplications.sh
-/usr/local/emhttp/plugins/community.applications/scripts/removeCron.php
-/usr/local/emhttp/plugins/community.applications/scripts/addCron.php
 
 echo ""
 echo "----------------------------------------------------"
@@ -608,15 +607,42 @@ echo "----------------------------------------------------"
 echo ""
 </INLINE>
 </FILE>
+<FILE Run="/usr/bin/php">
+<INLINE>
+<![CDATA[
+<?
+  if ( ! is_file("/boot/config/plugins/community.applications/installed") ) {
 
+    echo "Initial installation.  Installing Appdata Cleanup Plugin\n";
+    exec("/usr/local/sbin/installplg https://raw.githubusercontent.com/Squidly271/ca.cleanup.appdata/master/plugins/ca.cleanup.appdata.plg",$output);
+    foreach ($output as $line) {
+      echo "$line\n";
+    }
+    unset($output);
+    echo "Installing Plugin Auto Update\n";
+    exec("/usr/local/sbin/installplg https://raw.githubusercontent.com/Squidly271/ca.update.applications/master/plugins/ca.update.applications.plg",$output);
+    foreach ($output as $line) {
+      echo "$line\n";
+    }
+    unset($output);
+    echo "Installing Appdata Backup / Restore\n";
+    exec("/usr/local/sbin/installplg https://raw.githubusercontent.com/Squidly271/ca.backup/master/plugins/ca.backup.plg",$output);
+    foreach ($output as $line) {
+      echo "$line\n";
+    }
+    exec("mkdir -p /boot/config/plugins/community.applications");
+    file_put_contents("/boot/config/plugins/community.applications/installed","Flag file to indicate whether or not to install previously included modules");
+  }
+?>
+]]>
+</INLINE>
+</FILE>
 <!--
 The 'remove' script.
 -->
 <FILE Run="/bin/bash" Method="remove">
 <INLINE>
-/usr/local/emhttp/plugins/community.applications/scripts/removeCron.php
 removepkg &name;-&version;
-rm /etc/cron.daily/updateApplications.php
 rm -rf &plugdir;
 rm -rf /boot/config/plugins/&name;
 rm -rf /var/lib/docker/unraid/templates-community
