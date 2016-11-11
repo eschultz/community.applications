@@ -651,7 +651,7 @@ function removeApp(application, humanName) {
 }
 
 function uninstallApp(application,humanName) {
-  if ( humanName == "Community Applications" || humanName == "CA Resource Monitor" ) {
+  if ( humanName == "Community Applications" || humanName == "CA Resource Monitor" || humanName == "CA Appdata Backup/Restore" ) {
     myAlert("AE-35 Error","<b><font color='red'>"+humanName+"</font></b> cannot be uninstalled this way.  You must go to the plugins tab and remove Community Applications from there.  <em><font color='purple'>But, why would you ever want to uninstall CA?</font></em>",null,null,true,false,true,"error");
   } else {
     swal({
