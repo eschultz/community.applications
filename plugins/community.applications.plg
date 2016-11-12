@@ -2,8 +2,8 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.applications">
 <!ENTITY author    "Andrew Zawadzki">
-<!ENTITY version   "2016.11.11">
-<!ENTITY md5       "ff6e9788095753f3823814e21d57fda3">
+<!ENTITY version   "2016.11.11a">
+<!ENTITY md5       "3eb0ac3d8ba555cd25b68cf77b6f909a">
 <!ENTITY launch    "Settings/PluginSettings">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/community.applications">
@@ -560,8 +560,10 @@ THIS IS A REQUIRED UPDATE
     exit(1);
   }
   echo "Cleaning Up Old Versions\n";
-  @exec("/usr/local/emhttp/plugins/community.applications/scripts/removeCron.php");
-  @exec("rm -rf /usr/local/emhttp/plugins/community.applications");
+  if ( is_file("/usr/local/emhttp/plugins/community.applications/scripts/removeCron.php") ) {
+    exec("/usr/local/emhttp/plugins/community.applications/scripts/removeCron.php");
+  }
+  exec("rm -rf /usr/local/emhttp/plugins/community.applications");
 ?>
 ]]>
 </INLINE>
