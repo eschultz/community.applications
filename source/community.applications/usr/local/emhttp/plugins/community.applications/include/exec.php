@@ -1868,6 +1868,9 @@ case 'populateModules':
   $file = readJsonFile($communityPaths['community-templates-info']);
   foreach ($file as $template) {
     if ($template['CA']) {
+      if ( ! $template['Compatible'] ) {
+        continue;
+      }
       $filename = basename($template['PluginURL']);
       if ( is_file("/var/log/plugins/$filename") ) {
         $template['MyPath'] = "/var/log/plugins/$filename";

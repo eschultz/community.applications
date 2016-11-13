@@ -2,8 +2,8 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.applications">
 <!ENTITY author    "Andrew Zawadzki">
-<!ENTITY version   "2016.11.11a">
-<!ENTITY md5       "3eb0ac3d8ba555cd25b68cf77b6f909a">
+<!ENTITY version   "2016.11.13">
+<!ENTITY md5       "29862274d580fb0967ccfc1f17b0bfa4">
 <!ENTITY launch    "Settings/PluginSettings">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/community.applications">
@@ -13,6 +13,9 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
+###2016.11.13###
+- Fixed: CA Modules displaying incompatible add-ons
+
 ###2016.11.11###
 - Allow separate installs / removal of included modules
 

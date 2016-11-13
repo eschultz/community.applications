@@ -254,7 +254,7 @@ function myCloseAlert() {
 }
 
 function readMore() {
-  $('.desc_readmore').readmore({maxHeight:50});
+  $('.desc_readmore').readmore({maxHeight:150});
 }
 
 function showInfo(appNumber,appName) {
