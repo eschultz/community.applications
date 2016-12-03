@@ -261,6 +261,10 @@ function DownloadApplicationFeed() {
       $o = array_merge($o, $moderation[$o['Repository']]);
       $file = array_merge($file, $moderation[$o['Repository']]);
     }
+    if ($o['Blacklist']) {
+      unset($o);
+      continue;
+    }
 
     $o['Compatible'] = versionCheck($o);
 

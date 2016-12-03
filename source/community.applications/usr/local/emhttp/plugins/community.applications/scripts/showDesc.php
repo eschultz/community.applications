@@ -29,7 +29,6 @@ if ( $communitySettings['dockerRunning'] ) {
 }
 
 $appNumber =  urldecode($_GET['appNumber']);
-
 $file = readJsonFile($communityPaths['community-templates-info']);
 $repos = readJsonFile($communityPaths['Repositories']);
 if ( ! $repos ) {
@@ -37,17 +36,10 @@ if ( ! $repos ) {
 }
 $displayed = readJsonFile($communityPaths['community-templates-displayed']);
 
-$templateIndex = searchArray($displayed['community'],"ID",$appNumber);
-if ( $templateIndex === false ) {
-  $templateIndex = searchArray($file,"ID",$appNumber);
-  if ($templateIndex === false) {
-    echo "An unidentified error has happened";
-    exit;
-  } else {
-    $template = $file[$templateIndex];
+foreach ($file as $template) {
+  if ( $template['ID'] == $appNumber ) {
+    break;
   }
-} else {
-  $template = $displayed['community'][$templateIndex];
 }
 
 $repoIndex = searchArray($repos,"name",$template['RepoName']);

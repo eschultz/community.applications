@@ -369,7 +369,7 @@ function makeXML($template) {
   }
 
   # hack to fix differing schema in the appfeed vs what Array2XML class wants
-
+#echo "<br>".$template['Repository']."<br>";
   if ( $template['Config'] ) {
     foreach ($template['Config'] as $tempArray) {
       if ( $tempArray['value'] ) {
