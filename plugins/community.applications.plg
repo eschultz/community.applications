@@ -2,8 +2,8 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.applications">
 <!ENTITY author    "Andrew Zawadzki">
-<!ENTITY version   "2016.12.03">
-<!ENTITY md5       "367d6de94f18797cad7d4dbd1a046acf">
+<!ENTITY version   "2016.12.05">
+<!ENTITY md5       "f92a88df3c8d18d5875f9e1910e03182">
 <!ENTITY launch    "Settings/PluginSettings">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/community.applications">
@@ -13,6 +13,9 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
+###2016.12.05###
+- Fixed: Stopping array would hang until any calculations of appdata size was completed if CA Backup was not installed
+
 ###2016.12.03###
 - Fix pop up descriptions in Previous Apps
 - Don't process blacklisted apps
