@@ -106,7 +106,7 @@ $templateDescription .= $template['downloads'] ? "<tr><td><strong>Downloads:</st
 $templateDescription .= $template['Licence'] ? "<tr><td><strong>Licence:</strong></td><td>".$template['Licence']."</td></tr>" : "";
   
 if ( $selected ) {
-  $result = searchArray($dockerRunning,'Name',$template['Name']);
+  $result = searchArray($dockerRunning,'Name',$appName);
    
   if ( $dockerRunning[$result]['Running'] ) {
     $imageID = $dockerRunning[$result]['Id'];
