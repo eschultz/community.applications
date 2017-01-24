@@ -258,7 +258,7 @@ function readMore() {
 }
 
 function showInfo(appNumber,appName) {
-  openBox('<?=$execPath?>/showInfo.php<?=$commandArg?>' + appNumber,appName + " Changelog / More Information",550,550);
+  openBox('<?=$execPath?>/showInfo.php?appNumber=' + appNumber,appName + " Changelog / More Information",550,550);
 }
 
 function showCredits() {
@@ -266,7 +266,7 @@ function showCredits() {
 }
 
 function showDesc(appNumber,appName) {
-  openBox('<?=$execPath?>/showDesc.php<?=$commandArg?>' + appNumber,appName + " Description",550,550);
+  openBox('<?=$execPath?>/showDesc.php?appNumber=' + appNumber + '&appName=' + appName,appName + " Description",550,550);
 }
 
 function doSearch(button) {

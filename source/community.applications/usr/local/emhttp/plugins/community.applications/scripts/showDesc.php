@@ -6,7 +6,6 @@
 ###############################################################
  
 echo "<span id='wait'><center>Gathering Information...</center></span><br>";
-
 require_once("/usr/local/emhttp/plugins/community.applications/include/paths.php");
 require_once("/usr/local/emhttp/plugins/community.applications/include/helpers.php");
 require_once("/usr/local/emhttp/plugins/dynamix.docker.manager/include/DockerClient.php");
@@ -27,8 +26,9 @@ if ( $communitySettings['dockerRunning'] ) {
   $info = array();
   $dockerRunning = array();
 }
-
 $appNumber =  urldecode($_GET['appNumber']);
+$appName = urldecode($_GET['appName']);
+
 $file = readJsonFile($communityPaths['community-templates-info']);
 $repos = readJsonFile($communityPaths['Repositories']);
 if ( ! $repos ) {
@@ -50,7 +50,8 @@ $donateimg = $template['DonateImg'];
 $donatetext = $template['DonateText'];
 
 $name = $template['Name'];
-$selected = $info[$name]['template'] && stripos($info[$name]['icon'], $template['Author']) !== false;
+#$selected = $info[$name]['template'] && stripos($info[$name]['icon'], $template['Author']) !== false;
+$selected = $info[$appName]['running'];
 
 if ( $selected ) {
   $command = "docker ps -f name=".$template['Name']." --no-trunc";
@@ -69,7 +70,6 @@ if ( $selected ) {
     }
   } 
 }
-
 $template['Icon'] = $template['Icon'] ? $template['Icon'] : "/plugins/community.applications/images/question.png";
 $template['Description'] = ltrim($template['Description']);
 
@@ -135,9 +135,18 @@ if ( ($donatelink) && ($donateimg) ) {
 }
 $templateDescription .= "<script>document.getElementById('wait').innerHTML = '';</script>";
 if ( $imageID ) {
+  $unRaidVars = parse_ini_file("/var/local/emhttp/var.ini");
+  $csrf = $unRaidVars['csrf_token'];
+  
   $templateDescription .= "
     <script src='/webGui/javascript/dynamix.js'></script>
     <script>
+      $(document).ajaxSend(function(elm, xhr, s){
+        if (s.type == 'POST') {
+          s.data += s.data?'&':'';
+          s.data += 'csrf_token=$csrf';
+        }
+      });
       var URL = '/plugins/community.applications/scripts/showDescExec.php';
       var Interval = setTimeout(updateStats,1000);        
      
