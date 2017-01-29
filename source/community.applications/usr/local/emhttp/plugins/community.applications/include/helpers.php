@@ -176,12 +176,21 @@ function fixDescription($Description) {
 #                                                                      #
 ########################################################################
 
-function fixSecurity(&$template) {
+# pass a copy of the original template to relate security violations back to the template
+function fixSecurity(&$template,&$originalTemplate) {
   foreach ($template as &$element) {
     if ( is_array($element) ) {
-      fixSecurity($element);
+      fixSecurity($element,$originalTemplate);
     } else {
-      $element = preg_replace('#<script(.*?)>(.*?)</script>#is','',$element);
+      $tempElement = htmlspecialchars_decode($element);
+/*       $tempElement = str_replace("&amp;","&",$element);
+      $tempElement = str_replace("&lt;","<",$tempElement);
+      $tempElement = str_replace("&gt;",">",$tempElement); */
+      if ( preg_match('#<script(.*?)>(.*?)</script>#is',$tempElement) || preg_match('#<iframe(.*?)>(.*?)</iframe>#is',$tempElement) ) {
+        logger("Alert the maintainers of Community Applications with the following Information:".$originalTemplate['RepoName']." ".$originalTemplate['Name']." ".$originalTemplate['Repository']);
+        $originalTemplate['Blacklist'] = true;
+        return;
+      }
     }
   }  
 }

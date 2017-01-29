@@ -133,7 +133,7 @@ function DownloadCommunityTemplates() {
         $o['DonateImg'] = $o['DonateImg'] ? $o['DonateImg'] : $Repo['donateimg'];
         $o['WebPageURL'] = $Repo['web'];
         $o['Logo'] = $Repo['logo'];
-        fixSecurity($o);
+        fixSecurity($o,$o);
         $o = fixTemplates($o);
         $o['Compatible'] = versionCheck($o);
 
@@ -252,7 +252,7 @@ function DownloadApplicationFeed() {
     if ( ($file['DonateImg']) || ($file['DonateImage']) ) {  #because Sparklyballs can't read the tag documentation
       $o['DonateImg'] = $file['DonateImage'] ? $file['DonateImage'] : $file['DonateImg'];
     }
-    fixSecurity($o); # Apply various fixes to the templates for CA use
+    fixSecurity($o,$o); # Apply various fixes to the templates for CA use
     $o = fixTemplates($o);
 
 # Overwrite any template values with the moderated values
@@ -374,7 +374,7 @@ function getConvertedTemplates() {
         $o['Forum']        = "";
         $o['Compatible']   = versionCheck($o);
         
-        fixSecurity($o);
+        fixSecurity($o,$o);
         $myTemplates[$i]  = $o;
         $i = ++$i;
       }
