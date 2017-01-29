@@ -2,8 +2,8 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.applications">
 <!ENTITY author    "Andrew Zawadzki">
-<!ENTITY version   "2017.01.24">
-<!ENTITY md5       "2484c514c5c3ed5665c3f10e8227e376">
+<!ENTITY version   "2017.01.29">
+<!ENTITY md5       "9abbe28cd4a931f3559f0b547c935c4b">
 <!ENTITY launch    "Settings/PluginSettings">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/community.applications">
@@ -13,6 +13,9 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
+###2017.01.29###
+- Added: Automatic Blacklisting if a template poses a security risk
+
 ###2017.01.24###
 - Security fix on full description popups
 - Fixed: Show stats on full description popups if app name has been changed

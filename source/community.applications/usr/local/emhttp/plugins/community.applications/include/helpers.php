@@ -183,9 +183,6 @@ function fixSecurity(&$template,&$originalTemplate) {
       fixSecurity($element,$originalTemplate);
     } else {
       $tempElement = htmlspecialchars_decode($element);
-/*       $tempElement = str_replace("&amp;","&",$element);
-      $tempElement = str_replace("&lt;","<",$tempElement);
-      $tempElement = str_replace("&gt;",">",$tempElement); */
       if ( preg_match('#<script(.*?)>(.*?)</script>#is',$tempElement) || preg_match('#<iframe(.*?)>(.*?)</iframe>#is',$tempElement) ) {
         logger("Alert the maintainers of Community Applications with the following Information:".$originalTemplate['RepoName']." ".$originalTemplate['Name']." ".$originalTemplate['Repository']);
         $originalTemplate['Blacklist'] = true;
