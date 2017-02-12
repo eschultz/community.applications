@@ -2,8 +2,8 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.applications">
 <!ENTITY author    "Andrew Zawadzki">
-<!ENTITY version   "2017.01.29">
-<!ENTITY md5       "9abbe28cd4a931f3559f0b547c935c4b">
+<!ENTITY version   "2017.02.12">
+<!ENTITY md5       "cdf1a7f8392f89a16bb3dbf0e236f5e0">
 <!ENTITY launch    "Settings/PluginSettings">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/community.applications">
@@ -13,6 +13,9 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
+###2017.02.12###
+- Maintenance update.  Add more fixes for template errors from authors
+
 ###2017.01.29###
 - Added: Automatic Blacklisting if a template poses a security risk
 

@@ -317,7 +317,15 @@ function fixTemplates($template) {
   if ( !is_string($template['Overview']) ) {
     unset($template['Overview']);
   }
-  
+  if ( is_array($template['SortAuthor']) ) {                 # due to cmer
+    $template['SortAuthor'] = $template['SortAuthor'][0];
+  }
+  if ( is_array($template['Repository']) ) {                 # due to cmer
+    $template['Repository'] = $template['Repository'][0];
+  }
+  if ( is_array($template['PluginURL']) ) {                  # due to coppit
+    $template['PluginURL'] = $template['PluginURL'][1];
+  }
   if ( strlen($template['Overview']) > 0 ) {
     $template['Description'] = $template['Overview'];
     $template['Description'] = preg_replace('#\[([^\]]*)\]#', '<$1>', $template['Description']);
@@ -441,6 +449,15 @@ function readXmlFile($xmlfile) {
   $xml = file_get_contents($xmlfile);
   $o = TypeConverter::xmlToArray($xml,TypeConverter::XML_GROUP);
   if ( ! $o ) { return false; }
+
+  # Fix some errors in templates prior to continuing
+
+  if ( is_array($o['SortAuthor']) ) {
+    $o['SortAuthor'] = $o['SortAuthor'][0];
+  }
+  if ( is_array($o['Repository']) ) {
+    $o['Repository'] = $o['Repository'][0];
+  }
   $o['Path']        = $xmlfile;
   $o['Author']      = preg_replace("#/.*#", "", $o['Repository']);
   $o['DockerHubName'] = strtolower($o['Name']);
