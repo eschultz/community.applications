@@ -955,7 +955,7 @@ Sort Direction:
 <div class='dockerSearch' style='display:none'><center><input type=button class='initDockerSearch' value='Get more results from dockerHub'></input></center></div>
 <center>Last Change To Appfeed: <strong><span id='updateTime'></span></strong></center>
 <a href="Settings/caHelp" target='_blank'>CA Manual</a><a style='float:right;cursor:pointer' onclick='showCredits();'>Credits</a><br><br></span>
-<center><a href='http://lime-technology.com/forum/index.php?topic=40937.0' target='_blank'>Docker FAQ</a></center>
+<center><a href='https://forums.lime-technology.com/topic/55246-docker-faq/' target='_blank'>Docker FAQ</a></center>
 <center>Community Applications Version: <?=$installedVersion?></center>
 > <center>For support for this plugin, visit here: <a href="http://lime-technology.com/forum/index.php?topic=40262.0" target="_blank">http://lime-technology.com/forum/index.php?topic=40262.0</a></center>
 > <center><a href='https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7M7CBCVU732XG' target='_blank'><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif"></a></center>
