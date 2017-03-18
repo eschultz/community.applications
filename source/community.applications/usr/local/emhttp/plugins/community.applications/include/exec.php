@@ -391,7 +391,7 @@ function getConvertedTemplates() {
 #                                                          #
 ############################################################
 
-function display_apps($viewMode) {
+function display_apps($viewMode,$pageNumber=1) {
   global $communityPaths, $separateOfficial, $officialRepo, $communitySettings;
 
   $file = readJsonFile($communityPaths['community-templates-displayed']);
@@ -427,19 +427,19 @@ function display_apps($viewMode) {
       $navigate[] = "<a href='#COMMUNITY'>Community Supported Applications</a>";
       $display .= "<center><b><font size='4' color='purple' id='COMMUNITY'>Community Supported Applications</font></b></center><br>";
     }
-    $display .= my_display_apps($viewMode,$communityApplications,$runningDockers,$imagesDocker);
+    $display .= my_display_apps($viewMode,$communityApplications,$runningDockers,$imagesDocker,$pageNumber);
   }
 
   if ( $communitySettings['superCategory'] == "true" || $separateOfficial ) {
     if ( count($betaApplications) ) {
       $navigate[] = "<a href='#BETA'>Beta Applications</a>";
       $display .= "<center><b><font size='4' color='purple' id='BETA'>Beta / Work In Progress Applications</font></b></center><br>";
-      $display .= my_display_apps($viewMode,$betaApplications,$runningDockers,$imagesDocker);
+      $display .= my_display_apps($viewMode,$betaApplications,$runningDockers,$imagesDocker,$pageNumber);
     }
     if ( count($privateApplications) ) {
       $navigate[] = "<a href='#PRIVATE'>Private Applications</a>";
       $display .= "<center><b><font size='4' color='purple' id='PRIVATE'>Applications From Private Repositories</font></b></center><br>";
-      $display .= my_display_apps($viewMode,$privateApplications,$runningDockers,$imagesDocker);
+      $display .= my_display_apps($viewMode,$privateApplications,$runningDockers,$imagesDocker,$pageNumber);
     }
   }
 
@@ -462,7 +462,7 @@ function display_apps($viewMode) {
   echo $display;
 }
 
-function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
+function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker,$pageNumber=1) {
   global $communityPaths, $info, $communitySettings, $plugin;
 
   $pinnedApps = getPinnedApps();
@@ -474,7 +474,8 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
   $communitySettings['viewMode'] = $viewMode;
 
   $skin = readJsonFile($communityPaths['defaultSkin']);
-  $ct = $skin[$viewMode]['header'].$skin[$viewMode]['sol'];
+  $ct = "<br>".getPageNavigation($pageNumber,count($file))."<br>";
+  $ct .= $skin[$viewMode]['header'].$skin[$viewMode]['sol'];
   $displayTemplate = $skin[$viewMode]['template'];
   if ( $viewMode == "detail" ) {
     $communitySettings['maxColumn'] = 2; 
@@ -482,7 +483,15 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
   }
 
   $columnNumber = 0;
+  $appCount = 0;
+  $startingApp = ($pageNumber -1) * $communitySettings['maxPerPage'] + 1;
+  $startingAppCounter = 0;
+  
   foreach ($file as $template) {
+    $startingAppCounter++;
+    if ( $startingAppCounter < $startingApp ) {
+      continue;
+    }
     $name = $template['SortName'];
     $appName = str_replace(" ","",$template['SortName']);
     $t = "";
@@ -596,10 +605,43 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker) {
     }
  
     $ct .= $t;
+    $count++;
+    if ( $count == $communitySettings['maxPerPage'] ) {
+      break;
+    }
   }
   $ct .= $skin[$viewMode]['footer'];
   $ct .= caGetMode();
+  $ct .= "<br>".getPageNavigation($pageNumber,count($file))."<br>";
+
   return $ct;
+}
+
+function getPageNavigation($pageNumber,$totalApps) {
+  global $communitySettings;
+  
+  $totalPages = intval($totalApps / $communitySettings['maxPerPage']) + 1;
+  if ($totalPages == 1) {
+    return;
+  }
+  $startApp = ($pageNumber - 1) * $communitySettings['maxPerPage'] + 1;
+  $endApp = $pageNumber * $communitySettings['maxPerPage'];
+  if ( $endApp > $totalApps ) {
+    $endApp = $totalApps;
+  }
+  $o = "<center><b>Displaying $startApp - $endApp</b>&nbsp;&nbsp;Select Page:&nbsp;&nbsp&nbsp;";
+
+  for ($i = 1; $i <= $totalPages; $i++) {
+    if ( $i == $pageNumber ) {
+      $o .= "$i";
+    } else {
+      $o .= "<b><a style='cursor:pointer' onclick='changePage(&quot;$i&quot;);' title='Go To Page $i'>$i</a></b>";
+    }
+    $o .= "&nbsp;&nbsp;&nbsp";
+  }
+  $o .= "</b></center><span id='currentPageNumber' hidden>$pageNumber</span>";
+  
+  return $o;
 }
 
 #############################
@@ -834,6 +876,8 @@ case 'get_content':
   $category = "/".getPost("category",false)."/i";
   $newApp   = getPost("newApp",false);
   $sortOrder = getSortOrder(getPostArray("sortOrder"));
+  $windowWidth = getPost("windowWidth",false);
+  getMaxColumns($windowWidth);
 
   $newAppTime = strtotime($communitySettings['timeNew']);
 
@@ -1087,9 +1131,13 @@ case 'force_update_button':
 
 case 'display_content':
   $sortOrder = getSortOrder(getPostArray('sortOrder'));
+  $windowWidth = getPost("windowWidth",false);
+  $pageNumber = getPost("pageNumber","1");
+  
+  getMaxColumns($windowWidth);
   
   if ( file_exists($communityPaths['community-templates-displayed']) ) {
-    display_apps($sortOrder['viewMode']);
+    display_apps($sortOrder['viewMode'],$pageNumber);
   } else {
     echo "<center><font size='4'>Select A Category Above</font></center>";
   }

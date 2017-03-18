@@ -27,6 +27,7 @@ if ( ! $cfg['superCategory'] )     { $cfg['superCategory'] = "true"; }
 if ( ! $cfg['newWindow'] )         { $cfg['newWindow'] = "_self"; }
 if ( ! $cfg['hideIncompatible'] )  { $cfg['hideIncompatible'] = "true"; }
 if ( ! $cfg['separateInstalled'] ) { $cfg['separateInstalled'] = "true"; }
+if ( ! $cfg['maxPerPage'] )        { $cfg['maxPerPage'] = "-1"; }
 
 # Get the available repositories and setup the display for favourites
 
@@ -111,6 +112,17 @@ Number of columns (icon mode only):
   </select>
 
 > This setting determines changes the number of columns displayed in icon mode.
+
+Maximum Number Of Results Per Page:
+: <select name='maxPerPage' size='1'>
+  <?=mk_option($cfg['maxPerPage'], "25", "25")?>
+  <?=mk_option($cfg['maxPerPage'], "50", "50")?>
+  <?=mk_option($cfg['maxPerPage'], "75", "75")?>
+  <?=mk_option($cfg['maxPerPage'], "100", "100")?>
+  <?=mk_option($cfg['maxPerPage'], "-1", "All Results")?>
+  </select>
+  
+> This setting determines how many results per page to display
 
 Group Beta and Private Apps into "Super Categories":
 : <select name="superCategory" size="1">

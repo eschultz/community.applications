@@ -680,6 +680,22 @@ function getRedirectedURL($url) {
   return curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
 }
 
+###########################################################
+#                                                         #
+# Returns the maximum number of columns per display width #
+#                                                         #
+###########################################################
+
+function getMaxColumns($windowWidth) {
+  global $communitySettings;
+  
+  if ($windowWidth < 2000) $communitySettings['maxDetailColumns'] = 3;
+  if ($windowWidth < 1500) $communitySettings['maxDetailColumns'] = 2;
+  if ($windowWidth < 1000) $communitySettings['maxDetailColumns'] = 1;
+}
+  
+
+
 ############################################################################
 #                                                                          #
 # Function to convert a template's associative tags to static numeric tags #
