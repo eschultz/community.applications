@@ -657,13 +657,31 @@ function getPageNavigation($pageNumber,$totalApps) {
   $previousPage = $pageNumber - 1;
   $o .= ( $pageNumber == 1 ) ? "<img width='20px' src='/plugins/community.applications/images/grey-left.png'>" : "<img width='20px' style='cursor:pointer' onclick='changePage(&quot;$previousPage&quot;)' title='Go To Page $previousPage' src='/plugins/community.applications/images/green-left.png'>";
   $o .= "&nbsp;&nbsp;&nbsp;";
-  for ($i = 1; $i <= $totalPages; $i++) {
+  $startingPage = $pageNumber - 5;
+  if ($startingPage < 3 ) {
+    $startingPage = 1;
+  } else {
+    $o .= "<b><a style='cursor:pointer' onclick='changePage(&quot;1&quot;);' title='Go To Page 1'>1</a></b>&nbsp;&nbsp;&nbsp;...&nbsp;&nbsp;&nbsp;";
+  }
+  $endingPage = $pageNumber + 5;
+  if ( $endingPage > $totalPages ) {
+    $endingPage = $totalPages;
+  }
+  for ($i = $startingPage; $i <= $endingPage; $i++) {
     if ( $i == $pageNumber ) {
       $o .= "$i";
     } else {
       $o .= "<b><a style='cursor:pointer' onclick='changePage(&quot;$i&quot;);' title='Go To Page $i'>$i</a></b>";
     }
     $o .= "&nbsp;&nbsp;&nbsp";
+  }
+  if ( $endingPage != $totalPages) {
+    if ( ($totalPages - $pageNumber ) > 6){
+      $o .= "...&nbsp;&nbsp;&nbsp;";
+    }
+    if ( ($totalPages - $pageNumber ) >5 ) {
+      $o .= "<b><a style='cursor:pointer' onclick='changePage(&quot;$totalPages&quot;);'>$totalPages</a></b>&nbsp;&nbsp;&nbsp;";
+    }
   }
   $nextPage = $pageNumber + 1;
   $o .= ( $pageNumber < $totalPages ) ? "<img width='20px' style='cursor:pointer' title='Go To Page $nextPage' onclick='changePage(&quot;$nextPage&quot;);' src='/plugins/community.applications/images/green-right.png'>" : "<img width='20px' src='/plugins/community.applications/images/grey-right.png'>";
