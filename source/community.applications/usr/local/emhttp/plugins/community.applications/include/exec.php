@@ -23,11 +23,13 @@ $DockerTemplates = new DockerTemplates();
 ################################################################################
 
 $communitySettings = parse_plugin_cfg("$plugin");
-$communitySettings['appFeed']    = "true"; # set default for deprecated setting
+$communitySettings['appFeed']       = "true"; # set default for deprecated setting
+$communitySettings['superCategory'] = "false"; # remove option.  Instead add in mod comments on every beta app.
 
 if ( $communitySettings['favourite'] != "None" ) {
   $officialRepo = str_replace("*","'",$communitySettings['favourite']);
   $separateOfficial = true;
+  $communitySettings['maxPerPage'] = "-1";  # Pages do not work when favourite repos are set.  Really need to think about how to do it better
 }
 
 if ( is_dir("/var/lib/docker/containers") ) {
@@ -66,6 +68,7 @@ if (!is_link("/usr/local/emhttp/state/plugins/$plugin")) symlink($communityPaths
 function DownloadCommunityTemplates() {
   global $communityPaths, $infoFile, $plugin, $communitySettings;
 
+  $betaComment = "<font color='purple'>The author of this template has designated it to be a beta.  You may experience issues with this application</font>";
   $moderation = readJsonFile($communityPaths['moderation']);
   if ( ! is_array($moderation) ) {
       $moderation = array();
@@ -141,6 +144,14 @@ function DownloadCommunityTemplates() {
         if ( is_array($moderation[$o['Repository']]) ) {
           $o = array_merge($o, $moderation[$o['Repository']]);
         }
+        
+        if ( $o['Beta'] == "true" ) {
+          if ( $o['ModeratorComment'] ) {
+            $o['ModeratorComment'] .= "<br><br>$betaComment";
+          } else {
+            $o['ModeratorComment'] = $betaComment;
+          }
+        }
         $o['Category'] = str_replace("Status:Beta","",$o['Category']);    # undo changes LT made to my xml schema for no good reason
         $o['Category'] = str_replace("Status:Stable","",$o['Category']);
         $myTemplates[$o['ID']] = $o;
@@ -189,6 +200,7 @@ function DownloadCommunityTemplates() {
 function DownloadApplicationFeed() {
   global $communityPaths, $infoFile, $plugin, $communitySettings;
 
+  $betaComment = "<font color='purple'>The author of this template has designated it to be a beta.  You may experience issues with this application</font>";
   $moderation = readJsonFile($communityPaths['moderation']);
   if ( ! is_array($moderation) ) {
     $moderation = array();
@@ -252,9 +264,10 @@ function DownloadApplicationFeed() {
     if ( ($file['DonateImg']) || ($file['DonateImage']) ) {  #because Sparklyballs can't read the tag documentation
       $o['DonateImg'] = $file['DonateImage'] ? $file['DonateImage'] : $file['DonateImg'];
     }
+    
     fixSecurity($o,$o); # Apply various fixes to the templates for CA use
     $o = fixTemplates($o);
-
+    
 # Overwrite any template values with the moderated values
 
     if ( is_array($moderation[$o['Repository']]) ) {
@@ -268,7 +281,15 @@ function DownloadApplicationFeed() {
 
     $o['Compatible'] = versionCheck($o);
 
-# Update the settings for the template
+    if ( $o['Beta'] == "true" ) {
+      if ( $o['ModeratorComment'] ) {
+        $o['ModeratorComment'] .= "<br><br>$betaComment";
+      } else {
+        $o['ModeratorComment'] = $betaComment;
+      }
+    }
+
+    # Update the settings for the template
 
     $file['Compatible'] = $o['Compatible'];
     $file['Beta'] = $o['Beta'];
@@ -620,6 +641,7 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker,$pageNumb
 function getPageNavigation($pageNumber,$totalApps) {
   global $communitySettings;
   
+  if ( $communitySettings['maxPerPage'] < 0 ) { return; }
   $totalPages = intval($totalApps / $communitySettings['maxPerPage']) + 1;
   if ($totalPages == 1) {
     return;
@@ -629,8 +651,10 @@ function getPageNavigation($pageNumber,$totalApps) {
   if ( $endApp > $totalApps ) {
     $endApp = $totalApps;
   }
-  $o = "<center><b>Displaying $startApp - $endApp</b>&nbsp;&nbsp;Select Page:&nbsp;&nbsp&nbsp;";
-
+  $o = "<center><font color='purple'><b>Displaying $startApp - $endApp (of $totalApps)<br>Select Page:&nbsp;&nbsp&nbsp;";
+  $previousPage = $pageNumber - 1;
+  $o .= ( $pageNumber == 1 ) ? "<img width='20px' src='/plugins/community.applications/images/grey-left.png'>" : "<img width='20px' style='cursor:pointer' onclick='changePage(&quot;$previousPage&quot;)' title='Go To Page $previousPage' src='/plugins/community.applications/images/green-left.png'>";
+  $o .= "&nbsp;&nbsp;&nbsp;";
   for ($i = 1; $i <= $totalPages; $i++) {
     if ( $i == $pageNumber ) {
       $o .= "$i";
@@ -639,7 +663,9 @@ function getPageNavigation($pageNumber,$totalApps) {
     }
     $o .= "&nbsp;&nbsp;&nbsp";
   }
-  $o .= "</b></center><span id='currentPageNumber' hidden>$pageNumber</span>";
+  $nextPage = $pageNumber + 1;
+  $o .= ( $pageNumber < $totalPages ) ? "<img width='20px' style='cursor:pointer' title='Go To Page $nextPage' onclick='changePage(&quot;$nextPage&quot;);' src='/plugins/community.applications/images/green-right.png'>" : "<img width='20px' src='/plugins/community.applications/images/grey-right.png'>";
+  $o .= "</font></b></center><span id='currentPageNumber' hidden>$pageNumber</span>";
   
   return $o;
 }

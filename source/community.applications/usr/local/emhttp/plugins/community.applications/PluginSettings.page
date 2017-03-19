@@ -27,7 +27,7 @@ if ( ! $cfg['superCategory'] )     { $cfg['superCategory'] = "true"; }
 if ( ! $cfg['newWindow'] )         { $cfg['newWindow'] = "_self"; }
 if ( ! $cfg['hideIncompatible'] )  { $cfg['hideIncompatible'] = "true"; }
 if ( ! $cfg['separateInstalled'] ) { $cfg['separateInstalled'] = "true"; }
-if ( ! $cfg['maxPerPage'] )        { $cfg['maxPerPage'] = "-1"; }
+if ( ! $cfg['maxPerPage'] )        { $cfg['maxPerPage'] = "25"; }
 
 # Get the available repositories and setup the display for favourites
 
@@ -115,23 +115,24 @@ Number of columns (icon mode only):
 
 Maximum Number Of Results Per Page:
 : <select name='maxPerPage' size='1'>
+  <?=mk_option($cfg['maxPerPage'], "10", "10 (default)")?>
   <?=mk_option($cfg['maxPerPage'], "25", "25")?>
   <?=mk_option($cfg['maxPerPage'], "50", "50")?>
   <?=mk_option($cfg['maxPerPage'], "75", "75")?>
   <?=mk_option($cfg['maxPerPage'], "100", "100")?>
   <?=mk_option($cfg['maxPerPage'], "-1", "All Results")?>
-  </select>
+  </select> * ignored if favourite repository has been set
   
 > This setting determines how many results per page to display
 
-Group Beta and Private Apps into "Super Categories":
+<!-- Group Beta and Private Apps into "Super Categories":
 : <select name="superCategory" size="1">
   <?=mk_option($cfg['superCategory'], "true", "Yes (default)")?>
   <?=mk_option($cfg['superCategory'], "false", "No")?>
   </select>
 
 > This setting will group beta applications and private applications into their own "super category" separate from the main list
-
+ -->
 Show already installed apps within available apps:
 : <select name='separateInstalled' size='1'>
   <?=mk_option($cfg['separateInstalled'], "true", "No (default)")?>
