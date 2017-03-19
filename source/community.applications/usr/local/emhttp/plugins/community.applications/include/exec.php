@@ -642,7 +642,11 @@ function getPageNavigation($pageNumber,$totalApps) {
   global $communitySettings;
   
   if ( $communitySettings['maxPerPage'] < 0 ) { return; }
+  
   $totalPages = intval($totalApps / $communitySettings['maxPerPage']) + 1;
+  if ( intval($totalApps / $communitySettings['maxPerPage']) == ( $totalApps / $communitySettings['maxPerPage']) ) {
+    --$totalPages;
+  }
   if ($totalPages == 1) {
     return;
   }
