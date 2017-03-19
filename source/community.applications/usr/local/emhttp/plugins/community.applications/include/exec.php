@@ -26,6 +26,8 @@ $communitySettings = parse_plugin_cfg("$plugin");
 $communitySettings['appFeed']       = "true"; # set default for deprecated setting
 $communitySettings['superCategory'] = "false"; # remove option.  Instead add in mod comments on every beta app.
 
+$communitySettings['maxPerPage'] = getPost("maxPerPage",$communitySettings['maxPerPage']);
+
 if ( $communitySettings['favourite'] != "None" ) {
   $officialRepo = str_replace("*","'",$communitySettings['favourite']);
   $separateOfficial = true;
@@ -495,7 +497,7 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker,$pageNumb
   $communitySettings['viewMode'] = $viewMode;
 
   $skin = readJsonFile($communityPaths['defaultSkin']);
-  $ct = "<br>".getPageNavigation($pageNumber,count($file))."<br>";
+  $ct = "<br>".getPageNavigation($pageNumber,count($file),false)."<br>";
   $ct .= $skin[$viewMode]['header'].$skin[$viewMode]['sol'];
   $displayTemplate = $skin[$viewMode]['template'];
   if ( $viewMode == "detail" ) {
@@ -633,16 +635,20 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker,$pageNumb
   }
   $ct .= $skin[$viewMode]['footer'];
   $ct .= caGetMode();
-  $ct .= "<br>".getPageNavigation($pageNumber,count($file))."<br>";
+  $ct .= "<br>".getPageNavigation($pageNumber,count($file),false)."<br>";
 
   return $ct;
 }
 
-function getPageNavigation($pageNumber,$totalApps) {
+function getPageNavigation($pageNumber,$totalApps,$dockerSearch) {
   global $communitySettings;
   
   if ( $communitySettings['maxPerPage'] < 0 ) { return; }
   
+  $my_function = $dockerSearch ? "dockerSearch" : "changePage";
+  if ( $dockerSearch ) {
+    $communitySettings['maxPerPage'] = 25;
+  }
   $totalPages = ceil($totalApps / $communitySettings['maxPerPage']);
 
   if ($totalPages == 1) {
@@ -653,15 +659,20 @@ function getPageNavigation($pageNumber,$totalApps) {
   if ( $endApp > $totalApps ) {
     $endApp = $totalApps;
   }
-  $o = "<center><font color='purple'><b>Displaying $startApp - $endApp (of $totalApps)<br>Select Page:&nbsp;&nbsp&nbsp;";
+  $o = "<center><font color='purple'><b>";
+  if ( ! $dockerSearch ) {
+    $o .= "Displaying $startApp - $endApp (of $totalApps)<br>";
+  }
+  $o .= "Select Page:&nbsp;&nbsp&nbsp;";
+  
   $previousPage = $pageNumber - 1;
-  $o .= ( $pageNumber == 1 ) ? "<img width='20px' src='/plugins/community.applications/images/grey-left.png'>" : "<img width='20px' style='cursor:pointer' onclick='changePage(&quot;$previousPage&quot;)' title='Go To Page $previousPage' src='/plugins/community.applications/images/green-left.png'>";
+  $o .= ( $pageNumber == 1 ) ? "<img width='20px' src='/plugins/community.applications/images/grey-left.png'>" : "<img width='20px' style='cursor:pointer' onclick='{$my_function}(&quot;$previousPage&quot;)' title='Go To Page $previousPage' src='/plugins/community.applications/images/green-left.png'>";
   $o .= "&nbsp;&nbsp;&nbsp;";
   $startingPage = $pageNumber - 5;
   if ($startingPage < 3 ) {
     $startingPage = 1;
   } else {
-    $o .= "<b><a style='cursor:pointer' onclick='changePage(&quot;1&quot;);' title='Go To Page 1'>1</a></b>&nbsp;&nbsp;&nbsp;...&nbsp;&nbsp;&nbsp;";
+    $o .= "<b><a style='cursor:pointer' onclick='{$my_function}(&quot;1&quot;);' title='Go To Page 1'>1</a></b>&nbsp;&nbsp;&nbsp;...&nbsp;&nbsp;&nbsp;";
   }
   $endingPage = $pageNumber + 5;
   if ( $endingPage > $totalPages ) {
@@ -671,7 +682,7 @@ function getPageNavigation($pageNumber,$totalApps) {
     if ( $i == $pageNumber ) {
       $o .= "$i";
     } else {
-      $o .= "<b><a style='cursor:pointer' onclick='changePage(&quot;$i&quot;);' title='Go To Page $i'>$i</a></b>";
+      $o .= "<b><a style='cursor:pointer' onclick='{$my_function}(&quot;$i&quot;);' title='Go To Page $i'>$i</a></b>";
     }
     $o .= "&nbsp;&nbsp;&nbsp";
   }
@@ -680,13 +691,13 @@ function getPageNavigation($pageNumber,$totalApps) {
       $o .= "...&nbsp;&nbsp;&nbsp;";
     }
     if ( ($totalPages - $pageNumber ) >5 ) {
-      $o .= "<b><a style='cursor:pointer' onclick='changePage(&quot;$totalPages&quot;);'>$totalPages</a></b>&nbsp;&nbsp;&nbsp;";
+      $o .= "<b><a style='cursor:pointer' onclick='{$my_function}(&quot;$totalPages&quot;);'>$totalPages</a></b>&nbsp;&nbsp;&nbsp;";
     }
   }
   $nextPage = $pageNumber + 1;
-  $o .= ( $pageNumber < $totalPages ) ? "<img width='20px' style='cursor:pointer' title='Go To Page $nextPage' onclick='changePage(&quot;$nextPage&quot;);' src='/plugins/community.applications/images/green-right.png'>" : "<img width='20px' src='/plugins/community.applications/images/grey-right.png'>";
+  $o .= ( $pageNumber < $totalPages ) ? "<img width='20px' style='cursor:pointer' title='Go To Page $nextPage' onclick='{$my_function}(&quot;$nextPage&quot;);' src='/plugins/community.applications/images/green-right.png'>" : "<img width='20px' src='/plugins/community.applications/images/grey-right.png'>";
   $o .= "</font></b></center><span id='currentPageNumber' hidden>$pageNumber</span>";
-  
+
   return $o;
 }
 
@@ -770,22 +781,8 @@ function suggestSearch($filter,$displayFlag) {
 ########################################################################################
 
 function dockerNavigate($num_pages, $pageNumber) {
-  $returnValue = "";
-  $returnValue .= "<center>";
+  $returnValue = getPageNavigation($pageNumber,$num_pages * 25, true);
 
-  if ( $num_pages == 1 || $pageNumber == 1) {
-    $returnValue .= "<img src='/plugins/community.applications/images/grey-left.png'>";
-  } else {
-    $returnValue .= "<a onclick='dockerSearch($pageNumber-1);' style='cursor:pointer' title='Previous Page'><img src='/plugins/community.applications/images/green-left.png'></a>";
-  }
-  $returnValue .= "<input type='range' max='$num_pages' min='1' id='enterPage' value='$pageNumber' onchange='dockerSearch(this.value);'>";
-
-  if ( $number_pages == 1 || $pageNumber == $num_pages ) {
-    $returnValue .= "<img src='/plugins/community.applications/images/grey-right.png'>";
-  } else {
-    $returnValue .= "<a onclick='dockerSearch($pageNumber+1);' style='cursor:pointer' title='Next Page'><img src='/plugins/community.applications/images/green-right.png'></a>";
-  }
-  $returnValue .= "</center>";
   $returnValue .= "<span style='float:right;position:relative;bottom:30px'><input type='button' value='Display Recommended' onclick='doSearch();'></span>";
 
   return $returnValue;
@@ -897,7 +894,7 @@ function displaySearchResults($pageNumber,$viewMode) {
   $t .= "</table>";
   echo $t;
   echo dockerNavigate($num_pages,$pageNumber);
-  echo "<script>$('#pageNumber').html('(Page $pageNumber of $num_pages)');</script>";
+#  echo "<script>$('#pageNumber').html('(Page $pageNumber of $num_pages)');</script>";
 }
 
 ############################################

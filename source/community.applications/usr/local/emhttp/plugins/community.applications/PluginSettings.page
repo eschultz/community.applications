@@ -113,7 +113,7 @@ Number of columns (icon mode only):
 
 > This setting determines changes the number of columns displayed in icon mode.
 
-Maximum Number Of Results Per Page:
+Default Number Of Results Per Page:
 : <select name='maxPerPage' size='1'>
   <?=mk_option($cfg['maxPerPage'], "10", "10 (default)")?>
   <?=mk_option($cfg['maxPerPage'], "25", "25")?>
