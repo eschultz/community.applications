@@ -2,8 +2,8 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.applications">
 <!ENTITY author    "Andrew Zawadzki">
-<!ENTITY version   "2017.03.19a">
-<!ENTITY md5       "445276815ad9b877ae225a0edb644d4d">
+<!ENTITY version   "2017.03.21">
+<!ENTITY md5       "2662443d489435685929640203e0e931">
 <!ENTITY launch    "Settings/PluginSettings">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/community.applications">
@@ -13,6 +13,9 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
+###2017.03.21###
+- Maintenance update:  Prevent Deprecated apps from appearing on available apps lists
+
 ###2017.03.19a###
 - Ability to switch max per page on the fly
 - Unify docker search navigation with appstore navigation

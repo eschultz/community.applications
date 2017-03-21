@@ -730,6 +730,7 @@ function appOfDay($file) {
     if ( ! $file[$app[0]]['Compatible'] || ! $file[$app[1]]['Compatible'] ) continue;
     if ( $file[$app[0]]['Blacklist'] || $file[$app[1]]['Blacklist'] ) continue;
     if ( $file[$app[0]]['ModeratorComment'] || $file[$app[1]]['ModeratorComment'] ) continue;
+    if ( $file[$app[0]]['Deprecated'] || $file[$app[1]]['Deprecated'] ) continue;
     break;
   }
   writeJsonFile($communityPaths['appOfTheDay'],$app);
@@ -994,6 +995,9 @@ case 'get_content':
   foreach ($file as $template) {
     if ( $template['Blacklist'] ) {
       continue;
+    }
+    if ( $template['Deprecated'] ) {
+      continue;                          # ie: only show deprecated apps within previous apps section
     }
     if ( ! $template['Displayable'] ) {
       continue;
