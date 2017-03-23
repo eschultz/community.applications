@@ -2,8 +2,8 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.applications">
 <!ENTITY author    "Andrew Zawadzki">
-<!ENTITY version   "2017.03.21">
-<!ENTITY md5       "2662443d489435685929640203e0e931">
+<!ENTITY version   "2017.03.22">
+<!ENTITY md5       "5d7702888ab0c53906c8b9eea7482667">
 <!ENTITY launch    "Settings/PluginSettings">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/community.applications">
@@ -13,6 +13,9 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
+###2017.03.22###
+- Misc Display Fixes
+
 ###2017.03.21###
 - Maintenance update:  Prevent Deprecated apps from appearing on available apps lists
 
