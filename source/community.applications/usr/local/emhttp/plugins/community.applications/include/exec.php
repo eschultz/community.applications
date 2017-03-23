@@ -895,7 +895,6 @@ function displaySearchResults($pageNumber,$viewMode) {
   $t .= "</table>";
   echo $t;
   echo dockerNavigate($num_pages,$pageNumber);
-#  echo "<script>$('#pageNumber').html('(Page $pageNumber of $num_pages)');</script>";
 }
 
 ############################################
@@ -996,7 +995,7 @@ case 'get_content':
     if ( $template['Blacklist'] ) {
       continue;
     }
-    if ( $template['Deprecated'] ) {
+    if ( ($communitySettings['hideDeprecated'] == "true") && ($template['Deprecated']) ) {
       continue;                          # ie: only show deprecated apps within previous apps section
     }
     if ( ! $template['Displayable'] ) {
@@ -1478,6 +1477,9 @@ case 'previous_apps':
               $template['UpdateAvailable'] = true;
               $template['FullRepo'] = $installedImage;
             }
+            if ($template['Blacklist'] ) {
+              continue;
+            }
             $displayed[] = $template;
             break;
           }
@@ -1537,6 +1539,9 @@ case 'previous_apps':
           if ( $runningflag ) {
             $o['Uninstall'] = true;
             $o['ID'] = $containerID;
+            if ( $o['Blacklist'] ) {
+              continue;
+            }
             $displayed[] = $o;
           }
         }
@@ -1580,6 +1585,9 @@ case 'previous_apps':
               break;
             }
           }
+          if ( $moderation[$o['Repository']]['Blacklist'] ) {
+            continue;
+          }
           $displayed[] = $o;
         }
       }
@@ -1605,6 +1613,9 @@ case 'previous_apps':
           if ( checkPluginUpdate($filename) ) {
             $template['UpdateAvailable'] = true;
           }
+          if ( $template['Blacklist'] ) {
+            continue;
+          }
           $displayed[] = $template;
         }
       }
@@ -1618,6 +1629,9 @@ case 'previous_apps':
           if ( ! file_exists("/boot/config/plugins/$oldplug") ) {
             $template['Removable'] = true;
             $template['MyPath'] = "/boot/config/plugins-removed/$oldplug";
+            if ( $template['Blacklist'] ) {
+              continue;
+            }
             $displayed[] = $template;
             break;
           }

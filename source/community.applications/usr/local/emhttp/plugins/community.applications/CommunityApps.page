@@ -241,6 +241,7 @@ function changePage(pageNumber) {
   var windowWidth = getWindowWidth();
   var maxPerPage = getPerPage();
   
+  $("#Total").html("<img src='/plugins/community.applications/images/spinner2.gif' style='height:30px;width:30px'>");
   $.post(URL,{action:'display_content',sortOrder:sortOrder,windowWidth:windowWidth,pageNumber:pageNumber,maxPerPage:maxPerPage},function(data3) {
     if (data3) {
       $('#templates_content').html(data3);
@@ -323,7 +324,7 @@ function doSearch(button) {
       return;
     }
   }
-
+  $("#Total1").show();
   $("#Total").html("Searching... <img src='/plugins/community.applications/images/spinner2.gif' style='height:30px;width:30px'>");
   $('#BackToTop').hide();
   if (filter) {
@@ -952,7 +953,7 @@ function displayTags(leadTemplate) {
 <input class='allButtons' type=button id="All" style='margin:0px'; value='All Apps'></input>
 </span>
 
-<strong><font size='3'><span id="Category"></span></strong></font><span id="Total1" style='float: right';>Total Found: <strong><font size="3"><span id="Total"></span></font></strong><span>&nbsp;&nbsp;Results/page: <select id='maxPerPage' class='narrow' onchange='changeSortOrder(null,null,null);'><option value='-1'>All</option><option value='10'>10</option><option value='25'>25</option><option value='50'>50</option><option value='100'>100</option></select></span></span>
+<strong><font size='3'><span id="Category"></span></strong></font><span id="Total1" style='float: right';>Total Found: <strong><font size="3"><span id="Total"></span></font></strong><span>&nbsp;&nbsp;Results/page: <select id='maxPerPage' class='narrow' onchange='changePage(&quot;1&quot;);'><option value='-1'>All</option><option value='10'>10</option><option value='25'>25</option><option value='50'>50</option><option value='100'>100</option></select></span></span>
 </span><br>
 <center>
 <span id='sortButtons'>View Mode:

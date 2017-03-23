@@ -28,6 +28,7 @@ if ( ! $cfg['newWindow'] )         { $cfg['newWindow'] = "_self"; }
 if ( ! $cfg['hideIncompatible'] )  { $cfg['hideIncompatible'] = "true"; }
 if ( ! $cfg['separateInstalled'] ) { $cfg['separateInstalled'] = "true"; }
 if ( ! $cfg['maxPerPage'] )        { $cfg['maxPerPage'] = "25"; }
+if ( ! $cfg['hideDeprecated'] )    { $cfg['hideDeprecated'] = "true"; }
 
 # Get the available repositories and setup the display for favourites
 
@@ -149,6 +150,14 @@ Open Add / Edit / Settings in new Tab:
 
 > This setting determines if the settings / add / edit windows will open in a new tab on your browser or not
 
+Hide Deprecated Applications:
+: <select name='hideDeprecated' size='1'>
+  <?=mk_option($cfg['hideDeprecated'], "true", "Yes (default)")?>
+  <?=mk_option($cfg['hideDeprecated'], "false", "No")?>
+  </select>
+
+> This setting hides deprecated applications from the list of available apps.  Deprecated apps will still however display within the <em>installed</em> and <em>previous</em> apps sections.
+  
 Hide Incompatible Applications:
 : <select name='hideIncompatible' size='1'>
   <?=mk_option($cfg['hideIncompatible'], "true", "Yes (default)")?>
