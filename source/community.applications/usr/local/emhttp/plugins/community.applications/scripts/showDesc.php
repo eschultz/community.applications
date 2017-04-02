@@ -5,7 +5,6 @@
 #                                                             #
 ###############################################################
  
-echo "<span id='wait'><center>Gathering Information...</center></span><br>";
 require_once("/usr/local/emhttp/plugins/community.applications/include/paths.php");
 require_once("/usr/local/emhttp/plugins/community.applications/include/helpers.php");
 require_once("/usr/local/emhttp/plugins/dynamix.docker.manager/include/DockerClient.php");
@@ -28,6 +27,10 @@ if ( $communitySettings['dockerRunning'] ) {
 }
 $appNumber =  urldecode($_GET['appNumber']);
 $appName = urldecode($_GET['appName']);
+if ( ! $appNumber ) {
+  $appNumber = $_POST['appNumber'];
+  $color="<font color='white'>";
+}
 
 $file = readJsonFile($communityPaths['community-templates-info']);
 $repos = readJsonFile($communityPaths['Repositories']);
@@ -74,17 +77,20 @@ $template['Icon'] = $template['Icon'] ? $template['Icon'] : "/plugins/community.
 $template['Description'] = ltrim($template['Description']);
 
 $templateDescription = "<style>p { margin-left:20px;margin-right:20px }</style>";
-$templateDescription .= "\n<center><table><tr><td><figure style='margin:0px'><img id='icon' src='".$template['Icon']."' style='width:96px;height:96px' onerror='this.src=&quot;/plugins/community.applications/images/question.png&quot;';>";
+if ( $color ) {
+  $templateDescription .= "<br><br><br>";
+}
+$templateDescription .= "<center><table><tr><td><figure style='margin:0px'><img id='icon' src='".$template['Icon']."' style='width:96px;height:96px' onerror='this.src=&quot;/plugins/community.applications/images/question.png&quot;';>";
 $templateDescription .= ($template['Beta'] == "true") ? "<figcaption><font size='1' color='red'><center><strong>(beta)</strong></center></font></figcaption>" : "";
 $templateDescription .= "</figure>";
-$templateDescription .= "</td><td></td><td><table><tr><td><strong>Author: </strong></td><td>".$template['Author']."</td></tr>";
-$templateDescription .= "<tr><td><strong>Repository: </strong></td><td>";
+$templateDescription .= "</td><td></td><td><table><tr><td>$color<strong>Author: </strong></td><td>$color".$template['Author']."</td></tr>";
+$templateDescription .= "<tr><td>$color<strong>Repository: </strong></td><td>$color";
 $templateDescription .= $template['Forum'] ? "<a href='".$template['Forum']."' target='_blank'>".$template['RepoName']."</a>" : $template['RepoName'];
 $templateDescription .= "</td></tr>";
 $templateDescription .= ($template['Private'] == "true") ? "<tr><td></td><td><font color=red>Private Repository</font></td></tr>" : "";
-$templateDescription .= "<tr><td><strong>Categories: </strong></td><td>".$template['Category']."</td></tr>";
+$templateDescription .= "<tr><td>$color<strong>Categories: </strong></td><td>$color".$template['Category']."</td></tr>";
 
-$template['Base'] = $template['Plugin'] ? "<font color='red'>unRaid Plugin</font>" : $template['Base'];
+$template['Base'] = $template['Plugin'] ? "$color<font color='red'>unRaid Plugin</font>" : $template['Base'];
 
 if ( strtolower($template['Base']) == "unknown" ) {
   $template['Base'] = $template['BaseImage'];
@@ -93,17 +99,17 @@ if ( ! $template['Base'] ) {
   $template['Base'] = "Could Not Determine";
 }
 
-$templateDescription .= "<tr><td nowrap><strong>Base OS: </strong></td><td>".$template['Base']."</td></tr>";
-$templateDescription .= $template['stars'] ? "<tr><td nowrap><strong>Star Rating: </strong></td><td><img src='/plugins/community.applications/images/red-star.png' style='height:15px;width:15px'> ".$template['stars']."</td></tr>" : "";
+$templateDescription .= "<tr><td nowrap>$color<strong>Base OS: </strong></td><td>$color".$template['Base']."</td></tr>";
+$templateDescription .= $template['stars'] ? "<tr><td nowrap>$color<strong>Star Rating: </strong></td><td>$color<img src='/plugins/community.applications/images/red-star.png' style='height:15px;width:15px'> ".$template['stars']."</td></tr>" : "";
 
 if ( $template['Date'] ) {
   $niceDate = date("F j, Y",$template['Date']);
-  $templateDescription .= "<tr><td nowrap><strong>Date Updated: </strong></td><td>$niceDate</td></tr>";
+  $templateDescription .= "<tr><td nowrap>$color<strong>Date Updated: </strong></td><td>$color$niceDate</td></tr>";
 }
-$templateDescription .= $template['MinVer'] ? "<tr><td nowrap><strong>Minimum OS:</strong></td><td>unRaid v".$template['MinVer']."</td></tr>" : "";
-$templateDescription .= $template['MaxVer'] ? "<tr><td nowrap><strong>Max OS:</strong></td><td>unRaid v".$template['MaxVer']."</td></tr>" : "";
-$templateDescription .= $template['downloads'] ? "<tr><td><strong>Downloads:</strong></td><td>".$template['downloads']."</td></tr>" : "";
-$templateDescription .= $template['Licence'] ? "<tr><td><strong>Licence:</strong></td><td>".$template['Licence']."</td></tr>" : "";
+$templateDescription .= $template['MinVer'] ? "<tr><td nowrap>$color<b>Minimum OS:</strong></td><td>{$color}unRaid v".$template['MinVer']."</td></tr>" : "";
+$templateDescription .= $template['MaxVer'] ? "<tr><td nowrap>$color<strong>Max OS:</strong></td><td>{$color}unRaid v".$template['MaxVer']."</td></tr>" : "";
+$templateDescription .= $template['downloads'] ? "<tr><td>$color<strong>Downloads:</strong></td><td>{$color}".$template['downloads']."</td></tr>" : "";
+$templateDescription .= $template['Licence'] ? "<tr><td>$color<strong>Licence:</strong></td><td>$color".$template['Licence']."</td></tr>" : "";
   
 if ( $selected ) {
   $result = searchArray($dockerRunning,'Name',$appName);
@@ -111,21 +117,22 @@ if ( $selected ) {
   if ( $dockerRunning[$result]['Running'] ) {
     $imageID = $dockerRunning[$result]['Id'];
       
-    $templateDescription .= "<tr><td nowrap><strong>% CPU:</strong></td><td><span id='percent'>Calculating</span></td></tr>";
-    $templateDescription .= "<tr><td nowrap><strong>Memory:</strong></td><td><span id='memory'>Calculating</span></td></tr>";
+    $templateDescription .= "<tr><td nowrap>$color<strong>% CPU:</strong></td><td>$color<span id='percent'>Calculating</span></td></tr>";
+    $templateDescription .= "<tr><td nowrap>$color<strong>Memory:</strong></td><td>$color<span id='memory'>Calculating</span></td></tr>";
     $templateDescription .= "<tr><td></td><td>$o</td></tr>";
   } else {
-    $templateDescription .= "<tr><td nowrap><strong>% CPU:</strong></td><td>Not running</td></tr>";
-    $templateDescription .= "<tr><td nowrap><strong>Memory:</strong></td><td>Not running</td></tr>";
+    $templateDescription .= "<tr><td nowrap>$color<strong>% CPU:</strong></td><td>{$color}Not running</td></tr>";
+    $templateDescription .= "<tr><td nowrap>$color<strong>Memory:</strong></td><td>{$color}Not running</td></tr>";
   }
 }
-$templateDescription .= "</table></td></tr></table></center>\n<strong><hr></strong><p>".$template['Description'];
+$templateDescription .= "</table></td></tr></table></center>";
+$templateDescription .= $template['Description'];
 $templateDescription .= $template['ModeratorComment'] ? "<br><br><b><font color='red'>Moderator Comments:</font></b> ".$template['ModeratorComment'] : "";
-$templateDescription .= "</p>\n<center><table><tr>";
+$templateDescription .= "</p><br><center><table><tr>";
 $templateDescription .= $template['Support'] ? "<td><a href='".$template['Support']."' target='_blank'><strong>Support Thread</strong></a></td>" : "";
 $templateDescription .= $template['Project'] ? "<td></td><td><a href='".$template['Project']."' target='_blank'><strong>Project Page</strong></a></td>" : "";
 $templateDescription .= $template['WebPageURL'] ? "<td></td><td><a href='".$template['WebPageURL']."' target='_blank'><strong>Web Page</strong></a></td>" : "";
-$templateDescription .= "</tr></table>\n<span id='script'></span>";
+$templateDescription .= "</tr></table><br><span id='script'></span>";
 
 if ( ($donatelink) && ($donateimg) ) {
   $templateDescription .= "<br><center><font size='0'>$donatetext</font><br><a href='$donatelink' target='_blank'><img src='$donateimg' style='max-height:25px;'></a>";
@@ -133,7 +140,6 @@ if ( ($donatelink) && ($donateimg) ) {
     $templateDescription .= "<br><font size='0'>The above link is set by the author of the template, not the author of Community Applications</font></center>";
   }
 }
-$templateDescription .= "<script>document.getElementById('wait').innerHTML = '';</script>";
 if ( $imageID ) {
   $unRaidVars = parse_ini_file("/var/local/emhttp/var.ini");
   $csrf = $unRaidVars['csrf_token'];
@@ -161,6 +167,7 @@ if ( $imageID ) {
     </script>
   ";
 }
-     
+echo "<div style='overflow:scroll; max-height:450px; height:450px; overflow-x:hidden; overflow-y:auto;'>";
 echo $templateDescription;
+echo "</div>";
 ?>

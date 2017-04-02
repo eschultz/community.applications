@@ -522,10 +522,13 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker,$pageNumb
     $selected = $info[$name]['template'] && stripos($info[$name]['icon'], $template['SortAuthor']) !== false;
     $selected = $template['Uninstall'] ? true : $selected;
     $RepoName = ( $template['Private'] == "true" ) ? $template['RepoName']."<font color=red> (Private)</font>" : $template['RepoName'];
-    $template['display_DonateLink'] = $template['DonateLink'] ? "<font size='0'><a href='".$template['DonateLink']."' target='_blank' title='".$template['DonateText']."'>Donate To Author</a></font>" : "";
-    $template['display_Project'] = $template['Project'] ? "<a target='_blank' title='Click to go the the Project Home Page' href='".$template['Project']."'><font color=red>Project Home Page</font></a>" : "";
-    $template['display_Support'] = $template['Support'] ? "<a href='".$template['Support']."' target='_blank' title='Click to go to the support thread'><font color=red>Support Thread</font></a>" : "";
-    $template['display_webPage'] = $template['WebPageURL'] ? "<a href='".$template['WebPageURL']."' target='_blank'><font color='red'>Web Page</font></a></font>" : "";
+    if ( ! $template['DonateText'] ) {
+      $template['DonateText'] = "Donate To Author";
+    }
+    $template['display_DonateLink'] = $template['DonateLink'] ? "<font size='0'><a class='ca_tooltip' href='".$template['DonateLink']."' target='_blank' title='".$template['DonateText']."'>Donate To Author</a></font>" : "";
+    $template['display_Project'] = $template['Project'] ? "<a class='ca_tooltip' target='_blank' title='Click to go the the Project Home Page' href='".$template['Project']."'><font color=red>Project Home Page</font></a>" : "";
+    $template['display_Support'] = $template['Support'] ? "<a class='ca_tooltip' href='".$template['Support']."' target='_blank' title='Click to go to the support thread'><font color=red>Support Thread</font></a>" : "";
+    $template['display_webPage'] = $template['WebPageURL'] ? "<a class='ca_tooltip' title='Click to go to the web page of the author' href='".$template['WebPageURL']."' target='_blank'><font color='red'>Web Page</font></a></font>" : "";
 
     if ( $template['display_Support'] && $template['display_Project'] ) { $template['display_Project'] = "&nbsp;&nbsp;&nbsp".$template['display_Project'];}
     if ( $template['display_webPage'] && ( $template['display_Project'] || $template['display_Support'] ) ) { $template['display_webPage'] = "&nbsp;&nbsp;&nbsp;".$template['display_webPage']; }
@@ -534,7 +537,7 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker,$pageNumb
     }
     $template['display_ModeratorComment'] .= $template['ModeratorComment'] ? "</b></strong><font color='red'><b>Moderator Comments:</b></font> ".$template['ModeratorComment'] : "";
     $tempLogo = $template['Logo'] ? "<img src='".$template['Logo']."' height=20px>" : "";
-    $template['display_Announcement'] = $template['Forum'] ? "<a href='".$template['Forum']."' target='_blank' title='Click to go to the repository Announcement thread' >$RepoName $tempLogo</a>" : "$RepoName $tempLogo";
+    $template['display_Announcement'] = $template['Forum'] ? "<a class='ca_tooltip' href='".$template['Forum']."' target='_blank' title='Click to go to the repository Announcement thread' >$RepoName $tempLogo</a>" : "$RepoName $tempLogo";
     $template['display_Stars'] = $template['stars'] ? "<img src='/plugins/$plugin/images/red-star.png' style='height:15px;width:15px'> <strong>".$template['stars']."</strong>" : "";
     $template['display_Downloads'] = $template['downloads'] ? "<center>".$template['downloads']."</center>" : "<center>Not Available</center>";
 
@@ -545,20 +548,20 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker,$pageNumb
       $pinned = "redButton.png";
       $pinnedTitle = "Click to pin this application";
     }
-    $template['display_pinButton'] = "<img src='/plugins/$plugin/images/$pinned' style='height:15px;width:15px;cursor:pointer' title='$pinnedTitle' onclick='pinApp(this,&quot;".$template['Repository']."&quot;);'>";
+    $template['display_pinButton'] = "<img class='ca_tooltip' src='/plugins/$plugin/images/$pinned' style='height:15px;width:15px;cursor:pointer' title='$pinnedTitle' onclick='pinApp(this,&quot;".$template['Repository']."&quot;);'>";
     if ( $template['Uninstall'] ) {
-      $template['display_Uninstall'] = "<img src='/plugins/dynamix.docker.manager/images/remove.png' title='Uninstall Application' style='width:20px;height:20px;cursor:pointer' ";
+      $template['display_Uninstall'] = "<img class='ca_tooltip' src='/plugins/dynamix.docker.manager/images/remove.png' title='Uninstall Application' style='width:20px;height:20px;cursor:pointer' ";
       if ( $template['Plugin'] ) {
         $template['display_Uninstall'] .= "onclick='uninstallApp(&quot;".$template['MyPath']."&quot;,&quot;".$template['Name']."&quot;);'>";
       } else {
         $template['display_Uninstall'] .= "onclick='uninstallDocker(&quot;".$template['MyPath']."&quot;,&quot;".$template['Name']."&quot;);'>";
       }
     }
-    $template['display_removable'] = $template['Removable'] ? "<img src='/plugins/dynamix.docker.manager/images/remove.png' title='Remove Application From List' style='width:20px;height:20px;cursor:pointer' onclick='removeApp(&quot;".$template['MyPath']."&quot;,&quot;".$template['Name']."&quot;);'>" : "";
+    $template['display_removable'] = $template['Removable'] ? "<img class='ca_tooltip' src='/plugins/dynamix.docker.manager/images/remove.png' title='Remove Application From List' style='width:20px;height:20px;cursor:pointer' onclick='removeApp(&quot;".$template['MyPath']."&quot;,&quot;".$template['Name']."&quot;);'>" : "";
     if ( $template['Date'] > strtotime($communitySettings['timeNew'] ) ) {
-      $template['display_newIcon'] = "<img src='/plugins/$plugin/images/star.png' style='width:15px;height:15px;' title='New / Updated - ".date("F d Y",$template['Date'])."'></img>";
+      $template['display_newIcon'] = "<img class='ca_tooltip' src='/plugins/$plugin/images/star.png' style='width:15px;height:15px;' title='New / Updated - ".date("F d Y",$template['Date'])."'></img>";
     }
-    $template['display_changes'] = $template['Changes'] ? " <a style='cursor:pointer'><img src='/plugins/$plugin/images/information.png' onclick=showInfo($ID,'$appName'); title='Click for the changelog / more information'></a>" : "";
+    $template['display_changes'] = $template['Changes'] ? " <a style='cursor:pointer'><img class='ca_infoPopup' data-appnumber='$ID' src='/plugins/$plugin/images/information.png' onclick=showInfo($ID,'$appName'); title='Click for the changelog / more information'></a>" : "";
     $template['display_humanDate'] = date("F j, Y",$template['Date']);
 
     if ( $template['Plugin'] ) {
@@ -570,20 +573,20 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker,$pageNumb
 
       } else {
         $buttonTitle = $template['MyPath'] ? "Reinstall Plugin" : "Install Plugin";
-        $template['display_pluginInstall'] = "<input type='button' value='$buttonTitle' style='margin:0px' title='Click to install this plugin' onclick=installPlugin('".$template['PluginURL']."');>";
+        $template['display_pluginInstall'] = "<input class='ca_tooltip' type='button' value='$buttonTitle' style='margin:0px' title='Click to install this plugin' onclick=installPlugin('".$template['PluginURL']."');>";
       }
     } else {
       if ( $communitySettings['dockerRunning'] ) {
         if ( $selected ) {
-          $template['display_dockerDefault'] = "<input type='submit' value='Default' style='margin:1px' title='Click to reinstall the application using default values' formtarget='$tabMode' formmethod='post' formaction='AddContainer?xmlTemplate=default:".addslashes($template['Path'])."'>";
-          $template['display_dockerEdit']    = "<input type='submit' value='Edit' style='margin:1px' title='Click to edit the application values' formtarget='$tabMode' formmethod='post' formaction='UpdateContainer?xmlTemplate=edit:".addslashes($info[$name]['template'])."'>";
-          $template['display_dockerDefault'] = $template['BranchID'] ? "<input type='button' style='margin:0px' title='Click to reinstall the application using default values' value='Add' onclick='displayTags(&quot;$ID&quot;);'>" : $template['display_dockerDefault'];
+          $template['display_dockerDefault'] = "<input class='ca_tooltip' type='submit' value='Default' style='margin:1px' title='Click to reinstall the application using default values' formtarget='$tabMode' formmethod='post' formaction='AddContainer?xmlTemplate=default:".addslashes($template['Path'])."'>";
+          $template['display_dockerEdit']    = "<input class='ca_tooltip' type='submit' value='Edit' style='margin:1px' title='Click to edit the application values' formtarget='$tabMode' formmethod='post' formaction='UpdateContainer?xmlTemplate=edit:".addslashes($info[$name]['template'])."'>";
+          $template['display_dockerDefault'] = $template['BranchID'] ? "<input class='ca_tooltip' type='button' style='margin:0px' title='Click to reinstall the application using default values' value='Add' onclick='displayTags(&quot;$ID&quot;);'>" : $template['display_dockerDefault'];
           } else {
           if ( $template['MyPath'] ) {
-            $template['display_dockerReinstall'] = "<input type='submit' style='margin:0px' title='Click to reinstall the application' value='Reinstall' formtarget='$tabMode' formmethod='post' formaction='AddContainer?xmlTemplate=user:".addslashes($template['MyPath'])."'>";
+            $template['display_dockerReinstall'] = "<input class='ca_tooltip' type='submit' style='margin:0px' title='Click to reinstall the application' value='Reinstall' formtarget='$tabMode' formmethod='post' formaction='AddContainer?xmlTemplate=user:".addslashes($template['MyPath'])."'>";
           } else {
-            $template['display_dockerInstall']   = "<input type='submit' style='margin:0px' title='Click to install the application' value='Add' formtarget='$tabMode' formmethod='post' formaction='AddContainer?xmlTemplate=default:".addslashes($template['Path'])."'>";
-            $template['display_dockerInstall']   = $template['BranchID'] ? "<input type='button' style='margin:0px' title='Click to install the application' value='Add' onclick='displayTags(&quot;$ID&quot;);'>" : $template['display_dockerInstall'];
+            $template['display_dockerInstall']   = "<input class='ca_tooltip' type='submit' style='margin:0px' title='Click to install the application' value='Add' formtarget='$tabMode' formmethod='post' formaction='AddContainer?xmlTemplate=default:".addslashes($template['Path'])."'>";
+            $template['display_dockerInstall']   = $template['BranchID'] ? "<input class='ca_tooltip' type='button' style='margin:0px' title='Click to install the application' value='Add' onclick='displayTags(&quot;$ID&quot;);'>" : $template['display_dockerInstall'];
             }
         }
       } else {
@@ -594,24 +597,24 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker,$pageNumb
       $template['display_compatible'] = "NOTE: This application is listed as being NOT compatible with your version of unRaid<br>";
       $template['display_compatibleShort'] = "Incompatible";
     }
-    $template['display_author'] = "<a style='cursor:pointer' onclick='authorSearch(this.innerHTML);' title='Search for more containers from author'>".$template['Author']."</a>";
+    $template['display_author'] = "<a class='ca_tooltip' style='cursor:pointer' onclick='authorSearch(this.innerHTML);' title='Search for more containers from author'>".$template['Author']."</a>";
     $displayIcon = $template['Icon'];
     $displayIcon = $displayIcon ? $displayIcon : "/plugins/$plugin/images/question.png";
-    $template['display_iconSmall'] = "<a onclick='showDesc(".$template['ID'].",&#39;".$name."&#39;);' style='cursor:pointer'><img title='Click to display full description' src='".$displayIcon."' style='width:48px;height:48px;' onError='this.src=\"/plugins/$plugin/images/question.png\";'></a>";
+    $template['display_iconSmall'] = "<a onclick='showDesc(".$template['ID'].",&#39;".$name."&#39;);' style='cursor:pointer'><img class='ca_appPopup' data-appNumber='$ID' title='Click to display full description' src='".$displayIcon."' style='width:48px;height:48px;' onError='this.src=\"/plugins/$plugin/images/question.png\";'></a>";
     $template['display_iconSelectable'] = "<img src='$displayIcon' onError='this.src=\"/plugins/$plugin/images/question.png\";' style='width:".$iconSize."px;height=".$iconSize."px;'>";
     $template['display_popupDesc'] = ( $communitySettings['maxColumn'] > 2 ) ? "Click for a full description\n".$template['PopUpDescription'] : "Click for a full description";
     $template['display_dateUpdated'] = $template['Date'] ? "</b></strong><center><strong>Date Updated: </strong>".$template['display_humanDate']."</center>" : "";
-    $template['display_iconClickable'] = "<a onclick=showDesc($ID,'$appName'); style='cursor:pointer' title='".$template['display_popupDesc']."'>".$template['display_iconSelectable']."</a>";
+    $template['display_iconClickable'] = "<a class='ca_appPopup' data-appNumber='$ID' onclick=showDesc($ID,'$appName'); style='cursor:pointer' title='".$template['display_popupDesc']."'>".$template['display_iconSelectable']."</a>";
 
     if ( $communitySettings['dockerSearch'] == "yes" && ! $template['Plugin'] ) {
-      $template['display_dockerName'] = "<a style='cursor:pointer' onclick='mySearch(this.innerHTML);' title='Search dockerHub for similar containers'>".$template['Name']."</a>";
+      $template['display_dockerName'] = "<a class='ca_tooltip' data-appNumber='$ID' style='cursor:pointer' onclick='mySearch(this.innerHTML);' title='Search dockerHub for similar containers'>".$template['Name']."</a>";
     } else {
       $template['display_dockerName'] = $template['Name'];
     }
     $template['Category'] = ($template['Category'] == "UNCATEGORIZED") ? "Uncategorized" : $template['Category'];
 
     if ( ( $template['Beta'] == "true" ) ) {
-      $template['display_dockerName'] .= "<span title='Beta Container &#13;See support forum for potential issues'><font size='1' color='red'><strong>(beta)</strong></font></span>";
+      $template['display_dockerName'] .= "<span class='ca_tooltip' title='Beta Container &#13;See support forum for potential issues'><font size='1' color='red'><strong>(beta)</strong></font></span>";
     }
 
     $t .= vsprintf($displayTemplate,toNumericArray($template));
@@ -666,13 +669,13 @@ function getPageNavigation($pageNumber,$totalApps,$dockerSearch) {
   $o .= "Select Page:&nbsp;&nbsp&nbsp;";
   
   $previousPage = $pageNumber - 1;
-  $o .= ( $pageNumber == 1 ) ? "<img width='20px' src='/plugins/community.applications/images/grey-left.png'>" : "<img width='20px' style='cursor:pointer' onclick='{$my_function}(&quot;$previousPage&quot;)' title='Go To Page $previousPage' src='/plugins/community.applications/images/green-left.png'>";
+  $o .= ( $pageNumber == 1 ) ? "<img width='20px' src='/plugins/community.applications/images/grey-left.png'>" : "<img class='ca_tooltip' width='20px' style='cursor:pointer' onclick='{$my_function}(&quot;$previousPage&quot;)' title='Go To Page $previousPage' src='/plugins/community.applications/images/green-left.png'>";
   $o .= "&nbsp;&nbsp;&nbsp;";
   $startingPage = $pageNumber - 5;
   if ($startingPage < 3 ) {
     $startingPage = 1;
   } else {
-    $o .= "<b><a style='cursor:pointer' onclick='{$my_function}(&quot;1&quot;);' title='Go To Page 1'>1</a></b>&nbsp;&nbsp;&nbsp;...&nbsp;&nbsp;&nbsp;";
+    $o .= "<b><a style='cursor:pointer' onclick='{$my_function}(&quot;1&quot;);' class='ca_tooltip' title='Go To Page 1'>1</a></b>&nbsp;&nbsp;&nbsp;...&nbsp;&nbsp;&nbsp;";
   }
   $endingPage = $pageNumber + 5;
   if ( $endingPage > $totalPages ) {
@@ -682,7 +685,7 @@ function getPageNavigation($pageNumber,$totalApps,$dockerSearch) {
     if ( $i == $pageNumber ) {
       $o .= "$i";
     } else {
-      $o .= "<b><a style='cursor:pointer' onclick='{$my_function}(&quot;$i&quot;);' title='Go To Page $i'>$i</a></b>";
+      $o .= "<b><a class='ca_tooltip' style='cursor:pointer' onclick='{$my_function}(&quot;$i&quot;);' title='Go To Page $i'>$i</a></b>";
     }
     $o .= "&nbsp;&nbsp;&nbsp";
   }
@@ -691,11 +694,11 @@ function getPageNavigation($pageNumber,$totalApps,$dockerSearch) {
       $o .= "...&nbsp;&nbsp;&nbsp;";
     }
     if ( ($totalPages - $pageNumber ) >5 ) {
-      $o .= "<b><a style='cursor:pointer' onclick='{$my_function}(&quot;$totalPages&quot;);'>$totalPages</a></b>&nbsp;&nbsp;&nbsp;";
+      $o .= "<b><a style='cursor:pointer' class='ca_tooltip' title='Go To Page $totalPages' onclick='{$my_function}(&quot;$totalPages&quot;);'>$totalPages</a></b>&nbsp;&nbsp;&nbsp;";
     }
   }
   $nextPage = $pageNumber + 1;
-  $o .= ( $pageNumber < $totalPages ) ? "<img width='20px' style='cursor:pointer' title='Go To Page $nextPage' onclick='{$my_function}(&quot;$nextPage&quot;);' src='/plugins/community.applications/images/green-right.png'>" : "<img width='20px' src='/plugins/community.applications/images/grey-right.png'>";
+  $o .= ( $pageNumber < $totalPages ) ? "<img class='ca_tooltip' width='20px' style='cursor:pointer' title='Go To Page $nextPage' onclick='{$my_function}(&quot;$nextPage&quot;);' src='/plugins/community.applications/images/green-right.png'>" : "<img width='20px' src='/plugins/community.applications/images/grey-right.png'>";
   $o .= "</font></b></center><span id='currentPageNumber' hidden>$pageNumber</span>";
 
   return $o;
