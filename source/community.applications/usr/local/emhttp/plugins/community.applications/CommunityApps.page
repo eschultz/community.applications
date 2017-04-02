@@ -155,6 +155,8 @@ var categoryDesc = {
 
 function setToolTip() {
   if ( "<?=$toolTipsterAllowed?>" == "true" ) {
+    $('.ca_infoPopup').attr('title','Loading...');
+    $('.ca_appPopup').attr('title','Loading...');
     $('.ca_tooltip').tooltipster({delay:[1000,1],timer:15000, animation:'grow', arrow:true, trigger:'custom', triggerOpen:{mouseenter: true}, triggerClose:{click:false,scroll:true,mouseleave:true}});
     $('.ca_infoPopup').tooltipster({
       contentAsHTML: true,
@@ -910,6 +912,7 @@ function pinApp(button,repository) {
     $(button).attr("src","/plugins/community.applications/images/greenButton.png");
     $(button).attr("title","Click to unpin this application");
   }
+  $(button).tooltipster('content',$(button).attr("title"));
   $.post(URL,{action:'pinApp',repository:repository});
 }
 

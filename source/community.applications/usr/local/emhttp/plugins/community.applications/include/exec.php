@@ -569,7 +569,7 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker,$pageNumb
       if ( file_exists("/var/log/plugins/$pluginName") ) {
         $pluginSettings = isset($template['CAlink']) ? $template['CAlink'] : getPluginLaunch($pluginName);
         $tmpVar = $pluginSettings ? "" : " disabled ";
-        $template['display_pluginSettings'] = "<input type='submit' $tmpVar style='margin:0px' value='Settings' formtarget='$tabMode' formaction='$pluginSettings' formmethod='post'>";
+        $template['display_pluginSettings'] = "<input class='ca_tooltip' title='Click to go to the plugin settings' type='submit' $tmpVar style='margin:0px' value='Settings' formtarget='$tabMode' formaction='$pluginSettings' formmethod='post'>";
 
       } else {
         $buttonTitle = $template['MyPath'] ? "Reinstall Plugin" : "Install Plugin";
