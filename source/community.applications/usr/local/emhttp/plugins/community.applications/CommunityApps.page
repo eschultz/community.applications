@@ -912,7 +912,9 @@ function pinApp(button,repository) {
     $(button).attr("src","/plugins/community.applications/images/greenButton.png");
     $(button).attr("title","Click to unpin this application");
   }
-  $(button).tooltipster('content',$(button).attr("title"));
+  if ( "<?=$toolTipsterAllowed?>" == "true" ) {
+    $(button).tooltipster('content',$(button).attr("title"));
+  }
   $.post(URL,{action:'pinApp',repository:repository});
 }
 
