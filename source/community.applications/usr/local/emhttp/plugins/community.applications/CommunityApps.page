@@ -23,7 +23,7 @@ $cfg = parse_plugin_cfg($plugin);
 if ( ! is_file("/boot/config/plugins/$plugin/accepted") ) {
   $firstRun = "true";
 }
-$vars = my_parse_ini_file("/var/local/emhttp/var.ini");
+$vars = parse_ini_file("/var/local/emhttp/var.ini");
 $toolTipsterAllowed = version_compare($vars['version'],"6.3.3",">=") ? "true" : "false";
 
 $tabMode = $cfg['newWindow'];
@@ -157,7 +157,7 @@ function setToolTip() {
   if ( "<?=$toolTipsterAllowed?>" == "true" ) {
     $('.ca_infoPopup').attr('title','Loading...');
     $('.ca_appPopup').attr('title','Loading...');
-    $('.ca_tooltip').tooltipster({delay:[1000,1],timer:15000, animation:'grow', arrow:true, trigger:'custom', triggerOpen:{mouseenter: true}, triggerClose:{click:false,scroll:true,mouseleave:true}});
+    $('.ca_tooltip').tooltipster({delay:[1000,1],timer:15000, animation:'grow', arrow:true, trigger:'custom', triggerOpen:{mouseenter: true}, triggerClose:{click:true,scroll:true,mouseleave:true}});
     $('.ca_infoPopup').tooltipster({
       contentAsHTML: true,
       maxWidth:550,
@@ -171,8 +171,6 @@ function setToolTip() {
         var appNumber = origin.attr('data-appNumber');
         $.post("/plugins/community.applications/scripts/showInfo.php",{action:'none',appNumber:appNumber},function(data) {
           if (data) {
-            var origin = $(helper.origin);
-            var myID = origin.attr('id');
             instance.content(data);
           }
         });
@@ -192,8 +190,6 @@ function setToolTip() {
         var appNumber = origin.attr('data-appNumber');
         $.post("/plugins/community.applications/scripts/showDesc.php",{action:'none',appNumber:appNumber},function(data) {
           if (data) {
-            var origin = $(helper.origin);
-            var myID = origin.attr('id');
             instance.content(data);
           }
         });
@@ -211,7 +207,26 @@ $(function(){
     $("#maxPerPage").prop("disabled",true);
     $("#maxPerPage").val("-1");
   }
-
+  if ( "<?=$toolTipsterAllowed?>" == "true" ) {
+    $('.ca_credits').tooltipster({
+      trigger: 'custom',
+      triggerOpen: {mouseenter:true},
+      triggerClose:{click:true,scroll:true,mouseleave:true},
+      contentAsHTML: true,
+      maxWidth:550,
+      minWidth:550,
+      animation: 'grow',
+      triggerClose:{click:false,scroll:true,mouseleave:true},
+      interactive: true,
+      viewportAware: true,
+      functionBefore: function(instance,helper) {
+        var origin = $(helper.origin);
+        var myID = origin.attr('id');
+        instance.content("<div style='overflow:scroll; max-height:550px; height:550px; overflow-x:hidden; overflow-y:auto;'><center><img src='/plugins/community.applications/images/CA.png'><br><font size='6' color='white'>Community Applications</font><br><br><?=$caCredits?></div>");
+      }
+    });  
+  }
+  
   $("#monitor").click(function() { Monitor(); });
   $(".viewButton,.sortButton,.dirButton").click(function() { changeSortOrder(this.id,$(this).attr("class")); });
   $(".resourceSort,.resourceDir").click(function() { changeResource(this.id,$(this).attr("class")); });
@@ -1057,7 +1072,7 @@ Sort Direction:
 <a href="#" class="back-to-top" style="display: inline;"><img src='/plugins/community.applications/images/up.png' style='width:50px;height:50px' href="#" class="back-to-top"></img></a>
 <div class='dockerSearch' style='display:none'><center><input type=button class='initDockerSearch' value='Get more results from dockerHub'></input></center></div>
 <center>Last Change To Appfeed: <strong><span id='updateTime'></span></strong></center>
-<a href="Settings/caHelp" target='_blank'>CA Manual</a><a style='float:right;cursor:pointer' onclick='showCredits();'>Credits</a><br><br></span>
+<a href="Settings/caHelp" target='_blank'>CA Manual</a><a class='ca_credits' style='float:right;cursor:pointer' onclick='showCredits();'>Credits</a><br><br></span>
 <center><a href='https://forums.lime-technology.com/topic/55246-docker-faq/' target='_blank'>Docker FAQ</a></center>
 <center>Community Applications Version: <?=$installedVersion?></center>
 > <center>For support for this plugin, visit here: <a class='ca_tooltip' title='click for help' href="http://lime-technology.com/forum/index.php?topic=40262.0" target="_blank">http://lime-technology.com/forum/index.php?topic=40262.0</a></center>

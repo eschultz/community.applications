@@ -2,8 +2,8 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.applications">
 <!ENTITY author    "Andrew Zawadzki">
-<!ENTITY version   "2017.04.02b">
-<!ENTITY md5       "74e928d58dda27b2c6e4585a30f810cb">
+<!ENTITY version   "2017.04.04">
+<!ENTITY md5       "eba7b7fda7bb662709e4ef6ffa5b1637">
 <!ENTITY launch    "Settings/PluginSettings">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/community.applications">
@@ -13,6 +13,9 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
+###2017.04.04###
+- Fix 6.2.x compatibility
+
 ###2017.04.02###
 - Implement new features made available by 6.3.3+  (Still fully compatible with older versions of unRaid)
   - Hovering over app's icon opens up the full description
