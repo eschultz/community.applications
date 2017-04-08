@@ -787,7 +787,7 @@ function suggestSearch($filter,$displayFlag) {
 function dockerNavigate($num_pages, $pageNumber) {
   $returnValue = getPageNavigation($pageNumber,$num_pages * 25, true);
 
-  $returnValue .= "<span style='float:right;position:relative;bottom:30px'><input type='button' value='Display Recommended' onclick='doSearch();'></span>";
+#  $returnValue .= "<span style='float:right;position:relative;bottom:30px'><input type='button' value='Display Recommended' onclick='doSearch();'></span>";
 
   return $returnValue;
 }
@@ -957,7 +957,7 @@ case 'get_content':
         if (is_file($communityPaths['updateErrors'])) {
           echo "<table><td><td colspan='5'><br><center>The following errors occurred:<br><br>";
           echo "<strong>".file_get_contents($communityPaths['updateErrors'])."</strong></center></td></tr></table>";
-          echo "<script>$('#templateSortButtons,#total1').hide();$('#sortButtons').hide();</script>";
+          echo "<script>$('#templateSortButtons,#total1,#sortIcon').hide();$('#sortButtons').hide();</script>";
           echo changeUpdateTime();
           echo caGetMode();
           break;
@@ -979,7 +979,7 @@ case 'get_content':
         $appsOfDay = appOfDay($file);
         $displayApplications['community'] = array($file[$appsOfDay[0]],$file[$appsOfDay[1]]);
         writeJsonFile($communityPaths['community-templates-displayed'],$displayApplications);
-        echo "<script>$('#templateSortButtons').hide();$('#sortButtons').hide();</script>";
+        echo "<script>$('#templateSortButtons,#sortIcon,#sortButtons').hide();</script>";
         echo "<br><center><font size='4' color='purple'><b>Random Apps Of The Day</b></font><br><br>";
         echo my_display_apps("detail",$displayApplications['community'],$runningDockers,$imagesDocker);
         break;
