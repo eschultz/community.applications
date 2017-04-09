@@ -3,7 +3,7 @@
 <!ENTITY name      "community.applications">
 <!ENTITY author    "Andrew Zawadzki">
 <!ENTITY version   "2017.04.09">
-<!ENTITY md5       "08996228e34c3a74f1f0058d7ee81ae9">
+<!ENTITY md5       "31d90fb23455f2278105fdf9a776882d">
 <!ENTITY launch    "Settings/PluginSettings">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/community.applications">
