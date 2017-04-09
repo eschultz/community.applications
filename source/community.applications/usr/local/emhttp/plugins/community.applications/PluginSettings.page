@@ -10,6 +10,8 @@ function download_url($url, $path = "", $bg = false)
   return ($exit_code === 0 ) ? implode("\n", $out) : false;
 }
 
+$vars = parse_ini_file("/var/local/emhttp/var.ini");
+$toolTipsterAllowed = version_compare($vars['version'],"6.3.3",">=") ? "true" : "false";
 
 $plugin = "community.applications";
 $cfg = parse_plugin_cfg($plugin);
@@ -29,6 +31,7 @@ if ( ! $cfg['hideIncompatible'] )  { $cfg['hideIncompatible'] = "true"; }
 if ( ! $cfg['separateInstalled'] ) { $cfg['separateInstalled'] = "true"; }
 if ( ! $cfg['maxPerPage'] )        { $cfg['maxPerPage'] = "25"; }
 if ( ! $cfg['hideDeprecated'] )    { $cfg['hideDeprecated'] = "true"; }
+if ( ! $cfg['tooltipster'] )       { $cfd['tooltipster'] = "true"; }
 
 # Get the available repositories and setup the display for favourites
 
@@ -75,6 +78,16 @@ Time to display applications as new / updated:
   </select>
 
 > This setting determines how long an application will be displayed as "new"
+
+<?if ( $toolTipsterAllowed == "true" ): ?>
+Utilize New UI:
+: <select name='tooltipster' size='1'>
+  <?=mk_option($cfg['tooltipster'],"true", "Yes (default)")?>
+  <?=mk_option($cfg['tooltipster'],"false", "No")?>
+  </select>
+  
+> This setting will utilize a new UI for unRaid 6.3.3+.  However, if you have problems with this UI, you can forcibly set the old legacy UI with this setting
+<?endif;?>
 
 Initial View Mode:
 : <select name="viewMode" size="1">

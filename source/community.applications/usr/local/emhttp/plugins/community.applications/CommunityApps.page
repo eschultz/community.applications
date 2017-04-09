@@ -28,7 +28,10 @@ if ( ! is_file("/boot/config/plugins/$plugin/accepted") ) {
 }
 $vars = parse_ini_file("/var/local/emhttp/var.ini");
 $toolTipsterAllowed = version_compare($vars['version'],"6.3.3",">=") ? "true" : "false";
-#$toolTipsterAllowed = "false";
+if ( $cfg['tooltipster'] == "false" ) {
+  $toolTipsterAllowed = "false";
+}
+
 $tabMode = $cfg['newWindow'];
 $line_color = $display['theme']=='black' ? '#202020' : '#E8E8E8';
 
@@ -47,24 +50,17 @@ if ( is_dir("/var/lib/docker/containers") ) {
 <style>
 .searchSubmit{font-family:'FontAwesome';width:29px;height:26px;border:1px solid #dadada;border-radius:0px 4px 4px 0px;font-size:11px;position:relative;padding:0px 2px;background:#DADADA;border:none;cursor:pointer;}
 table#templates_list tbody td.topRow{border-top:1px solid <?=$line_color?>;}
-
-.back-to-top {
-  background: none;
-  margin: 0;
-  position: fixed;
-  bottom: 50px;
-  right: 0;
-  width: 70px;
-  height: 70px;
-  z-index: 100;
-  display: none;
-  text-decoration: none;
-  color: #ffffff;
-}
+.back-to-top {background: none;margin: 0;position: fixed;bottom: 50px;right: 0;width: 70px;height: 70px;z-index: 100;display: none;text-decoration: none;color: #ffffff;}
+input.appButtons {margin:0px;}
+input.viewButton {margin:1px;}
+input.sortButton {margin:1px;}
+input.dirButton {margin:1px;}
+input.resourceSort {margin:1px;}
+input.resourceDir {margin:1px;}
+input.allButtons {margin:-1px;}
 </style>
 
 <script>
-
 jQuery(document).ready(function() {
   var offset = 250;
   var duration = 500;
@@ -161,7 +157,6 @@ function setToolTip() {
     $('.ca_infoPopup').attr('title','Loading...');
     $('.ca_appPopup').attr('title','Loading...');
     $('.ca_tooltip').tooltipster({delay:[1000,1],timer:15000, animation:'grow', arrow:true, trigger:'custom', triggerOpen:{mouseenter: true}, triggerClose:{click:true,scroll:true,mouseleave:true}});
-
     $('.ca_infoPopup').tooltipster({
       contentAsHTML: true,
       maxWidth:550,
@@ -203,6 +198,14 @@ function setToolTip() {
 }
 
 $(function(){
+  <?if ($tabbed):?>
+    $('.tabs').append("<span id='searchFilter' class='status vhshift' style='display:none'><input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input class='ca_staticTips' type='button' id='updateButton' value='Legacy Mode' title='Switches CA to Legacy Mode (until the next appfeed update) - Not generally recommended' onclick='forceUpdateButton()' disabled><?if ( $toolTipsterAllowed == "false"):?><input type='button' value='CA Modules' onclick='caModules();'></span><?endif;?>");
+    for (var x=1; x<last; x++) $('#tab'+x).bind({click:function(){$('#searchFilter').hide();}});
+    $('#tab'+last).bind({click:function(){$('#searchFilter').show();readMore();}});
+  <?else:?>
+    $('div[id=title]').last().append("<span id='searchFilter' class='status vhshift'><input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input class='ca_staticTips' type='button' id='updateButton' value='Legacy Mode' title='Switches CA to Legacy Mode (until the next appfeed update) - Not generally recommended' onclick='forceUpdateButton()' disabled><?if ( $toolTipsterAllowed == "false"):?><input type='button' value='CA Modules' onclick='caModules();'><?endif;?>");
+  <?endif;?>
+  
   if ( "<?=$firstRun?>" == "true" ) { $("#appWarning").show(); }
   if ( "<?=$dockerRunning?>" == "false" ) { $("#monitor").hide(); }
   $("#maxPerPage").val("<?=$cfg['maxPerPage']?>");
@@ -211,6 +214,7 @@ $(function(){
     $("#maxPerPage").val("-1");
   }
   if ( "<?=$toolTipsterAllowed?>" == "true" ) {
+    $('.ca_staticTips').tooltipster({delay:[1000,1],timer:15000, animation:'grow', arrow:true, trigger:'custom', triggerOpen:{mouseenter: true}, triggerClose:{click:true,scroll:true,mouseleave:true}});
     $('.ca_toolsView').tooltipster({
       trigger: 'custom',
       triggerOpen: {mouseenter:true,click:true},
@@ -264,11 +268,13 @@ $(function(){
       interactive: true,
       viewportAware: true,
       functionBefore: function(instance,helper) {
-        var origin = $(helper.origin);
-        var myID = origin.attr('id');
-        setSortOrder();
+        var currentSection = $("#sortorder").attr("data-section");
+        $(".appButtons").prop("disabled",false);
+        $("#"+currentSection).prop("disabled",true);
         var displayContent = $("#sections").html();
         instance.content(displayContent);
+      },functionReady: function(instance,helper) {
+        $(".appButtons").click(function() { $(this).prop("disabled",true); });
       }
     });  
   }
@@ -279,7 +285,6 @@ $(function(){
   $("#calculateAppdata").click(function() { calculateAppdataSize(); });
   $(".initDockerSearch").click(function() { initDockerSearch(); });
   $(".moduleButton").click(function() { caModules(); });
-  
   $(".allButtons").click(function() {
     var description = this.value;
     var category = this.id;
@@ -321,13 +326,7 @@ $(function(){
   if ( "<?=$cfg['viewMode']?>" == "table" ) $("#viewTable").prop("disabled",true);
   if ( "<?=$cfg['viewMode']?>" == "detail" ) $("#viewDetail").prop("disabled",true);
 
-  <?if ($tabbed):?>
-    $('.tabs').append("<span id='searchFilter' class='status vhshift' style='display:none'><input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' id='updateButton' value='Legacy Mode' title='Switches CA to Legacy Mode (until the next appfeed update) - Not recommended' onclick='forceUpdateButton()' disabled><input type='button' value='CA Modules' onclick='caModules();'></span>");
-    for (var x=1; x<last; x++) $('#tab'+x).bind({click:function(){$('#searchFilter').hide();}});
-    $('#tab'+last).bind({click:function(){$('#searchFilter').show();readMore();}});
-  <?else:?>
-    $('div[id=title]').last().append("<span id='searchFilter' class='status vhshift'><input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' id='updateButton' value='Legacy Mode' title='Switches CA to Legacy Mode (until the next appfeed update) - Not recommended' onclick='forceUpdateButton()' disabled><input type='button' value='CA Modules' onclick='caModules();'>");
-  <?endif;?>
+
 
   getContent(true,'INITIALIZE','None Selected');
   $('#searchBox').keyup(function(e) {if(e.which == 13){doSearch(false);}});
@@ -335,6 +334,9 @@ $(function(){
 
 function caModules() {
   $(".appButtons,#monitor").prop("disabled",false);
+  $("#CAmodules").prop("disabled",true);
+  $("#sortorder").attr("data-section","CAmodules");
+  $("#currentSection").html("Additional CA Modules");
   clearTimeout(monitorInterval);  
   clearSearchBox();
   $("#sortorder").attr("data-docker","");
@@ -358,6 +360,7 @@ function changePage(pageNumber) {
   $.post(URL,{action:'display_content',sortOrder:sortOrder,windowWidth:windowWidth,pageNumber:pageNumber,maxPerPage:maxPerPage},function(data3) {
     if (data3) {
       $('#templates_content').html(data3);
+      $("#templates_content").fadeIn();
       readMore();
       setToolTip();
     }
@@ -412,19 +415,15 @@ function doSearch(button) {
   var windowWidth = getWindowWidth();
   var filter = $('#searchBox').val();
   var maxPerPage = getPerPage();
-  $("#maxPerPage").prop("disabled",false);
   $("#sortorder").attr("data-docker","");
   filter = filter.replace(/[^a-z0-9]/gi,' ')
   filter = filter.trim();
-
   $('#searchBox').val(filter);
 
-  $("#monitor,.appButtons").prop("disabled",false);
+  $("#monitor,.appButtons,#maxPerPage").prop("disabled",false);
   $(".resourceMonitor").hide();
-  $("#templates_content,#AppsOnly").show();
+  $("#templates_content,#AppsOnly,#templateSortButtons,#sortIcon").show();
   $("#AppStore").prop("disabled",true);
-
-  $("#templateSortButtons,#sortIcon").show();
 
   if ($('#searchButton').hasClass('fa-search')) {
     if (filter) {
@@ -467,8 +466,6 @@ function doSearch(button) {
       readMore();
       myCloseAlert();
       setToolTip();
-      
-      
     }
     readMore();
 
@@ -680,7 +677,6 @@ function getContent(init,category,description,newApp) {
     if ( category == "All" ) { category = ""; }
 
     var sortOrder = getSortOrder();
-
     var maxPerPage = getPerPage();
 
     $.post(URL,{action:'get_content',category:category,newApp:newApp,sortOrder:sortOrder,windowWidth:windowWidth,maxPerPage:maxPerPage},function(data) {
@@ -690,11 +686,8 @@ function getContent(init,category,description,newApp) {
         myCloseAlert();
         setToolTip();
       }
-
       description = "<?=$categoryTitle?>: <font color='red'>"+description+"</font>";
-
       $("#Category").html(description);
-
       $("#updateButton").prop("disabled",false);
     });
   }
@@ -720,8 +713,7 @@ function initDockerSearch() {
   $("#sortOrder").attr("data-docker","searching docker");
 }
 
-function dockerSearch(pageNumber) 
-{
+function dockerSearch(pageNumber) {
   var filter = $('#searchBox').val();  
   var dockerURL = "https://registry.hub.docker.com/search?q=" + filter;
   $("#sortorder").attr("data-docker","searching docker");
@@ -766,6 +758,7 @@ function dockerConvert(dockerID) {
     }
   });
 }
+
 function clearSearchBox() {
   $("#searchBox").val("");
   if ($('#searchButton').hasClass('fa-remove')) {
@@ -786,10 +779,9 @@ function previousApps(button,installed) {
   $("#sortorder").attr("data-docker","");
   clearTimeout(monitorInterval);  
   clearSearchBox();
-  $("#maxPerPage").prop("disabled",false);
-
-  $(".appButtons,#monitor").prop("disabled",false);
+  $(".appButtons,#monitor,#maxPerPage").prop("disabled",false);
   $("#"+button).prop("disabled",true);
+  $("#sortorder").attr("data-section",button);
 
   $("#Total").html("Searching... <img src='/plugins/community.applications/images/spinner2.gif' style='height:30px;width:30px'>");
   $("#templates_content,.resourceMonitor,.dockerSearch,#AppsOnly").hide();
@@ -919,6 +911,7 @@ function uninstallDocker(application,humanName) {
 
 function appStore() {
   $("#currentSection").html("Available Apps");
+  $("#sortorder").attr("data-section","AppStore");
   clearTimeout(monitorInterval);
   $("#templates_content").html("");
   $("#monitor,.appButtons,.allButtons").prop("disabled",false);
@@ -1001,6 +994,7 @@ function pinApp(button,repository) {
   }
   if ( "<?=$toolTipsterAllowed?>" == "true" ) {
     $(button).tooltipster('content',$(button).attr("title"));
+    $(button).attr("title","");
   }
   $.post(URL,{action:'pinApp',repository:repository});
 }
@@ -1010,7 +1004,8 @@ function pinnedApps(button) {
   $("#sortorder").attr("data-docker","");
   $("#maxPerPage").prop("disabled",false);
   $(".appButtons,#monitor").prop("disabled",false);
-  $(button).prop("disabled",true);
+  $("#"+button).prop("disabled",true);
+  $("#sortorder").attr("data-section",button);
   clearTimeout(monitorInterval);  
   clearSearchBox();
   $("#templates_content,.resourceMonitor,.dockerSearch,#AppsOnly").hide();
@@ -1042,69 +1037,72 @@ function displayTags(leadTemplate) {
 </script>
 <FORM method="get" id="myForm">
 > For help with this plugin, click here (a new tab will open with the help file)  <strong><font size="2"><a href="Settings/caHelp" target="_blank">HELP</a></font></strong>
+<?if ($toolTipsterAllowed == "true"):?>
+> <br><font color='red'>NOTE:</font> Some mobile devices may have problems with the CA's new UI.  If you find that you are unable to click to change the view modes, sort order, or select categories, then within CA's General Settings (Settings Tab), disable the updated UI
+<?endif;?>
 
 <?if ( $toolTipsterAllowed == "true" ) : ?>
-<img id='sortIcon' class='ca_toolsView' title='change view' style='cursor:pointer;position:relative;' src='/plugins/community.applications/images/view.png'>
-<img src='/plugins/community.applications/images/section.png' height='35px' class='ca_section' style='cursor:pointer;'><font size='2'><b>Current Section: <font color='red'><span id='currentSection'>Available Apps</span></font></b></font>
+<img id='sortIcon' class='ca_toolsView' title='change view' height='50px' style='cursor:pointer;position:relative;' src='/plugins/community.applications/images/view.png'>
+<img src='/plugins/community.applications/images/section.png' height='50px' class='ca_section' style='cursor:pointer;'><font size='2'><b>Current Section: <font color='red'><span id='currentSection'>Available Apps</span></font></b></font>
 <?else:?>
-<input type='button' class='appButtons' id='AppStore' value='Available Apps' disabled onclick='appStore();' style=margin:0px>
-<input type='button' class='appButtons' id='InstalledApps' value='Installed Apps' onclick='previousApps(this.id,true);' style=margin:0px></input>
-<input type='button' class='appButtons' id='OldApps' value='Previous Apps' onclick='previousApps(this.id,false);' style=margin:0px></input>
-<input type='button' class='appButtons' id='PinnedApps' value='Pinned Apps' onclick='pinnedApps(this);' style=margin:0px></input>
+<input type='button' class='appButtons' id='AppStore' value='Available Apps' disabled onclick='appStore();'>
+<input type='button' class='appButtons' id='InstalledApps' value='Installed Apps' onclick='previousApps(this.id,true);'></input>
+<input type='button' class='appButtons' id='OldApps' value='Previous Apps' onclick='previousApps(this.id,false);'></input>
+<input type='button' class='appButtons' id='PinnedApps' value='Pinned Apps' onclick='pinnedApps(this.id);'></input>
 <?endif;?>
-<img class='ca_tooltip' height='35px' src='/plugins/community.applications/images/resource.png' id='monitor' title='Resource Monitor' style='margin:0px;cursor:pointer;float:right;'><br>
+<img class='ca_staticTips' height='35px' src='/plugins/community.applications/images/resource.png' id='monitor' title='Resource Monitor' style='margin:0px;cursor:pointer;float:right;'><br>
 <span id='AppsOnly'>
 <br><font size='4'><b>Categories:</b></font><br>
 <span id='MainCategory'>
-<input class='allButtons' type=button id='backup' value='Backup' style='margin:-1px';></input>
-<input class='allButtons' type=button id='cloud' value='Cloud' style='margin:-1px';></input>
-<input class='allButtons' type=button id='downloaders' value='Downloaders' style='margin:-1px';></input>
-<input class='allButtons' type=button id='HomeAutomation' value='Home Automation' style='margin:-1px';></input>
-<input class='allButtons' type=button id='networkALL' value='Network Services' style='margin:-1px';></input>
-<input class='allButtons' type=button id='mediaappALL' value='Media Applications' style='margin:-1px';></input>
-<input class='allButtons' type=button id='mediaserverALL' value='Media Servers' style='margin:-1px';></input>
-<input class='allButtons' type=button id='productivity' value='Productivity' style='margin:-1px';></input>
-<input class='allButtons' type=button id='toolsALL' value='Tools/Utilities' style='margin:-1px';></input>
-<input class='allButtons' type=button id='other' value='Other' style='margin:-1px';></input>
-<input class='allButtons' type=button id='Plugins' value='Plugins' style='margin:-1px';></input>
+<input class='allButtons' type=button id='backup' value='Backup'></input>
+<input class='allButtons' type=button id='cloud' value='Cloud'></input>
+<input class='allButtons' type=button id='downloaders' value='Downloaders'></input>
+<input class='allButtons' type=button id='HomeAutomation' value='Home Automation'></input>
+<input class='allButtons' type=button id='networkALL' value='Network Services'></input>
+<input class='allButtons' type=button id='mediaappALL' value='Media Applications'></input>
+<input class='allButtons' type=button id='mediaserverALL' value='Media Servers'></input>
+<input class='allButtons' type=button id='productivity' value='Productivity'></input>
+<input class='allButtons' type=button id='toolsALL' value='Tools/Utilities'></input>
+<input class='allButtons' type=button id='other' value='Other'></input>
+<input class='allButtons' type=button id='Plugins' value='Plugins'></input>
 </span>
 <span id='NetworkCategory' hidden>
-<input class='allButtons' type=button id='networkweb' value='Web Servers' style='margin:-1px'; ></input>
-<input class='allButtons' type=button id='networkdns' value='DNS Clients / Servers' style='margin:-1px';></input>
-<input class='allButtons' type=button id='networkftp' value='FTP Clients / Servers' style='margin:-1px';></input>
-<input class='allButtons' type=button id='networkproxy' value='Proxies' style='margin:-1px';></input>
-<input class='allButtons' type=button id='networkvoip' value='VOIP' style='margin:-1px';></input>
-<input class='allButtons' type=button id='networkmanagement' value='Management / Analyzer' style='margin:-1px';></input>
-<input class='allButtons' type=button id='networkmessenger' value='Messengers' style='margin:-1px';></input>
-<input class='allButtons' type=button id='networkother' value='Other' style='margin:-1px';></input>
-<input class='allButtons' type=button id='network' value='All Network Services' style='margin:-1px';></input>
+<input class='allButtons' type=button id='networkweb' value='Web Servers'></input>
+<input class='allButtons' type=button id='networkdns' value='DNS Clients / Servers'></input>
+<input class='allButtons' type=button id='networkftp' value='FTP Clients / Servers'></input>
+<input class='allButtons' type=button id='networkproxy' value='Proxies'></input>
+<input class='allButtons' type=button id='networkvoip' value='VOIP'></input>
+<input class='allButtons' type=button id='networkmanagement' value='Management / Analyzer'></input>
+<input class='allButtons' type=button id='networkmessenger' value='Messengers'></input>
+<input class='allButtons' type=button id='networkother' value='Other'></input>
+<input class='allButtons' type=button id='network' value='All Network Services'></input>
 </span>
 <span id='MediaAppCategory' hidden>
-<input class='allButtons' type=button id='MediaAppVideo' value='Video' style='margin:-1px';></input>
-<input class='allButtons' type=button id='MediaAppMusic' value='Music' style='margin:-1px';></input>
-<input class='allButtons' type=button id='MediaAppBooks' value='Books / Comics' style='margin:-1px';></input>
-<input class='allButtons' type=button id='MediaAppPhotos' value='Photos' style='margin:-1px';></input>
-<input class='allButtons' type=button id='MediaAppOther' value='Other' style='margin:-1px';></input>
-<input class='allButtons' type=button id='MediaApp' value='All Media Applications' style='margin:-1px';></input>
+<input class='allButtons' type=button id='MediaAppVideo' value='Video'></input>
+<input class='allButtons' type=button id='MediaAppMusic' value='Music'></input>
+<input class='allButtons' type=button id='MediaAppBooks' value='Books / Comics'></input>
+<input class='allButtons' type=button id='MediaAppPhotos' value='Photos'></input>
+<input class='allButtons' type=button id='MediaAppOther' value='Other'></input>
+<input class='allButtons' type=button id='MediaApp' value='All Media Applications'></input>
 </span>
 <span id='MediaServerCategory' hidden>
-<input class='allButtons' type=button id='MediaServerVideo' value='Video' style='margin:-1px';></input>
-<input class='allButtons' type=button id='MediaServerMusic' value='Music' style='margin:-1px';></input>
-<input class='allButtons' type=button id='MediaServerBooks' value='Books / Comics' style='margin:-1px';></input>
-<input class='allButtons' type=button id='MediaServerPhotos' value='Photos' style='margin:-1px';></input>
-<input class='allButtons' type=button id='MediaServerOther' value='Other' style='margin:-1px';></input>
-<input class='allButtons' type=button id='MediaServer' value='All Media Server' style='margin:-1px';></input>
+<input class='allButtons' type=button id='MediaServerVideo' value='Video'></input>
+<input class='allButtons' type=button id='MediaServerMusic' value='Music'></input>
+<input class='allButtons' type=button id='MediaServerBooks' value='Books / Comics'></input>
+<input class='allButtons' type=button id='MediaServerPhotos' value='Photos'></input>
+<input class='allButtons' type=button id='MediaServerOther' value='Other'></input>
+<input class='allButtons' type=button id='MediaServer' value='All Media Server'></input>
 </span>
 <span id='ToolsCategory' hidden>
-<input class='allButtons' type=button id='toolssystem' value='System Tools' style='margin:-1px';></input>
-<input class='allButtons' type=button id='tools' value='All Tools/Utilities' style='margin:-1px';></input>
+<input class='allButtons' type=button id='toolssystem' value='System Tools'></input>
+<input class='allButtons' type=button id='tools' value='All Tools/Utilities'></input>
 </span>
 <span style='float:right'>
-<input class='allButtons' type=button id="NONE" style='margin:1px'; value='All Categories' hidden></input>
+<input class='allButtons' type=button id="NONE" value='All Categories' hidden></input>
 <span id='topLevelButton'>
-<input class='allButtons' type=button id="New" style='margin:0px'; value='New/Updated'></input>
-<input class='allButtons' type=button id="UNCATEGORIZED" style='margin:0px'; value='Uncategorized'></input>
-<input class='allButtons' type=button id="All" style='margin:0px'; value='All Apps'></input>
+<input class='allButtons' type=button id="New" value='New/Updated'></input>
+<input class='allButtons' type=button id="UNCATEGORIZED" value='Uncategorized'></input>
+<input class='allButtons' type=button id="All" value='All Apps'></input>
 </span>
 
 <strong><font size='3'><span id="Category"></span></strong></font><span id="Total1" style='float: right';>Total Found: <strong><font size="3"><span id="Total"></span></font></strong><span>&nbsp;&nbsp;Results/page: <select id='maxPerPage' class='narrow' onchange='changePage(&quot;1&quot;);'><option value='-1'>All</option><option value='10'>10</option><option value='25'>25</option><option value='50'>50</option><option value='100'>100</option></select></span></span>
@@ -1112,18 +1110,18 @@ function displayTags(leadTemplate) {
 <center>
 <?if ( $toolTipsterAllowed == "false" ) : ?>
 <span id='sortButtons'>View Mode:
-<input type='button' class='viewButton' value='Tables' id='viewTable' style='margin:1px'>
-<input type='button' class='viewButton' value='Icon Details' id='viewDetail' style='margin:1px'>
-<input type='button' class='viewButton' value='Icons' id='viewIcon' style='margin:1px'>
+<input type='button' class='viewButton' value='Tables' id='viewTable'>
+<input type='button' class='viewButton' value='Icon Details' id='viewDetail'>
+<input type='button' class='viewButton' value='Icons' id='viewIcon'>
 <span id='templateSortButtons'>Sort By:
-<input type='button' class='sortButton' id='Name' value='Name' style='margin:1px' disabled>
-<input type='button' class='sortButton' id='RepoName' value='Repository' style='margin:1px'>
-<input type='button' class='sortButton' id='Downloads' value='Downloads' style='margin:1px'>
-<input type='button' class='sortButton' id='Author' value='Author' style='margin:1px'>
-<input type='button' class='sortButton' id='Date' value='Date' style='margin:1px'>
+<input type='button' class='sortButton' id='Name' value='Name' disabled>
+<input type='button' class='sortButton' id='RepoName' value='Repository'>
+<input type='button' class='sortButton' id='Downloads' value='Downloads'>
+<input type='button' class='sortButton' id='Author' value='Author'>
+<input type='button' class='sortButton' id='Date' value='Date'>
 Sort Direction:
-<input type='button' class='dirButton' id='Up' value='Ascending' style='margin:1px' disabled>
-<input type='button' class='dirButton' id='Down' value='Descending' style='margin:1px'>
+<input type='button' class='dirButton' id='Up' value='Ascending' disabled>
+<input type='button' class='dirButton' id='Down' value='Descending'>
 </center></span></span>
 <?endif;?>
 
@@ -1137,13 +1135,13 @@ Sort Direction:
 <?if ( $toolTipsterAllowed == "false" ) : ?>
 <div class='resourceMonitor' hidden>
 <center>Sort By:
-<input type='button' value='Name' id='resourceName' class='resourceSort' style='margin:1px' disabled>
-<input type='button' value='CPU' id='resourceCPU' class='resourceSort' style='margin:1px'>
-<input type='button' value='Memory' id='resourceMemory' class='resourceSort' style='margin:1px'>
+<input type='button' value='Name' id='resourceName' class='resourceSort' disabled>
+<input type='button' value='CPU' id='resourceCPU' class='resourceSort'>
+<input type='button' value='Memory' id='resourceMemory' class='resourceSort'>
 Sort Direction:
-<input type='button' value='Up' id='resourceUp' class='resourceDir' style='margin:1px' disabled>
-<input type='button' value='Down' id='resourceDown' class='resourceDir' style='margin:1px'>
-<input type='button' value='Calculate Appdata Size' id='calculateAppdata' style='float:right'>
+<input type='button' value='Up' id='resourceUp' class='resourceDir' disabled>
+<input type='button' value='Down' id='resourceDown' class='resourceDir'>
+<input type='button' value='Calculate Appdata Size' id='calculateAppdata'>
 <br><br><table id='resourceHeader' class='tablesorter'>
 <thead><th></th><th>AppName</th><th>DockerHub Repository</th><th>CPU %</th><th>Memory (Used/Max)</th><th>Memory %</th><th>Network (Down/Up)</th><th>Virtual Size</th><th><center>Appdata</center></th></thead>
 <tbody id='resourceBody'></tbody>
@@ -1161,7 +1159,7 @@ Sort Direction:
 <font size='2' color='red'>Note: All Applications listed here are 3rd party additions to unRaid.<br>Neither the authors of Community Applications nor Limetech make any warranty as to the suitability of any applications listed herein</font>
 <br><input type='button' value='Dismiss Warning' onclick='dismissWarning();'></input></center></div>
 </center>
-<a href="#" class="back-to-top" style="display: inline;"><img src='/plugins/community.applications/images/up.png' style='width:50px;height:50px' href="#" class="back-to-top"></img></a>
+<a href="#" class="back-to-top" style="display: inline;"><img src='/plugins/community.applications/images/up.png' style='width:30px;height:30px' href="#" class="back-to-top"></img></a>
 <div class='dockerSearch' style='display:none'><center><input type=button class='initDockerSearch' value='Get more results from dockerHub'></input></center></div>
 <center>Last Change To Appfeed: <strong><span id='updateTime'></span></strong></center>
 <a href="Settings/caHelp" target='_blank'>CA Manual</a><a class='ca_credits' style='float:right;cursor:pointer' onclick='showCredits();'>Credits</a><br><br></span>
@@ -1176,35 +1174,38 @@ Sort Direction:
 <div>
 <span id='tooltipviews' style='display:none;'>
 <span id='sortButtons'>View Mode:
-<input type='button' class='viewButton' value='Tables' id='viewTable' style='margin:1px'>
-<input type='button' class='viewButton' value='Icon Details' id='viewDetail' style='margin:1px'>
-<input type='button' class='viewButton' value='Icons' id='viewIcon' style='margin:1px'>
+<input type='button' class='viewButton' value='Tables' id='viewTable'>
+<input type='button' class='viewButton' value='Icon Details' id='viewDetail'>
+<input type='button' class='viewButton' value='Icons' id='viewIcon'>
 <span id='templateSortButtons'>Sort By:
-<input type='button' class='sortButton' id='Name' value='Name' style='margin:1px' disabled>
-<input type='button' class='sortButton' id='RepoName' value='Repository' style='margin:1px'>
-<input type='button' class='sortButton' id='Downloads' value='Downloads' style='margin:1px'>
-<input type='button' class='sortButton' id='Author' value='Author' style='margin:1px'>
-<input type='button' class='sortButton' id='Date' value='Date' style='margin:1px'>
+<input type='button' class='sortButton' id='Name' value='Name' disabled>
+<input type='button' class='sortButton' id='RepoName' value='Repository'>
+<input type='button' class='sortButton' id='Downloads' value='Downloads'>
+<input type='button' class='sortButton' id='Author' value='Author'>
+<input type='button' class='sortButton' id='Date' value='Date'>
 Sort Direction:
-<input type='button' class='dirButton' id='Up' value='Ascending' style='margin:1px' disabled>
-<input type='button' class='dirButton' id='Down' value='Descending' style='margin:1px'>
+<input type='button' class='dirButton' id='Up' value='Ascending' disabled>
+<input type='button' class='dirButton' id='Down' value='Descending'>
 </span></span>
 <div class='resourceMonitor' style='display:none;'><center>Sort By:
-<input type='button' value='Name' id='resourceName' class='resourceSort' style='margin:1px' disabled>
-<input type='button' value='CPU' id='resourceCPU' class='resourceSort' style='margin:1px'>
-<input type='button' value='Memory' id='resourceMemory' class='resourceSort' style='margin:1px'>
+<input type='button' value='Name' id='resourceName' class='resourceSort' disabled>
+<input type='button' value='CPU' id='resourceCPU' class='resourceSort'>
+<input type='button' value='Memory' id='resourceMemory' class='resourceSort'>
 Sort Direction:
-<input type='button' value='Up' id='resourceUp' class='resourceDir' style='margin:1px' disabled>
-<input type='button' value='Down' id='resourceDown' class='resourceDir' style='margin:1px'>
+<input type='button' value='Up' id='resourceUp' class='resourceDir' disabled>
+<input type='button' value='Down' id='resourceDown' class='resourceDir'>
 </div>
 </span></div>
-<span id='sections'>
-<input type='button' class='appButtons' id='AppStore' value='Available Apps' disabled onclick='appStore();' style=margin:0px>
-<input type='button' class='appButtons' id='InstalledApps' value='Installed Apps' onclick='previousApps(this.id,true);' style=margin:0px></input>
-<input type='button' class='appButtons' id='OldApps' value='Previous Apps' onclick='previousApps(this.id,false);' style=margin:0px></input>
-<input type='button' class='appButtons' id='PinnedApps' value='Pinned Apps' onclick='pinnedApps(this);' style=margin:0px></input>
+<span id='sections' style='display:none;'>
+<input type='button' class='appButtons' id='AppStore' value='Available Apps' disabled onclick='appStore();'>
+<input type='button' class='appButtons' id='InstalledApps' value='Installed Apps' onclick='previousApps(this.id,true);'></input>
+<input type='button' class='appButtons' id='OldApps' value='Previous Apps' onclick='previousApps(this.id,false);'></input>
+<input type='button' class='appButtons' id='PinnedApps' value='Pinned Apps' onclick='pinnedApps(this.id);'></input>
+<input type='button' class='appButtons' id='CAmodules' value='CA Modules' onclick='caModules();'>
 </span>
 <?endif;?>
 </span>
-<span id='sortorder' data-sortorder='' data-docker=''></span>
+<span id='sortorder' data-sortorder='' data-docker='' data-section='AppStore'></span>
 </FORM>
+<span id='debugging'></span>
+

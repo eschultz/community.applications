@@ -6,7 +6,7 @@
 ###############################################################
 
 function getLineCount($directory) {
-  global $lineCount;
+  global $lineCount, $charCount;
 
   $allFiles = array_diff(scandir($directory),array(".",".."));
   foreach ($allFiles as $file) {
@@ -17,6 +17,7 @@ function getLineCount($directory) {
     $extension = pathinfo("$directory/$file",PATHINFO_EXTENSION);
     if ( $extension == "sh" || $extension == "php" || $extension == "page" ) {
       $lineCount = $lineCount + count(file("$directory/$file"));
+      $charCount = $charCount + filesize("$directory/$file");
     }
   }
 }
@@ -44,7 +45,7 @@ $caCredits = "
         <td>Additional Testing</td>
       </tr>
       <tr>
-        <td><img src='http://i.imgur.com/hpBxTJX.jpg' width='48px' height='48px'></td>
+        <td><img src='https://github.com/Squidly271/plugin-repository/raw/master/minion.thumb.jpg.b6e9d9eebd4588a36dd4511eee285133.jpg' width='48px' height='48px'></td>
         <td><strong>CHBMB</strong></td>
         <td>Additional Testing</td>
       </tr>
@@ -55,6 +56,6 @@ $caCredits = "
     <br><center><a href='http://lime-technology.com/forum/index.php?topic=40262.0' target='_blank'>Plugin Support Thread</a></center>
   ";
   getLineCount("/usr/local/emhttp/plugins/community.applications");
-  $caCredits .= "<center>$lineCount Lines of code and counting!</center>";
+  $caCredits .= "<center>$lineCount Lines of code and counting! ($charCount characters)</center>";
   $caCredits = str_replace("\n","",$caCredits);
 ?>
