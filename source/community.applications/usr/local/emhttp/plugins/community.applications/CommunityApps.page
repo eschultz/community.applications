@@ -5,7 +5,7 @@ Title="Community Applications"
 <?
 ###############################################################
 #                                                             #
-# Community Applications copyright 2015-2016, Andrew Zawadzki #
+# Community Applications copyright 2015-2017, Andrew Zawadzki #
 #                                                             #
 ###############################################################
 
@@ -80,6 +80,8 @@ jQuery(document).ready(function() {
 });
 
 var URL = "/plugins/<?=$plugin?>/include/exec.php";
+var resourceURL = "/plugins/<?=$plugin?>/include/resourceMonitor.php";
+
 var monitorInterval;
 var last = $('input[name$="tabs"]').length;
 var VIEWSBACKUP = " ";
@@ -926,6 +928,7 @@ function appStore() {
 
 function Monitor() {
   $("#currentSection").html("Resource Monitor");
+  $("#sortorder").attr("data-section","monitor");
   clearSearchBox();
   $(".appButtons").prop("disabled",false);
   $("#monitor").prop("disabled",true);  
@@ -934,7 +937,7 @@ function Monitor() {
   $(".resourceMonitor,#sortIcon").show();
   $("#sortorder").attr("data-resource","resource running");
   $("#resourceBody").html("<center>Initializing</center>");
-  $.post(URL,{action:'resourceInitialize'}, function(data) {
+  $.post(resourceURL,{action:'resourceInitialize'}, function(data) {
     if (data) {
       $("#Category").html("Docker Application Resource Monitor <font size='0'>For more detailed results, click "+data+"</font>");
       runMonitor();
@@ -944,16 +947,16 @@ function Monitor() {
 
 function runMonitor() {
   if ( $('#monitor').prop("disabled") ) {
-    $.post(URL,{action:'checkCalculations'},function(result) {
+    $.post(resourceURL,{action:'checkCalculations'},function(result) {
       if (result) {
         $("#miscScript").html(result);
       }
     });
     var sortOrder = getSortOrder();
-    $.post(URL,{action:'resourceMonitor',sortOrder:sortOrder},function(data) {
+    $.post(resourceURL,{action:'resourceMonitor',sortOrder:sortOrder},function(data) {
       if (data) {
         $('#resourceBody').html(data);
-        monitorInterval = setTimeout(runMonitor,300);
+        monitorInterval = setTimeout(runMonitor,1000);
       }
     });
   }
@@ -967,7 +970,7 @@ function changeResource(button,buttonclass) {
 
 function calculateAppdataSize() {
   $("#calculateAppdata").prop("disabled",true);
-  $.post(URL,{action:'calculateAppdata'});
+  $.post(resourceURL,{action:'calculateAppdata'});
 }
 
 function installPLGupdate(filename,plgName) {
@@ -976,7 +979,7 @@ function installPLGupdate(filename,plgName) {
 
 function startCadvisor() {
   myAlert("","Starting the cAdvisor application");
-  $.post(URL,{action:'startCadvisor'},function(data) {
+  $.post(resourceURL,{action:'startCadvisor'},function(data) {
     if (data) {
       myCloseAlert();
       Monitor();
