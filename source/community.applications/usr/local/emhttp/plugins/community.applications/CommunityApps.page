@@ -444,6 +444,8 @@ function doSearch(button) {
   $('#BackToTop').hide();
   if (filter) {
     enableButtons();
+    $("#currentSection").html("Search Results");
+    $("#sortorder").attr("data-section","");
     $("#Category").html("<?=$categoryTitle?> (Search Results for <font color='red'>"+filter+"</font>)");
   } else {
     $("#Category").html("All Recommended Applications");
@@ -625,7 +627,8 @@ function getContent(init,category,description,newApp) {
   }
   $("#Total1").show();
   $("#sortButtons,#templateSortButtons").show();
-  $("#templateSortButtons").show();
+  $("#sortorder").attr("data-section","AppStore");
+  $("#currentSection").html("Available Apps");
   var windowWidth = getWindowWidth();
   $("#maxPerPage").prop("disabled",false);
 
