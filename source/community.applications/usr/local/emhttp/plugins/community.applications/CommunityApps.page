@@ -5,7 +5,7 @@ Title="Community Applications"
 <?
 ###############################################################
 #                                                             #
-# Community Applications copyright 2015-2017, Andrew Zawadzki #
+# Community Applications copyright 2015-2016, Andrew Zawadzki #
 #                                                             #
 ###############################################################
 
@@ -80,8 +80,6 @@ jQuery(document).ready(function() {
 });
 
 var URL = "/plugins/<?=$plugin?>/include/exec.php";
-var resourceURL = "/plugins/<?=$plugin?>/include/resourceMonitor.php";
-
 var monitorInterval;
 var last = $('input[name$="tabs"]').length;
 var VIEWSBACKUP = " ";
@@ -167,7 +165,7 @@ function setToolTip() {
       triggerClose:{click:false,scroll:true,mouseleave:false},
       interactive: true,
       viewportAware: true,
-      functionBefore: function(instance,helper) {
+      functionInit: function(instance,helper) {
         var origin = $(helper.origin);
         var appNumber = origin.attr('data-appNumber');
         $.post("/plugins/community.applications/scripts/showInfo.php",{action:'none',appNumber:appNumber},function(data) {
@@ -186,7 +184,7 @@ function setToolTip() {
       triggerClose:{click:false,scroll:true,mouseleave:false},
       interactive: true,
       viewportAware: true,
-      functionBefore: function(instance,helper) {
+      functionInit: function(instance,helper) {
         var origin = $(helper.origin);
         var appNumber = origin.attr('data-appNumber');
         $.post("/plugins/community.applications/scripts/showDesc.php",{action:'none',appNumber:appNumber},function(data) {
@@ -207,7 +205,6 @@ $(function(){
   <?else:?>
     $('div[id=title]').last().append("<span id='searchFilter' class='status vhshift'><input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input class='ca_staticTips' type='button' id='updateButton' value='Legacy Mode' title='Switches CA to Legacy Mode (until the next appfeed update) - Not generally recommended' onclick='forceUpdateButton()' disabled><?if ( $toolTipsterAllowed == "false"):?><input type='button' value='CA Modules' onclick='caModules();'><?endif;?>");
   <?endif;?>
-  
   if ( "<?=$firstRun?>" == "true" ) { $("#appWarning").show(); }
   if ( "<?=$dockerRunning?>" == "false" ) { $("#monitor").hide(); }
   $("#maxPerPage").val("<?=$cfg['maxPerPage']?>");
@@ -279,6 +276,31 @@ $(function(){
         $(".appButtons").click(function() { $(this).prop("disabled",true); });
       }
     });  
+    $('.ca_categories').tooltipster({
+      trigger: 'custom',
+      triggerOpen: {mouseenter:true,click:true},
+      contentAsHTML: true,
+      animation: 'grow',
+      arrow: true,
+      triggerClose:{click:true,scroll:true,mouseleave:true},
+      interactive: true,
+      viewportAware: true,
+      functionBefore: function(instance,helper) {
+        var currentCategory = $("#sortorder").attr("data-main_category");
+        var selectedCategory = $("#sortorder").attr("data-selected_category");
+        $(".allButtons").prop("disabled",false);
+        $("#"+selectedCategory).prop("disabled",true);
+        var otherContent = $("#otherButtons").html();
+        var displayContent = $("#"+currentCategory).html();
+        instance.content(displayContent + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + otherContent);
+      },functionReady: function(instance,helper) {
+        $(".allButtons").click(function() { 
+          $(this).prop("disabled",true); 
+          $("#sortorder").attr("data-selected_category",this.id);
+          changeCategory(this);
+        });
+      }
+    });  
   }
   
   $("#monitor").click(function() { Monitor(); });
@@ -288,38 +310,7 @@ $(function(){
   $(".initDockerSearch").click(function() { initDockerSearch(); });
   $(".moduleButton").click(function() { caModules(); });
   $(".allButtons").click(function() {
-    var description = this.value;
-    var category = this.id;
-    clearSearchBox();
-  
-    $('.allButtons').prop('disabled', false);
-    $(this).prop("disabled",true);
-
-    if ( typeof categorySub[this.id] !== "undefined" ) {
-      category = categorySub[this.id];
-    }
-    if ( typeof categoryDesc[this.id] !== "undefined" ) {
-      description = categoryDesc[this.id];
-    }
-    var newFlag = false;
-    switch (category) {
-      case "network:":
-        $("#network").prop("disabled",true);
-        break;
-      case "MediaApp:":
-        $("#MediaApp").prop("disabled",true);
-        break;
-      case "MediaServer:":
-        $("#MediaServer").prop("disabled",true);
-        break;
-      case "tools:":
-        $("#tools").prop("disabled",true);
-        break;
-      case "New":
-        newFlag = true;
-        break;
-    }
-    getContent(false,category,description,newFlag);
+    changeCategory(this);
   });
   myAlert("Updating Content","Retrieving the latest application Lists","/plugins/community.applications/images/spinner2.gif","40x40");
   $.post(URL,{action:'force_update'});
@@ -333,6 +324,48 @@ $(function(){
   getContent(true,'INITIALIZE','None Selected');
   $('#searchBox').keyup(function(e) {if(e.which == 13){doSearch(false);}});
 });
+
+function changeCategory(button) {
+  var description = button.value;
+  var category = button.id;
+  clearSearchBox();
+  
+  $('.allButtons').prop('disabled', false);
+  $(button).prop("disabled",true);
+
+  if ( typeof categorySub[button.id] !== "undefined" ) {
+    category = categorySub[button.id];
+  }
+  if ( typeof categoryDesc[button.id] !== "undefined" ) {
+    description = categoryDesc[button.id];
+  }
+  var newFlag = false;
+  $("#sortorder").attr("data-main_category","MainCategory");
+<?if ( $toolTipsterAllowed == "false" ) : ?>
+  switch (category) {
+    case "network:":
+      $("#network").prop("disabled",true);
+      $("#sortorder").attr("data-main_category","NetworkCategory");
+      break;
+    case "MediaApp:":
+      $("#MediaApp").prop("disabled",true);
+      $("#sortorder").attr("data-main_category","MediaAppCategory");
+      break;
+    case "MediaServer:":
+      $("#MediaServer").prop("disabled",true);
+      $("#sortorder").attr("data-main_category","MediaServerCategory");
+      break;
+    case "tools:":
+      $("#tools").prop("disabled",true);
+      $("#sortorder").attr("data-main_category","ToolsCategory");
+      break;
+    case "New":
+      newFlag = true;
+      break;
+  }
+<?endif;?>
+  getContent(false,category,description,newFlag);
+}
 
 function caModules() {
   $(".appButtons,#monitor").prop("disabled",false);
@@ -444,8 +477,6 @@ function doSearch(button) {
   $('#BackToTop').hide();
   if (filter) {
     enableButtons();
-    $("#currentSection").html("Search Results");
-    $("#sortorder").attr("data-section","");
     $("#Category").html("<?=$categoryTitle?> (Search Results for <font color='red'>"+filter+"</font>)");
   } else {
     $("#Category").html("All Recommended Applications");
@@ -467,6 +498,8 @@ function doSearch(button) {
   $.post(URL,{action:'get_content',filter:filter,sortOrder:sortOrder,windowWidth:windowWidth,maxPerPage:maxPerPage},function(data) {
     if (data) { 
       $('#templates_content').html(data);
+      $("#sortorder").attr("data-section","AppStore");
+      $("#currentSection").html("Available Apps");
       readMore();
       myCloseAlert();
       setToolTip();
@@ -627,11 +660,11 @@ function getContent(init,category,description,newApp) {
   }
   $("#Total1").show();
   $("#sortButtons,#templateSortButtons").show();
-  $("#sortorder").attr("data-section","AppStore");
-  $("#currentSection").html("Available Apps");
+  $("#templateSortButtons").show();
   var windowWidth = getWindowWidth();
   $("#maxPerPage").prop("disabled",false);
 
+<?if ( $toolTipsterAllowed == "false" ) : ?>
   switch (category) {
     case 'network:':
       $("#MainCategory,#topLevelButton").hide();
@@ -663,6 +696,7 @@ function getContent(init,category,description,newApp) {
       $("#MainCategory,#topLevelButton").show();
       break;
   }
+<?endif;?>
   
   $('#BackToTop').hide();
   
@@ -776,6 +810,7 @@ function installPlugin(pluginURL) {
 }
 
 function previousApps(button,installed) {
+  $("#categoryIcon").hide();
   if ( installed ) {
     $("#currentSection").html("Installed Apps");
   } else {
@@ -915,6 +950,7 @@ function uninstallDocker(application,humanName) {
 }
 
 function appStore() {
+  $("#categoryIcon").show();
   $("#currentSection").html("Available Apps");
   $("#sortorder").attr("data-section","AppStore");
   clearTimeout(monitorInterval);
@@ -931,16 +967,17 @@ function appStore() {
 
 function Monitor() {
   $("#currentSection").html("Resource Monitor");
-  $("#sortorder").attr("data-section","monitor");
   clearSearchBox();
   $(".appButtons").prop("disabled",false);
   $("#monitor").prop("disabled",true);  
-  $("#templates_content,.dockerSearch,#AppsOnly,#sortButtons,#Total1").hide();
+  $("#templates_content,.dockerSearch,#AppsOnly,#sortButtons,#Total1,#categoryIcon").hide();
+  $("#sortorder").attr("data-main_category","MainCategory");
+  $("#sortorder").attr("data-section","");
   $("#templates_content").html("");
   $(".resourceMonitor,#sortIcon").show();
   $("#sortorder").attr("data-resource","resource running");
   $("#resourceBody").html("<center>Initializing</center>");
-  $.post(resourceURL,{action:'resourceInitialize'}, function(data) {
+  $.post(URL,{action:'resourceInitialize'}, function(data) {
     if (data) {
       $("#Category").html("Docker Application Resource Monitor <font size='0'>For more detailed results, click "+data+"</font>");
       runMonitor();
@@ -950,16 +987,16 @@ function Monitor() {
 
 function runMonitor() {
   if ( $('#monitor').prop("disabled") ) {
-    $.post(resourceURL,{action:'checkCalculations'},function(result) {
+    $.post(URL,{action:'checkCalculations'},function(result) {
       if (result) {
         $("#miscScript").html(result);
       }
     });
     var sortOrder = getSortOrder();
-    $.post(resourceURL,{action:'resourceMonitor',sortOrder:sortOrder},function(data) {
+    $.post(URL,{action:'resourceMonitor',sortOrder:sortOrder},function(data) {
       if (data) {
         $('#resourceBody').html(data);
-        monitorInterval = setTimeout(runMonitor,1000);
+        monitorInterval = setTimeout(runMonitor,300);
       }
     });
   }
@@ -973,7 +1010,7 @@ function changeResource(button,buttonclass) {
 
 function calculateAppdataSize() {
   $("#calculateAppdata").prop("disabled",true);
-  $.post(resourceURL,{action:'calculateAppdata'});
+  $.post(URL,{action:'calculateAppdata'});
 }
 
 function installPLGupdate(filename,plgName) {
@@ -982,7 +1019,7 @@ function installPLGupdate(filename,plgName) {
 
 function startCadvisor() {
   myAlert("","Starting the cAdvisor application");
-  $.post(resourceURL,{action:'startCadvisor'},function(data) {
+  $.post(URL,{action:'startCadvisor'},function(data) {
     if (data) {
       myCloseAlert();
       Monitor();
@@ -1006,6 +1043,7 @@ function pinApp(button,repository) {
 }
 
 function pinnedApps(button) {
+  $("#categoryIcon").hide();
   $("#currentSection").html("Pinned Apps");
   $("#sortorder").attr("data-docker","");
   $("#maxPerPage").prop("disabled",false);
@@ -1048,6 +1086,7 @@ function displayTags(leadTemplate) {
 <?endif;?>
 
 <?if ( $toolTipsterAllowed == "true" ) : ?>
+<img id='categoryIcon' class='ca_categories' title='Select Category' height='50px' style='cursor:pointer;position:relative;' src='/plugins/community.applications/images/category.png'>
 <img id='sortIcon' class='ca_toolsView' title='change view' height='50px' style='cursor:pointer;position:relative;' src='/plugins/community.applications/images/view.png'>
 <img src='/plugins/community.applications/images/section.png' height='50px' class='ca_section' style='cursor:pointer;'><font size='2'><b>Current Section: <font color='red'><span id='currentSection'>Available Apps</span></font></b></font>
 <?else:?>
@@ -1057,6 +1096,7 @@ function displayTags(leadTemplate) {
 <input type='button' class='appButtons' id='PinnedApps' value='Pinned Apps' onclick='pinnedApps(this.id);'></input>
 <?endif;?>
 <img class='ca_staticTips' height='35px' src='/plugins/community.applications/images/resource.png' id='monitor' title='Resource Monitor' style='margin:0px;cursor:pointer;float:right;'><br>
+<?if ($toolTipsterAllowed == "false" ) : ?>
 <span id='AppsOnly'>
 <br><font size='4'><b>Categories:</b></font><br>
 <span id='MainCategory'>
@@ -1110,11 +1150,11 @@ function displayTags(leadTemplate) {
 <input class='allButtons' type=button id="UNCATEGORIZED" value='Uncategorized'></input>
 <input class='allButtons' type=button id="All" value='All Apps'></input>
 </span>
-
+<?endif;?>
 <strong><font size='3'><span id="Category"></span></strong></font><span id="Total1" style='float: right';>Total Found: <strong><font size="3"><span id="Total"></span></font></strong><span>&nbsp;&nbsp;Results/page: <select id='maxPerPage' class='narrow' onchange='changePage(&quot;1&quot;);'><option value='-1'>All</option><option value='10'>10</option><option value='25'>25</option><option value='50'>50</option><option value='100'>100</option></select></span></span>
 </span><br>
-<center>
 <?if ( $toolTipsterAllowed == "false" ) : ?>
+<center>
 <span id='sortButtons'>View Mode:
 <input type='button' class='viewButton' value='Tables' id='viewTable'>
 <input type='button' class='viewButton' value='Icon Details' id='viewDetail'>
@@ -1209,9 +1249,64 @@ Sort Direction:
 <input type='button' class='appButtons' id='PinnedApps' value='Pinned Apps' onclick='pinnedApps(this.id);'></input>
 <input type='button' class='appButtons' id='CAmodules' value='CA Modules' onclick='caModules();'>
 </span>
+<div style='display:none;'>
+<span id='MainCategory'>
+<input class='allButtons' type=button id='backup' value='Backup'></input>
+<input class='allButtons' type=button id='cloud' value='Cloud'></input>
+<input class='allButtons' type=button id='downloaders' value='Downloaders'></input>
+<input class='allButtons' type=button id='HomeAutomation' value='Home Automation'></input>
+<input class='allButtons' type=button id='networkALL' value='Network Services'></input>
+<input class='allButtons' type=button id='mediaappALL' value='Media Applications'></input>
+<input class='allButtons' type=button id='mediaserverALL' value='Media Servers'></input>
+<input class='allButtons' type=button id='productivity' value='Productivity'></input>
+<input class='allButtons' type=button id='toolsALL' value='Tools/Utilities'></input>
+<input class='allButtons' type=button id='other' value='Other'></input>
+<input class='allButtons' type=button id='Plugins' value='Plugins'></input>
+</span>
+<span id='NetworkCategory'>
+<input class='allButtons' type=button id='networkweb' value='Web Servers'></input>
+<input class='allButtons' type=button id='networkdns' value='DNS Clients / Servers'></input>
+<input class='allButtons' type=button id='networkftp' value='FTP Clients / Servers'></input>
+<input class='allButtons' type=button id='networkproxy' value='Proxies'></input>
+<input class='allButtons' type=button id='networkvoip' value='VOIP'></input>
+<input class='allButtons' type=button id='networkmanagement' value='Management / Analyzer'></input>
+<input class='allButtons' type=button id='networkmessenger' value='Messengers'></input>
+<input class='allButtons' type=button id='networkother' value='Other'></input>
+<input class='allButtons' type=button id='network' value='All Network Services'></input>
+</span>
+<span id='MediaAppCategory'>
+<input class='allButtons' type=button id='MediaAppVideo' value='Video'></input>
+<input class='allButtons' type=button id='MediaAppMusic' value='Music'></input>
+<input class='allButtons' type=button id='MediaAppBooks' value='Books / Comics'></input>
+<input class='allButtons' type=button id='MediaAppPhotos' value='Photos'></input>
+<input class='allButtons' type=button id='MediaAppOther' value='Other'></input>
+<input class='allButtons' type=button id='MediaApp' value='All Media Applications'></input>
+</span>
+<span id='MediaServerCategory'>
+<input class='allButtons' type=button id='MediaServerVideo' value='Video'></input>
+<input class='allButtons' type=button id='MediaServerMusic' value='Music'></input>
+<input class='allButtons' type=button id='MediaServerBooks' value='Books / Comics'></input>
+<input class='allButtons' type=button id='MediaServerPhotos' value='Photos'></input>
+<input class='allButtons' type=button id='MediaServerOther' value='Other'></input>
+<input class='allButtons' type=button id='MediaServer' value='All Media Server'></input>
+</span>
+<span id='ToolsCategory'>
+<input class='allButtons' type=button id='toolssystem' value='System Tools'></input>
+<input class='allButtons' type=button id='tools' value='All Tools/Utilities'></input>
+</span>
+<div id='otherButtons'>
+<span style='float:right'>
+<input class='allButtons' type=button id="NONE" value='All Categories' hidden></input>
+<span id='topLevelButton'>
+<input class='allButtons' type=button id="New" value='New/Updated'></input>
+<input class='allButtons' type=button id="UNCATEGORIZED" value='Uncategorized'></input>
+<input class='allButtons' type=button id="All" value='All Apps'></input>
+</span>
+</div>
+</div>
 <?endif;?>
 </span>
-<span id='sortorder' data-sortorder='' data-docker='' data-section='AppStore'></span>
+<span id='sortorder' data-sortorder='' data-docker='' data-section='AppStore' data-main_category='MainCategory'></span>
 </FORM>
 <span id='debugging'></span>
 
