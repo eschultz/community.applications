@@ -885,6 +885,7 @@ function installPlugin(pluginURL) {
 }
 
 function previousApps(button,installed) {
+  setPageOne();
   myAlert("","Searching");
   enableIcon("#categoryIcon, #subcategoryIcon",false);
   $("#sortorder").removeAttr("data-resource");
@@ -1125,7 +1126,12 @@ function pinApp(button,repository) {
   $.post(URL,{action:'pinApp',repository:repository});
 }
 
+function setPageOne() {
+  $("#currentPageNumber").html("1");
+}
+
 function pinnedApps(button) {
+  setPageOne();
   myAlert("","Searching");
   $("#sortorder").removeAttr("data-resource");
   $("#sortorder").removeAttr("data-docker");
