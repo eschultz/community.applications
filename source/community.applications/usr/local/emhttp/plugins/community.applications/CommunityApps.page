@@ -5,7 +5,7 @@ Title="Community Applications"
 <?
 ###############################################################
 #                                                             #
-# Community Applications copyright 2015-2016, Andrew Zawadzki #
+# Community Applications copyright 2015-2017, Andrew Zawadzki #
 #                                                             #
 ###############################################################
 
@@ -27,10 +27,7 @@ if ( ! is_file("/boot/config/plugins/$plugin/accepted") ) {
   $firstRun = "true";
 }
 $vars = parse_ini_file("/var/local/emhttp/var.ini");
-$toolTipsterAllowed = version_compare($vars['version'],"6.3.3",">=") ? "true" : "false";
-if ( $cfg['tooltipster'] == "false" ) {
-  $toolTipsterAllowed = "false";
-}
+$toolTipsterIncluded = version_compare($vars['version'],"6.3.3",">=") ? "true" : "false";
 
 $tabMode = $cfg['newWindow'];
 $line_color = $display['theme']=='black' ? '#202020' : '#E8E8E8';
@@ -39,7 +36,6 @@ $timeNew = str_replace("-","",$cfg['timeNew']);
 $categoryTitle = "Recommended Applications";
 $viewMode = $cfg['viewMode'];
 $execPath = "/plugins/$plugin/scripts";
-$commandArg="?appNumber=";
 
 if ( is_dir("/var/lib/docker/containers") ) {
   $dockerRunning = "true";
@@ -60,6 +56,10 @@ input.resourceDir {margin:1px;}
 input.allButtons {margin:-1px;}
 </style>
 
+<?if ( $toolTipsterIncluded == "false" ) : ?>
+<script src="/plugins/community.applications/javascript/tooltipster.bundle.min.js"></script>
+<link type="text/css" rel="stylesheet" href="/plugins/community.applications/styles/tooltipster.css">
+<?endif;?>
 <script>
 jQuery(document).ready(function() {
   var offset = 250;
@@ -152,49 +152,66 @@ var categoryDesc = {
   All: "All Available Applications"
   };
 
+function enableIcon(icon,enable) {
+  $(icon).each(function() {
+    var source = $(this).attr("src");
+    source = source.replace(".png","");
+    source = source.replace("Disabled","");
+    if ( ! enable) {
+      source = source + "Disabled";
+      $(this).css("cursor","normal");
+    } else {
+      $(this).css("cursor","pointer");
+    }
+    $(this).attr("src",source + ".png");
+  });
+}
+
 function setToolTip() {
-  if ( "<?=$toolTipsterAllowed?>" == "true" ) {
-    $('.ca_infoPopup').attr('title','Loading...');
-    $('.ca_appPopup').attr('title','Loading...');
-    $('.ca_tooltip').tooltipster({delay:[1000,1],timer:15000, animation:'grow', arrow:true, trigger:'custom', triggerOpen:{mouseenter: true}, triggerClose:{click:true,scroll:true,mouseleave:true}});
-    $('.ca_infoPopup').tooltipster({
-      contentAsHTML: true,
-      maxWidth:550,
-      minWidth:550,
-      animation: 'grow',
-      triggerClose:{click:false,scroll:true,mouseleave:false},
-      interactive: true,
-      viewportAware: true,
-      functionInit: function(instance,helper) {
-        var origin = $(helper.origin);
-        var appNumber = origin.attr('data-appNumber');
-        $.post("/plugins/community.applications/scripts/showInfo.php",{action:'none',appNumber:appNumber},function(data) {
-          if (data) {
-            instance.content(data);
-          }
-        });
-      }
-    });     
-    $('.ca_appPopup').tooltipster({
-      contentAsHTML: true,
-      maxWidth:550,
-      minWidth:550,
-      animation: 'grow',
-      arrow:true,
-      triggerClose:{click:false,scroll:true,mouseleave:false},
-      interactive: true,
-      viewportAware: true,
-      functionInit: function(instance,helper) {
-        var origin = $(helper.origin);
-        var appNumber = origin.attr('data-appNumber');
-        $.post("/plugins/community.applications/scripts/showDesc.php",{action:'none',appNumber:appNumber},function(data) {
-          if (data) {
-            instance.content(data);
-          }
-        });
-      }
-    });      
-  }
+  $('.ca_infoPopup').attr('title','Loading...');
+  $('.ca_appPopup').attr('title','Loading...');
+  $('.ca_tooltip').tooltipster({delay:[1000,1],timer:15000, animation:'grow', arrow:true, trigger:'custom', triggerOpen:{mouseenter: true}, triggerClose:{click:true,scroll:true,mouseleave:true}});
+  $('.ca_infoPopup').tooltipster({
+    contentAsHTML: true,
+    maxWidth:550,
+    minWidth:550,
+    animation: 'grow',
+    trigger: 'custom',
+    triggerOpen: {mouseenter:true,click:true,touchstart:true},
+    triggerClose:{click:true,scroll:true,mouseleave:true,delay:1},
+    interactive: true,
+    viewportAware: true,
+    functionInit: function(instance,helper) {
+      var origin = $(helper.origin);
+      var appNumber = origin.attr('data-appNumber');
+      $.post("/plugins/community.applications/scripts/showInfo.php",{action:'none',appNumber:appNumber},function(data) {
+        if (data) {
+          instance.content(data);
+        }
+      });
+    }
+  });     
+  $('.ca_appPopup').tooltipster({
+    contentAsHTML: true,
+    maxWidth:550,
+    minWidth:550,
+    animation: 'grow',
+    arrow:true,
+    trigger: 'custom',
+    triggerOpen: {mouseenter:true,click:true,touchstart:true},
+    triggerClose:{click:true,scroll:true,mouseleave:true,delay:1},
+    interactive: true,
+    viewportAware: true,
+    functionInit: function(instance,helper) {
+      var origin = $(helper.origin);
+      var appNumber = origin.attr('data-appNumber');
+      $.post("/plugins/community.applications/scripts/showDesc.php",{action:'none',appNumber:appNumber},function(data) {
+        if (data) {
+          instance.content(data);
+        }
+      });
+    }
+  });      
 }
 
 $(function(){
@@ -212,120 +229,170 @@ $(function(){
     $("#maxPerPage").prop("disabled",true);
     $("#maxPerPage").val("-1");
   }
-  if ( "<?=$toolTipsterAllowed?>" == "true" ) {
-    $('.ca_staticTips').tooltipster({delay:[1000,1],timer:15000, animation:'grow', arrow:true, trigger:'custom', triggerOpen:{mouseenter: true}, triggerClose:{click:true,scroll:true,mouseleave:true}});
-    $('.ca_toolsView').tooltipster({
-      trigger: 'custom',
-      triggerOpen: {mouseenter:true,click:true},
-      contentAsHTML: true,
-      animation: 'grow',
-      arrow: true,
-      triggerClose:{click:true,scroll:true,mouseleave:true},
-      interactive: true,
-      viewportAware: true,
-      functionBefore: function(instance,helper) {
-        var origin = $(helper.origin);
+  $('.ca_staticTips').tooltipster({delay:[1000,1],timer:15000, animation:'grow', arrow:true, trigger:'custom', triggerOpen:{mouseenter: true}, triggerClose:{click:true,scroll:true,mouseleave:true}});
+  $('.ca_toolsView').tooltipster({
+    trigger: 'custom',
+    triggerOpen: {mouseenter:true,click:true,touchstart:true},
+    contentAsHTML: true,
+    animation: 'grow',
+    arrow: true,
+    triggerClose:{click:true,scroll:true,mouseleave:true,delay:1},
+    interactive: true,
+    viewportAware: true,
+    functionBefore: function(instance,helper) {
+      var origin = $(helper.origin);
+      var source = origin.attr("src");
+      
+      if ( source.includes("Disabled") ) {
+        var displayContent = "Changing Of Views Disabled";
+      } else {
         var myID = origin.attr('id');
         setSortOrder();
+        if ( $("#sortorder").attr("data-resource") ) {
+          $(".resourceMonitor").show();
+        } else {
+          $(".resourceMonitor").hide();
+        }
         var displayContent = $("#tooltipviews").html();
         $("#tooltipviews").attr("data-backup",displayContent);
         $("#tooltipviews").html("");
-        instance.content(displayContent);
-      },
-      functionReady: function(instance,helper) {
-        $(".viewButton,.sortButton,.dirButton").click(function() { changeSortOrder(this.id,$(this).attr("class")); });
-        $(".resourceSort,.resourceDir").click(function() { changeResource(this.id,$(this).attr("class")); });
-      },
-      functionAfter: function(instance,helper) {
-        $("#tooltipviews").html($("#tooltipviews").attr("data-backup"));
-        setSortOrder();
       }
-    }); 
-    $('.ca_credits').tooltipster({
-      trigger: 'custom',
-      triggerOpen: {mouseenter:true},
-      contentAsHTML: true,
-      maxWidth:550,
-      minWidth:550,
-      animation: 'grow',
-      triggerClose:{click:false,scroll:true,mouseleave:true},
-      interactive: true,
-      viewportAware: true,
-      functionBefore: function(instance,helper) {
-        var origin = $(helper.origin);
-        var myID = origin.attr('id');
-        instance.content("<div style='overflow:scroll; max-height:550px; height:550px; overflow-x:hidden; overflow-y:auto;'><center><img src='/plugins/community.applications/images/CA.png'><br><font size='6' color='white'>Community Applications</font><br><br><?=$caCredits?></div>");
-      }
-    });
-    $('.ca_section').tooltipster({
-      trigger: 'custom',
-      triggerOpen: {mouseenter:true,click:true},
-      contentAsHTML: true,
-      animation: 'grow',
-      arrow: true,
-      triggerClose:{click:true,scroll:true,mouseleave:true},
-      interactive: true,
-      viewportAware: true,
-      functionBefore: function(instance,helper) {
+      instance.content(displayContent);
+    },
+    functionReady: function(instance,helper) {
+      $(".viewButton,.sortButton,.dirButton").click(function() { changeSortOrder(this.id,$(this).attr("class")); });
+      $(".resourceSort,.resourceDir").click(function() { changeResource(this.id,$(this).attr("class")); });
+    },
+    functionAfter: function(instance,helper) {
+      $("#tooltipviews").html($("#tooltipviews").attr("data-backup"));
+      setSortOrder();
+    }
+  }); 
+  $('.ca_credits').tooltipster({
+    trigger: 'custom',
+    triggerOpen: {mouseenter:true,click:true,touchstart:true},
+    contentAsHTML: true,
+    maxWidth:550,
+    minWidth:550,
+    animation: 'grow',
+    triggerClose:{click:true,scroll:true,mouseleave:true,delay:1},
+    interactive: true,
+    viewportAware: true,
+    functionBefore: function(instance,helper) {
+      var origin = $(helper.origin);
+      var myID = origin.attr('id');
+      instance.content("<div style='overflow:scroll; max-height:550px; height:550px; overflow-x:hidden; overflow-y:auto;'><center><img src='/plugins/community.applications/images/CA.png'><br><font size='6' color='white'>Community Applications</font><br><br><?=$caCredits?></div>");
+    }
+  });
+  $('.ca_section').tooltipster({
+    trigger: 'custom',
+    triggerOpen: {mouseenter:true,click:true,touchstart:true},
+    contentAsHTML: true,
+    animation: 'grow',
+    arrow: true,
+    triggerClose:{click:true,scroll:true,mouseleave:true,delay:1},
+    interactive: true,
+    viewportAware: true,
+    functionBefore: function(instance,helper) {
+      var origin = $(helper.origin);
+      var source = origin.attr("src");
+      if ( source.includes("Disabled") ) {
+        var displayContent = "Changing Of Sections Disabled";
+      } else {
         var currentSection = $("#sortorder").attr("data-section");
         $(".appButtons").prop("disabled",false);
         $("#"+currentSection).prop("disabled",true);
         var displayContent = $("#sections").html();
-        instance.content(displayContent);
-      },functionReady: function(instance,helper) {
-        $(".appButtons").click(function() { $(this).prop("disabled",true); });
       }
-    });  
-    $('.ca_categories').tooltipster({
-      trigger: 'custom',
-      triggerOpen: {mouseenter:true,click:true},
-      contentAsHTML: true,
-      animation: 'grow',
-      arrow: true,
-      triggerClose:{click:true,scroll:true,mouseleave:true},
-      interactive: true,
-      viewportAware: true,
-      functionBefore: function(instance,helper) {
+      instance.content(displayContent);
+    },functionReady: function(instance,helper) {
+      $(".appButtons").click(function() { $(this).prop("disabled",true); });
+    }
+  });  
+  $('.ca_categories').tooltipster({
+    trigger: 'custom',
+    triggerOpen: {mouseenter:true,click:true,touchstart:true},
+    contentAsHTML: true,
+    animation: 'grow',
+    arrow: true,
+    triggerClose:{click:true,scroll:true,mouseleave:true,delay:1},
+    interactive: true,
+    viewportAware: true,
+    functionBefore: function(instance,helper) {
+      var origin = $(helper.origin);
+      var source = origin.attr("src");
+      if ( source.includes("Disabled") ) {
+        var displayContent = "Changing Of Categories Disabled In This Section";
+      } else {
         var currentCategory = $("#sortorder").attr("data-main_category");
         var selectedCategory = $("#sortorder").attr("data-selected_category");
         $(".allButtons").prop("disabled",false);
         $("#"+selectedCategory).prop("disabled",true);
         var otherContent = $("#otherButtons").html();
         var displayContent = $("#"+currentCategory).html();
-        instance.content(displayContent + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + otherContent);
-      },functionReady: function(instance,helper) {
-        $(".allButtons").click(function() { 
-          $(this).prop("disabled",true); 
-          $("#sortorder").attr("data-selected_category",this.id);
-          changeCategory(this);
-        });
+        displayContent = displayContent + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + otherContent;
       }
-    });  
-  }
+      instance.content(displayContent);
+    },functionReady: function(instance,helper) {
+      $(".allButtons").click(function() { 
+        $(this).prop("disabled",true); 
+        $("#sortorder").attr("data-selected_category",this.id);
+        changeCategory(this,false);
+      });
+    }
+  });
+  $('.ca_subcategories').tooltipster({
+    trigger: 'custom',
+    triggerOpen: {mouseenter:true,click:true,touchstart:true},
+    contentAsHTML: true,
+    animation: 'grow',
+    arrow: true,
+    triggerClose:{click:true,scroll:true,mouseleave:true,delay:1},
+    interactive: true,
+    viewportAware: true,
+    functionBefore: function(instance,helper) {
+      var origin = $(helper.origin);
+      var source = origin.attr("src");
+      if ( source.includes("Disabled") ) {
+        var displayContent = "No Subcategories Available To Display";
+      } else {
+        var currentSub = $("#sortorder").attr("data-subcategory");
+        var selectedCategory = $("#sortorder").attr("data-selected_subcategory");
+        $(".allButtons").prop("disabled",false);
+        $("#"+selectedCategory).prop("disabled",true);
+        var displayContent = $(currentSub).html();
+        displayContent = displayContent
+      }
+      instance.content(displayContent);
+    },functionReady: function(instance,helper) {
+      $(".allButtons").click(function() { 
+        $(this).prop("disabled",true); 
+        $("#sortorder").attr("data-selected_subcategory",this.id);
+        changeCategory(this,true);
+      });
+    }
+  });      
   
-  $("#monitor").click(function() { Monitor(); });
+  $("#monitor").click(function()                           { Monitor(); });
   $(".viewButton,.sortButton,.dirButton").click(function() { changeSortOrder(this.id,$(this).attr("class")); });
-  $(".resourceSort,.resourceDir").click(function() { changeResource(this.id,$(this).attr("class")); });
-  $("#calculateAppdata").click(function() { calculateAppdataSize(); });
-  $(".initDockerSearch").click(function() { initDockerSearch(); });
-  $(".moduleButton").click(function() { caModules(); });
-  $(".allButtons").click(function() {
-    changeCategory(this);
+  $(".resourceSort,.resourceDir").click(function()         { changeResource(this.id,$(this).attr("class")); });
+  $("#calculateAppdata").click(function()                  { calculateAppdataSize(); });
+  $(".initDockerSearch").click(function()                  { initDockerSearch(); });
+  $(".moduleButton").click(function()                      { caModules(); });
+  $(".allButtons").click(function()                        { changeCategory(this);
   });
   myAlert("Updating Content","Retrieving the latest application Lists","/plugins/community.applications/images/spinner2.gif","40x40");
   $.post(URL,{action:'force_update'});
 
-  if ( "<?=$cfg['viewMode']?>" == "icon" ) $("#viewIcon").prop("disabled",true);
-  if ( "<?=$cfg['viewMode']?>" == "table" ) $("#viewTable").prop("disabled",true);
+  if ( "<?=$cfg['viewMode']?>" == "icon" )   $("#viewIcon").prop("disabled",true);
+  if ( "<?=$cfg['viewMode']?>" == "table" )  $("#viewTable").prop("disabled",true);
   if ( "<?=$cfg['viewMode']?>" == "detail" ) $("#viewDetail").prop("disabled",true);
-
-
 
   getContent(true,'INITIALIZE','None Selected');
   $('#searchBox').keyup(function(e) {if(e.which == 13){doSearch(false);}});
 });
 
-function changeCategory(button) {
+function changeCategory(button,subSwitch) {
   var description = button.value;
   var category = button.id;
   clearSearchBox();
@@ -340,48 +407,60 @@ function changeCategory(button) {
     description = categoryDesc[button.id];
   }
   var newFlag = false;
-  $("#sortorder").attr("data-main_category","MainCategory");
-<?if ( $toolTipsterAllowed == "false" ) : ?>
-  switch (category) {
-    case "network:":
-      $("#network").prop("disabled",true);
-      $("#sortorder").attr("data-main_category","NetworkCategory");
-      break;
-    case "MediaApp:":
-      $("#MediaApp").prop("disabled",true);
-      $("#sortorder").attr("data-main_category","MediaAppCategory");
-      break;
-    case "MediaServer:":
-      $("#MediaServer").prop("disabled",true);
-      $("#sortorder").attr("data-main_category","MediaServerCategory");
-      break;
-    case "tools:":
-      $("#tools").prop("disabled",true);
-      $("#sortorder").attr("data-main_category","ToolsCategory");
-      break;
-    case "New":
-      newFlag = true;
-      break;
+  if ( ! subSwitch ) {
+    switch (category) {
+      case "network:":
+        enableIcon("#subcategoryIcon",true);
+        $("#sortorder").attr("data-subcategory","#NetworkCategory");
+        $("#sortorder").attr("data-selected_subcategory","network");
+        break;
+      case "MediaApp:":
+        enableIcon("#subcategoryIcon",true);
+        $("#sortorder").attr("data-subcategory","#MediaAppCategory");
+        $("#sortorder").attr("data-selected_subcategory","MediaApp");
+        break;
+      case "MediaServer:":
+        enableIcon("#subcategoryIcon",true);
+        $("#sortorder").attr("data-subcategory","#MediaServerCategory");
+        $("#sortorder").attr("data-selected_subcategory","MediaServer");
+        break;
+      case "tools:":
+        enableIcon("#subcategoryIcon",true);
+        $("#sortorder").attr("data-subcategory","#ToolsCategory");
+        $("#sortorder").attr("data-selected_subcategory","tools");
+        break;
+      case "New":
+        newFlag = true;
+        break;
+      default:
+        enableIcon("#subcategoryIcon",false);
+        $("#sortorder").attr("data-main_category","MainCategory");
+        break;
+    }
   }
-<?endif;?>
   getContent(false,category,description,newFlag);
 }
 
 function caModules() {
+  myAlert("","Searching");
+  $("#sortorder").removeAttr("data-resource");
+  $("#sortorder").removeAttr("data-docker");
   $(".appButtons,#monitor").prop("disabled",false);
   $("#CAmodules").prop("disabled",true);
   $("#sortorder").attr("data-section","CAmodules");
   $("#currentSection").html("Additional CA Modules");
   clearTimeout(monitorInterval);  
   clearSearchBox();
-  $("#sortorder").attr("data-docker","");
   $("#templates_content,.resourceMonitor,.dockerSearch,#AppsOnly").hide();
   $("#templates_content").html("<center><font size='3'>Searching</font></center>");
-  $("#templates_content,#sortButtons,#Total1,#templateSortButtons,#sortIcon").show();
+  $("#templates_content,#sortButtons,#Total1,#templateSortButtons").show();
+  enableIcon("#sortIcon",true);
+  enableIcon("#subcategoryIcon, #categoryIcon",false);
   $("#Category").html("All Community Application Modules");
   $.post(URL,{action:'populateModules'},function(data) {
     if (data) {
       changeSortOrder(null,null,null);
+      myCloseAlert();
     }
   });
 }
@@ -390,14 +469,14 @@ function changePage(pageNumber) {
   var sortOrder = getSortOrder();
   var windowWidth = getWindowWidth();
   var maxPerPage = getPerPage();
-  
+  myAlert("","Searching");  
   $("#Total").html("<img src='/plugins/community.applications/images/spinner2.gif' style='height:30px;width:30px'>");
   $.post(URL,{action:'display_content',sortOrder:sortOrder,windowWidth:windowWidth,pageNumber:pageNumber,maxPerPage:maxPerPage},function(data3) {
     if (data3) {
       $('#templates_content').html(data3);
-      $("#templates_content").fadeIn();
       readMore();
       setToolTip();
+      myCloseAlert();
     }
   });
 }
@@ -434,18 +513,6 @@ function readMore() {
   $('.desc_readmore').readmore({maxHeight:150});
 }
 
-function showInfo(appNumber,appName) {
-  openBox('<?=$execPath?>/showInfo.php?appNumber=' + appNumber,appName + " Changelog / More Information",550,550);
-}
-
-function showCredits() {
-  myAlert("Community Applications","<?=$caCredits?>","/plugins/<?=$plugin?>/images/community.applications.png","40x40", true, false, true);
-}
-
-function showDesc(appNumber,appName) {
-  openBox('<?=$execPath?>/showDesc.php?appNumber=' + appNumber + '&appName=' + appName,appName + " Description",550,550);
-}
-
 function doSearch(button) {
   var windowWidth = getWindowWidth();
   var filter = $('#searchBox').val();
@@ -457,7 +524,8 @@ function doSearch(button) {
 
   $("#monitor,.appButtons,#maxPerPage").prop("disabled",false);
   $(".resourceMonitor").hide();
-  $("#templates_content,#AppsOnly,#templateSortButtons,#sortIcon").show();
+  $("#templates_content,#AppsOnly,#templateSortButtons").show();
+  enableIcon("#sortIcon",true);
   $("#AppStore").prop("disabled",true);
 
   if ($('#searchButton').hasClass('fa-search')) {
@@ -482,7 +550,8 @@ function doSearch(button) {
     $("#Category").html("All Recommended Applications");
   }
   
-  $("#sortButtons,#MainCategory,#topLevelButton,#sortIcon").show();
+  $("#sortButtons,#MainCategory,#topLevelButton").show();
+  enableIcon("#sortIcon",true);
   $("#NetworkCategory,#MediaAppCategory,#MediaServerCategory,#NONE,#ToolsCategory").hide();
 
   $("#convert").val("");
@@ -588,10 +657,10 @@ function changeSortOrder(button,buttonClass,previousApps) {
     $("#"+button).prop("disabled", true);
   }
 
-  if ( button == "Date" || button == "Downloads" ) {
+/*   if ( button == "Date" || button == "Downloads" ) {
     $("#Down").prop("disabled", true);
     $("#Up").prop("disabled", false);
-  }
+  } */
 
   var sortOrder = getSortOrder();
   if ( $("#sortorder").attr("data-docker") ) {
@@ -654,9 +723,10 @@ function setSortOrder() {
 
 function getContent(init,category,description,newApp) {
   if ( init == true ) {
-    $("#sortIcon").hide();
+    enableIcon("#sortIcon, #subcategoryIcon",false);
   } else {
-    $("#sortIcon").show();
+    enableIcon("#sortIcon",true);
+    myAlert("","Searching");
   }
   $("#Total1").show();
   $("#sortButtons,#templateSortButtons").show();
@@ -664,7 +734,6 @@ function getContent(init,category,description,newApp) {
   var windowWidth = getWindowWidth();
   $("#maxPerPage").prop("disabled",false);
 
-<?if ( $toolTipsterAllowed == "false" ) : ?>
   switch (category) {
     case 'network:':
       $("#MainCategory,#topLevelButton").hide();
@@ -696,7 +765,6 @@ function getContent(init,category,description,newApp) {
       $("#MainCategory,#topLevelButton").show();
       break;
   }
-<?endif;?>
   
   $('#BackToTop').hide();
   
@@ -749,7 +817,10 @@ function mySearch(filter) {
 function initDockerSearch() {
   $("#maxPerPage").prop("disabled",true);
   dockerSearch(1);
-  $("#sortOrder").attr("data-docker","searching docker");
+  $("#sortorder").attr("data-docker","searching docker");
+  $("#sortorder").attr("data-section","");
+  $("#sortorder").attr("data-selected_category","");
+  enableIcon("#categoryIcon,#subcategoryIcon",false);
 }
 
 function dockerSearch(pageNumber) {
@@ -758,7 +829,8 @@ function dockerSearch(pageNumber) {
   $("#sortorder").attr("data-docker","searching docker");
   $(".appButtons").prop("disabled",false);
   $("#AppStore").prop("disabled",true);
-  $("#AppsOnly,#New,#UNCATEGORIZED,#All,#sortButtons,#sortIcon").show();
+  $("#AppsOnly,#New,#UNCATEGORIZED,#All,#sortButtons").show();
+  enableIcon("#sortIcon",true);
   $(".dockerSearch,#templateSortButtons").hide();
   $("#Total").html("Searching... <img src='/plugins/community.applications/images/spinner2.gif' style='height:30px;width:30px'>");
   $("#Category").html("DockerHub Search Results For <font color='red'>"+filter+"</font> <span id='pageNumber'></span>");
@@ -810,7 +882,10 @@ function installPlugin(pluginURL) {
 }
 
 function previousApps(button,installed) {
-  $("#categoryIcon").hide();
+  myAlert("","Searching");
+  enableIcon("#categoryIcon, #subcategoryIcon",false);
+  $("#sortorder").removeAttr("data-resource");
+  $("#sortorder").removeAttr("data-docker");
   if ( installed ) {
     $("#currentSection").html("Installed Apps");
   } else {
@@ -825,8 +900,9 @@ function previousApps(button,installed) {
 
   $("#Total").html("Searching... <img src='/plugins/community.applications/images/spinner2.gif' style='height:30px;width:30px'>");
   $("#templates_content,.resourceMonitor,.dockerSearch,#AppsOnly").hide();
-  $("#templates_content").html("<center><font size='3'>Searching</font></center>");
-  $("#templates_content,#sortButtons,#Total1,#templateSortButtons,#sortIcon").show();
+//  $("#templates_content").html("<center><font size='3'>Searching</font></center>");
+  $("#templates_content,#sortButtons,#Total1,#templateSortButtons").show();
+  enableIcon("#sortIcon",true);
 
   if ( button == "OldApps" ) {
     $("#Category").html("All Previously Installed Applications");
@@ -837,6 +913,7 @@ function previousApps(button,installed) {
   $.post(URL,{action:'previous_apps',installed:installed},function(data) {
     if (data) {
       changeSortOrder(null,null,"true");
+      myCloseAlert();
     }
   });
 }
@@ -950,9 +1027,10 @@ function uninstallDocker(application,humanName) {
 }
 
 function appStore() {
-  $("#categoryIcon").show();
+  enableIcon("#categoryIcon",true);
   $("#currentSection").html("Available Apps");
   $("#sortorder").attr("data-section","AppStore");
+  $("#sortorder").attr("data-selected_category","");
   clearTimeout(monitorInterval);
   $("#templates_content").html("");
   $("#monitor,.appButtons,.allButtons").prop("disabled",false);
@@ -962,7 +1040,8 @@ function appStore() {
   getContent(true,'INITIALIZE','None Selected');
   $('#searchBox').keyup(function(e) {if(e.which == 13){doSearch(false);}});
   $("#Category").html("None Selected");
-  $("#sortorder").attr("data-docker","");
+  $("#sortorder").removeAttr("data-resource");
+  $("#sortorder").removeAttr("data-docker");
 }
 
 function Monitor() {
@@ -970,11 +1049,13 @@ function Monitor() {
   clearSearchBox();
   $(".appButtons").prop("disabled",false);
   $("#monitor").prop("disabled",true);  
-  $("#templates_content,.dockerSearch,#AppsOnly,#sortButtons,#Total1,#categoryIcon").hide();
+  $("#templates_content,.dockerSearch,#AppsOnly,#sortButtons,#Total1").hide();
+  enableIcon("#categoryIcon, #subcategoryIcon",false);
   $("#sortorder").attr("data-main_category","MainCategory");
   $("#sortorder").attr("data-section","");
   $("#templates_content").html("");
-  $(".resourceMonitor,#sortIcon").show();
+  $(".resourceMonitor").show();
+  enableIcon("#sortIcon",true);
   $("#sortorder").attr("data-resource","resource running");
   $("#resourceBody").html("<center>Initializing</center>");
   $.post(URL,{action:'resourceInitialize'}, function(data) {
@@ -1035,15 +1116,16 @@ function pinApp(button,repository) {
     $(button).attr("src","/plugins/community.applications/images/greenButton.png");
     $(button).attr("title","Click to unpin this application");
   }
-  if ( "<?=$toolTipsterAllowed?>" == "true" ) {
-    $(button).tooltipster('content',$(button).attr("title"));
-    $(button).attr("title","");
-  }
+  $(button).tooltipster('content',$(button).attr("title"));
+  $(button).attr("title","");
   $.post(URL,{action:'pinApp',repository:repository});
 }
 
 function pinnedApps(button) {
-  $("#categoryIcon").hide();
+  myAlert("","Searching");
+  $("#sortorder").removeAttr("data-resource");
+  $("#sortorder").removeAttr("data-docker");
+  enableIcon("#categoryIcon, #subcategoryIcon",false);
   $("#currentSection").html("Pinned Apps");
   $("#sortorder").attr("data-docker","");
   $("#maxPerPage").prop("disabled",false);
@@ -1054,11 +1136,13 @@ function pinnedApps(button) {
   clearSearchBox();
   $("#templates_content,.resourceMonitor,.dockerSearch,#AppsOnly").hide();
   $("#templates_content").html("<center><font size='3'>Searching</font></center>");
-  $("#templates_content,#sortButtons,#Total1,#templateSortButtons,#sortIcon").show();
+  $("#templates_content,#sortButtons,#Total1,#templateSortButtons").show();
+  enableIcon("#sortIcon",true);
   $("#Category").html("All Pinned Applications");
   $.post(URL,{action:'pinnedApps'},function(data) {
     if (data) {
       changeSortOrder(null,null,null);
+      myCloseAlert();
     }
   });
 }
@@ -1081,126 +1165,27 @@ function displayTags(leadTemplate) {
 </script>
 <FORM method="get" id="myForm">
 > For help with this plugin, click here (a new tab will open with the help file)  <strong><font size="2"><a href="Settings/caHelp" target="_blank">HELP</a></font></strong>
-<?if ($toolTipsterAllowed == "true"):?>
-> <br><font color='red'>NOTE:</font> Some mobile devices may have problems with the CA's new UI.  If you find that you are unable to click to change the view modes, sort order, or select categories, then within CA's General Settings (Settings Tab), disable the updated UI
-<?endif;?>
 
-<?if ( $toolTipsterAllowed == "true" ) : ?>
-<img id='categoryIcon' class='ca_categories' title='Select Category' height='50px' style='cursor:pointer;position:relative;' src='/plugins/community.applications/images/category.png'>
-<img id='sortIcon' class='ca_toolsView' title='change view' height='50px' style='cursor:pointer;position:relative;' src='/plugins/community.applications/images/view.png'>
-<img src='/plugins/community.applications/images/section.png' height='50px' class='ca_section' style='cursor:pointer;'><font size='2'><b>Current Section: <font color='red'><span id='currentSection'>Available Apps</span></font></b></font>
-<?else:?>
-<input type='button' class='appButtons' id='AppStore' value='Available Apps' disabled onclick='appStore();'>
-<input type='button' class='appButtons' id='InstalledApps' value='Installed Apps' onclick='previousApps(this.id,true);'></input>
-<input type='button' class='appButtons' id='OldApps' value='Previous Apps' onclick='previousApps(this.id,false);'></input>
-<input type='button' class='appButtons' id='PinnedApps' value='Pinned Apps' onclick='pinnedApps(this.id);'></input>
-<?endif;?>
+<img id='sectionIcon' src='/plugins/community.applications/images/SectionIcon.png' height='50px' class='ca_section' style='cursor:pointer;'>
+<img id='sortIcon' class='ca_toolsView' title='change view' height='50px' style='cursor:normal;position:relative;' src='/plugins/community.applications/images/ViewIcon.png'>
+<img id='categoryIcon' class='ca_categories' title='Select Category' height='50px' style='cursor:pointer;position:relative;' src='/plugins/community.applications/images/CategoryIcon.png'>
+<img id='subcategoryIcon' class='ca_subcategories' title='Select Sub Category' height='50px' style='cursor:pointer;position:relative;' src='/plugins/community.applications/images/SubCategoryIcon.png'>
+<font size='2'><b>Current Section: <font color='red'><span id='currentSection'>Available Apps</span></font></b></font>
 <img class='ca_staticTips' height='35px' src='/plugins/community.applications/images/resource.png' id='monitor' title='Resource Monitor' style='margin:0px;cursor:pointer;float:right;'><br>
-<?if ($toolTipsterAllowed == "false" ) : ?>
-<span id='AppsOnly'>
-<br><font size='4'><b>Categories:</b></font><br>
-<span id='MainCategory'>
-<input class='allButtons' type=button id='backup' value='Backup'></input>
-<input class='allButtons' type=button id='cloud' value='Cloud'></input>
-<input class='allButtons' type=button id='downloaders' value='Downloaders'></input>
-<input class='allButtons' type=button id='HomeAutomation' value='Home Automation'></input>
-<input class='allButtons' type=button id='networkALL' value='Network Services'></input>
-<input class='allButtons' type=button id='mediaappALL' value='Media Applications'></input>
-<input class='allButtons' type=button id='mediaserverALL' value='Media Servers'></input>
-<input class='allButtons' type=button id='productivity' value='Productivity'></input>
-<input class='allButtons' type=button id='toolsALL' value='Tools/Utilities'></input>
-<input class='allButtons' type=button id='other' value='Other'></input>
-<input class='allButtons' type=button id='Plugins' value='Plugins'></input>
-</span>
-<span id='NetworkCategory' hidden>
-<input class='allButtons' type=button id='networkweb' value='Web Servers'></input>
-<input class='allButtons' type=button id='networkdns' value='DNS Clients / Servers'></input>
-<input class='allButtons' type=button id='networkftp' value='FTP Clients / Servers'></input>
-<input class='allButtons' type=button id='networkproxy' value='Proxies'></input>
-<input class='allButtons' type=button id='networkvoip' value='VOIP'></input>
-<input class='allButtons' type=button id='networkmanagement' value='Management / Analyzer'></input>
-<input class='allButtons' type=button id='networkmessenger' value='Messengers'></input>
-<input class='allButtons' type=button id='networkother' value='Other'></input>
-<input class='allButtons' type=button id='network' value='All Network Services'></input>
-</span>
-<span id='MediaAppCategory' hidden>
-<input class='allButtons' type=button id='MediaAppVideo' value='Video'></input>
-<input class='allButtons' type=button id='MediaAppMusic' value='Music'></input>
-<input class='allButtons' type=button id='MediaAppBooks' value='Books / Comics'></input>
-<input class='allButtons' type=button id='MediaAppPhotos' value='Photos'></input>
-<input class='allButtons' type=button id='MediaAppOther' value='Other'></input>
-<input class='allButtons' type=button id='MediaApp' value='All Media Applications'></input>
-</span>
-<span id='MediaServerCategory' hidden>
-<input class='allButtons' type=button id='MediaServerVideo' value='Video'></input>
-<input class='allButtons' type=button id='MediaServerMusic' value='Music'></input>
-<input class='allButtons' type=button id='MediaServerBooks' value='Books / Comics'></input>
-<input class='allButtons' type=button id='MediaServerPhotos' value='Photos'></input>
-<input class='allButtons' type=button id='MediaServerOther' value='Other'></input>
-<input class='allButtons' type=button id='MediaServer' value='All Media Server'></input>
-</span>
-<span id='ToolsCategory' hidden>
-<input class='allButtons' type=button id='toolssystem' value='System Tools'></input>
-<input class='allButtons' type=button id='tools' value='All Tools/Utilities'></input>
-</span>
-<span style='float:right'>
-<input class='allButtons' type=button id="NONE" value='All Categories' hidden></input>
-<span id='topLevelButton'>
-<input class='allButtons' type=button id="New" value='New/Updated'></input>
-<input class='allButtons' type=button id="UNCATEGORIZED" value='Uncategorized'></input>
-<input class='allButtons' type=button id="All" value='All Apps'></input>
-</span>
-<?endif;?>
 <strong><font size='3'><span id="Category"></span></strong></font><span id="Total1" style='float: right';>Total Found: <strong><font size="3"><span id="Total"></span></font></strong><span>&nbsp;&nbsp;Results/page: <select id='maxPerPage' class='narrow' onchange='changePage(&quot;1&quot;);'><option value='-1'>All</option><option value='10'>10</option><option value='25'>25</option><option value='50'>50</option><option value='100'>100</option></select></span></span>
 </span><br>
-<?if ( $toolTipsterAllowed == "false" ) : ?>
-<center>
-<span id='sortButtons'>View Mode:
-<input type='button' class='viewButton' value='Tables' id='viewTable'>
-<input type='button' class='viewButton' value='Icon Details' id='viewDetail'>
-<input type='button' class='viewButton' value='Icons' id='viewIcon'>
-<span id='templateSortButtons'>Sort By:
-<input type='button' class='sortButton' id='Name' value='Name' disabled>
-<input type='button' class='sortButton' id='RepoName' value='Repository'>
-<input type='button' class='sortButton' id='Downloads' value='Downloads'>
-<input type='button' class='sortButton' id='Author' value='Author'>
-<input type='button' class='sortButton' id='Date' value='Date'>
-Sort Direction:
-<input type='button' class='dirButton' id='Up' value='Ascending' disabled>
-<input type='button' class='dirButton' id='Down' value='Descending'>
-</center></span></span>
-<?endif;?>
 
 <?if ( $upgradeAvailable ) :?>
 <span id='upgradeAvailable'><center> <font color='red'>An update to Community Applications is Available. Click <a onclick=installPLGupdate('community.applications.plg',"CommunityApplications"); style=cursor:pointer>HERE</a> to install the update  <img src='/plugins/community.applications/images/information.png' onclick='showInfo("CA","Community Applications");' style='cursor:pointer'></center></font></span>
 <?endif?>
 <div class='dockerSearch' style='display:none'><center><input type=button class='initDockerSearch' value='Get more results from dockerHub'></input></center></div>
-
 <span id='templates_content'></span>
-
-<?if ( $toolTipsterAllowed == "false" ) : ?>
-<div class='resourceMonitor' hidden>
-<center>Sort By:
-<input type='button' value='Name' id='resourceName' class='resourceSort' disabled>
-<input type='button' value='CPU' id='resourceCPU' class='resourceSort'>
-<input type='button' value='Memory' id='resourceMemory' class='resourceSort'>
-Sort Direction:
-<input type='button' value='Up' id='resourceUp' class='resourceDir' disabled>
-<input type='button' value='Down' id='resourceDown' class='resourceDir'>
-<input type='button' value='Calculate Appdata Size' id='calculateAppdata'>
-<br><br><table id='resourceHeader' class='tablesorter'>
-<thead><th></th><th>AppName</th><th>DockerHub Repository</th><th>CPU %</th><th>Memory (Used/Max)</th><th>Memory %</th><th>Network (Down/Up)</th><th>Virtual Size</th><th><center>Appdata</center></th></thead>
-<tbody id='resourceBody'></tbody>
-</table>
-</div>
-<?else:?>
 <div class='resourceMonitor' hidden><input type='button' value='Calculate Appdata Size' id='calculateAppdata' style='float:right'>
 <br><br><table id='resourceHeader' class='tablesorter'>
 <thead><th></th><th>AppName</th><th>DockerHub Repository</th><th>CPU %</th><th>Memory (Used/Max)</th><th>Memory %</th><th>Network (Down/Up)</th><th>Virtual Size</th><th><center>Appdata</center></th></thead>
 <tbody id='resourceBody'></tbody>
 </table>
 </div>
-<?endif;?>
 <div id='appWarning' style='display:none'><center><img src='https://raw.githubusercontent.com/Squidly271/community.applications/master/webImages/Warning2.png' height='50px' width='50px'><br>
 <font size='2' color='red'>Note: All Applications listed here are 3rd party additions to unRaid.<br>Neither the authors of Community Applications nor Limetech make any warranty as to the suitability of any applications listed herein</font>
 <br><input type='button' value='Dismiss Warning' onclick='dismissWarning();'></input></center></div>
@@ -1208,7 +1193,7 @@ Sort Direction:
 <a href="#" class="back-to-top" style="display: inline;"><img src='/plugins/community.applications/images/up.png' style='width:30px;height:30px' href="#" class="back-to-top"></img></a>
 <div class='dockerSearch' style='display:none'><center><input type=button class='initDockerSearch' value='Get more results from dockerHub'></input></center></div>
 <center>Last Change To Appfeed: <strong><span id='updateTime'></span></strong></center>
-<a href="Settings/caHelp" target='_blank'>CA Manual</a><a class='ca_credits' style='float:right;cursor:pointer' onclick='showCredits();'>Credits</a><br><br></span>
+<a href="Settings/caHelp" target='_blank'>CA Manual</a><a class='ca_credits' style='float:right;cursor:pointer'>Credits</a><br><br></span>
 <center><a href='https://forums.lime-technology.com/topic/55246-docker-faq/' target='_blank'>Docker FAQ</a></center>
 <center>Community Applications Version: <?=$installedVersion?></center>
 > <center>For support for this plugin, visit here: <a title='click for help' href="http://lime-technology.com/forum/index.php?topic=40262.0" target="_blank">http://lime-technology.com/forum/index.php?topic=40262.0</a></center>
@@ -1216,9 +1201,8 @@ Sort Direction:
 
 <span id='miscScript'></span>
 
-<?if ( $toolTipsterAllowed == "true" ) : ?>
 <div>
-<span id='tooltipviews' style='display:none;'>
+<div id='tooltipviews' style='display:none;'>
 <span id='sortButtons'>View Mode:
 <input type='button' class='viewButton' value='Tables' id='viewTable'>
 <input type='button' class='viewButton' value='Icon Details' id='viewDetail'>
@@ -1241,7 +1225,7 @@ Sort Direction:
 <input type='button' value='Up' id='resourceUp' class='resourceDir' disabled>
 <input type='button' value='Down' id='resourceDown' class='resourceDir'>
 </div>
-</span></div>
+</div></div>
 <span id='sections' style='display:none;'>
 <input type='button' class='appButtons' id='AppStore' value='Available Apps' disabled onclick='appStore();'>
 <input type='button' class='appButtons' id='InstalledApps' value='Installed Apps' onclick='previousApps(this.id,true);'></input>
@@ -1304,7 +1288,6 @@ Sort Direction:
 </span>
 </div>
 </div>
-<?endif;?>
 </span>
 <span id='sortorder' data-sortorder='' data-docker='' data-section='AppStore' data-main_category='MainCategory'></span>
 </FORM>

@@ -2,7 +2,7 @@
 
 ###############################################################
 #                                                             #
-# Community Applications copyright 2015-2016, Andrew Zawadzki #
+# Community Applications copyright 2015-2017, Andrew Zawadzki #
 #                                                             #
 ###############################################################
 
@@ -561,7 +561,7 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker,$pageNumb
     if ( $template['Date'] > strtotime($communitySettings['timeNew'] ) ) {
       $template['display_newIcon'] = "<img class='ca_tooltip' src='/plugins/$plugin/images/star.png' style='width:15px;height:15px;' title='New / Updated - ".date("F d Y",$template['Date'])."'></img>";
     }
-    $template['display_changes'] = $template['Changes'] ? " <a style='cursor:pointer'><img class='ca_infoPopup' data-appnumber='$ID' src='/plugins/$plugin/images/information.png' onclick=showInfo($ID,'$appName'); title='Click for the changelog / more information'></a>" : "";
+    $template['display_changes'] = $template['Changes'] ? " <a style='cursor:pointer'><img class='ca_infoPopup' data-appnumber='$ID' src='/plugins/$plugin/images/information.png' title='Click for the changelog / more information'></a>" : "";
     $template['display_humanDate'] = date("F j, Y",$template['Date']);
 
     if ( $template['Plugin'] ) {
@@ -597,14 +597,14 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker,$pageNumb
       $template['display_compatible'] = "NOTE: This application is listed as being NOT compatible with your version of unRaid<br>";
       $template['display_compatibleShort'] = "Incompatible";
     }
-    $template['display_author'] = "<a class='ca_tooltip' style='cursor:pointer' onclick='authorSearch(this.innerHTML);' title='Search for more containers from author'>".$template['Author']."</a>";
+    $template['display_author'] = "<a class='ca_tooltip' style='cursor:pointer' onclick='authorSearch(this.innerHTML);' title='Search for more applications from {$template['SortAuthor']}'>".$template['Author']."</a>";
     $displayIcon = $template['Icon'];
     $displayIcon = $displayIcon ? $displayIcon : "/plugins/$plugin/images/question.png";
     $template['display_iconSmall'] = "<a onclick='showDesc(".$template['ID'].",&#39;".$name."&#39;);' style='cursor:pointer'><img class='ca_appPopup' data-appNumber='$ID' title='Click to display full description' src='".$displayIcon."' style='width:48px;height:48px;' onError='this.src=\"/plugins/$plugin/images/question.png\";'></a>";
     $template['display_iconSelectable'] = "<img src='$displayIcon' onError='this.src=\"/plugins/$plugin/images/question.png\";' style='width:".$iconSize."px;height=".$iconSize."px;'>";
     $template['display_popupDesc'] = ( $communitySettings['maxColumn'] > 2 ) ? "Click for a full description\n".$template['PopUpDescription'] : "Click for a full description";
     $template['display_dateUpdated'] = $template['Date'] ? "</b></strong><center><strong>Date Updated: </strong>".$template['display_humanDate']."</center>" : "";
-    $template['display_iconClickable'] = "<a class='ca_appPopup' data-appNumber='$ID' onclick=showDesc($ID,'$appName'); style='cursor:pointer' title='".$template['display_popupDesc']."'>".$template['display_iconSelectable']."</a>";
+    $template['display_iconClickable'] = "<a class='ca_appPopup' data-appNumber='$ID' style='cursor:pointer' title='".$template['display_popupDesc']."'>".$template['display_iconSelectable']."</a>";
 
     if ( $communitySettings['dockerSearch'] == "yes" && ! $template['Plugin'] ) {
       $template['display_dockerName'] = "<a class='ca_tooltip' data-appNumber='$ID' style='cursor:pointer' onclick='mySearch(this.innerHTML);' title='Search dockerHub for similar containers'>".$template['Name']."</a>";
@@ -669,13 +669,13 @@ function getPageNavigation($pageNumber,$totalApps,$dockerSearch) {
   $o .= "Select Page:&nbsp;&nbsp&nbsp;";
   
   $previousPage = $pageNumber - 1;
-  $o .= ( $pageNumber == 1 ) ? "<img width='20px' src='/plugins/community.applications/images/grey-left.png'>" : "<img class='ca_tooltip' width='20px' style='cursor:pointer' onclick='{$my_function}(&quot;$previousPage&quot;)' title='Go To Page $previousPage' src='/plugins/community.applications/images/green-left.png'>";
+  $o .= ( $pageNumber == 1 ) ? "<font size='3' color='grey'><i class='fa fa-arrow-circle-left' aria-hidden='true'></i></font>" : "<font size='3' color='green'><i class='fa fa-arrow-circle-left' aria-hidden='true' style='cursor:pointer' onclick='{$my_function}(&quot;$previousPage&quot;)' title='Go To Page $previousPage'></i></font>";
   $o .= "&nbsp;&nbsp;&nbsp;";
   $startingPage = $pageNumber - 5;
   if ($startingPage < 3 ) {
     $startingPage = 1;
   } else {
-    $o .= "<b><a style='cursor:pointer' onclick='{$my_function}(&quot;1&quot;);' class='ca_tooltip' title='Go To Page 1'>1</a></b>&nbsp;&nbsp;&nbsp;...&nbsp;&nbsp;&nbsp;";
+    $o .= "<b><a style='cursor:pointer' onclick='{$my_function}(&quot;1&quot;);' title='Go To Page 1'>1</a></b>&nbsp;&nbsp;&nbsp;...&nbsp;&nbsp;&nbsp;";
   }
   $endingPage = $pageNumber + 5;
   if ( $endingPage > $totalPages ) {
@@ -685,7 +685,7 @@ function getPageNavigation($pageNumber,$totalApps,$dockerSearch) {
     if ( $i == $pageNumber ) {
       $o .= "$i";
     } else {
-      $o .= "<b><a class='ca_tooltip' style='cursor:pointer' onclick='{$my_function}(&quot;$i&quot;);' title='Go To Page $i'>$i</a></b>";
+      $o .= "<b><a style='cursor:pointer' onclick='{$my_function}(&quot;$i&quot;);' title='Go To Page $i'>$i</a></b>";
     }
     $o .= "&nbsp;&nbsp;&nbsp";
   }
@@ -694,11 +694,11 @@ function getPageNavigation($pageNumber,$totalApps,$dockerSearch) {
       $o .= "...&nbsp;&nbsp;&nbsp;";
     }
     if ( ($totalPages - $pageNumber ) >5 ) {
-      $o .= "<b><a style='cursor:pointer' class='ca_tooltip' title='Go To Page $totalPages' onclick='{$my_function}(&quot;$totalPages&quot;);'>$totalPages</a></b>&nbsp;&nbsp;&nbsp;";
+      $o .= "<b><a style='cursor:pointer' title='Go To Page $totalPages' onclick='{$my_function}(&quot;$totalPages&quot;);'>$totalPages</a></b>&nbsp;&nbsp;&nbsp;";
     }
   }
   $nextPage = $pageNumber + 1;
-  $o .= ( $pageNumber < $totalPages ) ? "<img class='ca_tooltip' width='20px' style='cursor:pointer' title='Go To Page $nextPage' onclick='{$my_function}(&quot;$nextPage&quot;);' src='/plugins/community.applications/images/green-right.png'>" : "<img width='20px' src='/plugins/community.applications/images/grey-right.png'>";
+  $o .= ( $pageNumber < $totalPages ) ? "<font size='3' color='green'><i class='fa fa-arrow-circle-right' aria-hidden='true' style='cursor:pointer' title='Go To Page $nextPage' onclick='{$my_function}(&quot;$nextPage&quot;);'></i></font>" : "<font size='3' color='grey'><i class='fa fa-arrow-circle-right' aria-hidden='true'></i></font>";
   $o .= "</font></b></center><span id='currentPageNumber' hidden>$pageNumber</span>";
 
   return $o;
@@ -979,7 +979,7 @@ case 'get_content':
         $appsOfDay = appOfDay($file);
         $displayApplications['community'] = array($file[$appsOfDay[0]],$file[$appsOfDay[1]]);
         writeJsonFile($communityPaths['community-templates-displayed'],$displayApplications);
-        echo "<script>$('#templateSortButtons,#sortIcon,#sortButtons').hide();</script>";
+        echo "<script>$('#templateSortButtons,#sortButtons').hide();enableIcon('#sortIcon',false);</script>";
         echo "<br><center><font size='4' color='purple'><b>Random Apps Of The Day</b></font><br><br>";
         echo my_display_apps("detail",$displayApplications['community'],$runningDockers,$imagesDocker);
         break;
@@ -1876,8 +1876,12 @@ case 'resourceInitialize':
 ####################################################
   
 case 'calculateAppdata':
-  $commandLine = $communityPaths['calculateAppdataScript']." > /dev/null | at NOW -M >/dev/null 2>&1";
-  exec($commandLine);
+  $descriptorspec = array(
+    0 => array("pipe", "r"),  // stdin is a pipe that the child will read from
+    1 => array("pipe", "w"),  // stdout is a pipe that the child will write to
+    2 => array("pipe", "w") // stderr is a file to write to
+  );
+  proc_open($communityPaths['calculateAppdataScript'],$descriptorspec,$pipes);
   break;
 
 ##############################################################

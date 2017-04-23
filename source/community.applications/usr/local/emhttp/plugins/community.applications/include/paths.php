@@ -1,7 +1,7 @@
 <?PHP
 ###############################################################
 #                                                             #
-# Community Applications copyright 2015-2016, Andrew Zawadzki #
+# Community Applications copyright 2015-2017, Andrew Zawadzki #
 #                                                             #
 ###############################################################
 
@@ -36,7 +36,7 @@ $communityPaths['logos']                         = $communityPaths['tempFiles'].
 $communityPaths['deleteAppdataScript']           = "/usr/local/emhttp/plugins/community.applications/scripts/deleteAppData.sh";
 $communityPaths['unRaidVars']                    = "/var/local/emhttp/var.ini";
 $communityPaths['appdataSize']                   = $communityPaths['tempFiles']."/appdata/";
-$communityPaths['calculateAppdataScript']        = "/usr/local/emhttp/plugins/community.applications/scripts/calculateAppData.sh";
+$communityPaths['calculateAppdataScript']        = "/usr/local/emhttp/plugins/community.applications/scripts/calculateAppData1.php";
 $communityPaths['calculateAppdataProgress']      = $communityPaths['tempFiles']."/appdata/inprogress";
 $communityPaths['cAdvisor']                      = $communityPaths['tempFiles']."/cAdvisorURL";                         /* URL of cadvisor (if installed) */
 $communityPaths['updateErrors']                  = $communityPaths['tempFiles']."/updateErrors.txt";

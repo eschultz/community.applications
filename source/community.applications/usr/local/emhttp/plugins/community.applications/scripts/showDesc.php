@@ -1,7 +1,7 @@
-<?
+<?PHP
 ###############################################################
 #                                                             #
-# Community Applications copyright 2015-2016, Andrew Zawadzki #
+# Community Applications copyright 2015-2017, Andrew Zawadzki #
 #                                                             #
 ###############################################################
  
@@ -9,6 +9,7 @@ require_once("/usr/local/emhttp/plugins/community.applications/include/paths.php
 require_once("/usr/local/emhttp/plugins/community.applications/include/helpers.php");
 require_once("/usr/local/emhttp/plugins/dynamix.docker.manager/include/DockerClient.php");
 
+file_put_contents("/tmp/hello","hello");
 $DockerTemplates = new DockerTemplates();
 
 if ( is_dir("/var/lib/docker/containers") ) {
@@ -16,7 +17,6 @@ if ( is_dir("/var/lib/docker/containers") ) {
 } else {
   $communitySettings['dockerSearch'] = "no";
 }
-
 if ( $communitySettings['dockerRunning'] ) {
   $info = $DockerTemplates->getAllInfo();
   $DockerClient = new DockerClient();
@@ -53,26 +53,7 @@ $donateimg = $template['DonateImg'];
 $donatetext = $template['DonateText'];
 
 $name = $template['Name'];
-#$selected = $info[$name]['template'] && stripos($info[$name]['icon'], $template['Author']) !== false;
-$selected = $info[$appName]['running'];
 
-if ( $selected ) {
-  $command = "docker ps -f name=".$template['Name']." --no-trunc";
-  $fullImages = explode("\n",shell_exec($command));
-  $fullImage = explode(" ",$fullImages[1]);
-  $cadvisor = searchArray($dockerRunning,"Image","google/cadvisor:latest");
-
-  if ( $cadvisor !== false ) {
-    if ( $dockerRunning[$cadvisor]['Running'] ) {
-      $cadvisorPort = $dockerRunning[$cadvisor]['Ports'][0]['PublicPort'];
-      $unRaidVars = my_parse_ini_file($communityPaths['unRaidVars']);
-      $unRaidIP = $unRaidVars['NAME'];
-      $cAdvisorPath = "//$unRaidIP:$cadvisorPort/docker/".$fullImage[0];
-      $o = "<a href='$cAdvisorPath' target='_blank'>More Details</a>";  
-      file_put_contents($communityPaths['cAdvisor'],$cAdvisorPath);
-    }
-  } 
-}
 $template['Icon'] = $template['Icon'] ? $template['Icon'] : "/plugins/community.applications/images/question.png";
 $template['Description'] = ltrim($template['Description']);
 
@@ -111,20 +92,6 @@ $templateDescription .= $template['MaxVer'] ? "<tr><td nowrap>$color<strong>Max 
 $templateDescription .= $template['downloads'] ? "<tr><td>$color<strong>Downloads:</strong></td><td>{$color}".$template['downloads']."</td></tr>" : "";
 $templateDescription .= $template['Licence'] ? "<tr><td>$color<strong>Licence:</strong></td><td>$color".$template['Licence']."</td></tr>" : "";
   
-if ( $selected ) {
-  $result = searchArray($dockerRunning,'Name',$appName);
-   
-  if ( $dockerRunning[$result]['Running'] ) {
-    $imageID = $dockerRunning[$result]['Id'];
-      
-    $templateDescription .= "<tr><td nowrap>$color<strong>% CPU:</strong></td><td>$color<span id='percent'>Calculating</span></td></tr>";
-    $templateDescription .= "<tr><td nowrap>$color<strong>Memory:</strong></td><td>$color<span id='memory'>Calculating</span></td></tr>";
-    $templateDescription .= "<tr><td></td><td>$o</td></tr>";
-  } else {
-    $templateDescription .= "<tr><td nowrap>$color<strong>% CPU:</strong></td><td>{$color}Not running</td></tr>";
-    $templateDescription .= "<tr><td nowrap>$color<strong>Memory:</strong></td><td>{$color}Not running</td></tr>";
-  }
-}
 $templateDescription .= "</table></td></tr></table></center>";
 $templateDescription .= $template['Description'];
 $templateDescription .= $template['ModeratorComment'] ? "<br><br><b><font color='red'>Moderator Comments:</font></b> ".$template['ModeratorComment'] : "";
@@ -140,33 +107,7 @@ if ( ($donatelink) && ($donateimg) ) {
     $templateDescription .= "<br><font size='0'>The above link is set by the author of the template, not the author of Community Applications</font></center>";
   }
 }
-if ( $imageID ) {
-  $unRaidVars = parse_ini_file("/var/local/emhttp/var.ini");
-  $csrf = $unRaidVars['csrf_token'];
-  
-  $templateDescription .= "
-    <script src='/webGui/javascript/dynamix.js'></script>
-    <script>
-      $(document).ajaxSend(function(elm, xhr, s){
-        if (s.type == 'POST') {
-          s.data += s.data?'&':'';
-          s.data += 'csrf_token=$csrf';
-        }
-      });
-      var URL = '/plugins/community.applications/scripts/showDescExec.php';
-      var Interval = setTimeout(updateStats,1000);        
-     
-      function updateStats() {
-        $.post(URL,{imageID:'$imageID'},function(data) {
-          if (data) {
-            $('#script').html(data);
-            Interval = setTimeout(updateStats,1000);
-          }
-        });
-      }
-    </script>
-  ";
-}
+
 echo "<div style='overflow:scroll; max-height:450px; height:450px; overflow-x:hidden; overflow-y:auto;'>";
 echo $templateDescription;
 echo "</div>";
