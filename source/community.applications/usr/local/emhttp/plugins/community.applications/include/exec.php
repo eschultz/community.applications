@@ -528,7 +528,7 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker,$pageNumb
     $template['display_DonateLink'] = $template['DonateLink'] ? "<font size='0'><a class='ca_tooltip' href='".$template['DonateLink']."' target='_blank' title='".$template['DonateText']."'>Donate To Author</a></font>" : "";
     $template['display_Project'] = $template['Project'] ? "<a class='ca_tooltip' target='_blank' title='Click to go the the Project Home Page' href='".$template['Project']."'><font color=red>Project Home Page</font></a>" : "";
     $template['display_Support'] = $template['Support'] ? "<a class='ca_tooltip' href='".$template['Support']."' target='_blank' title='Click to go to the support thread'><font color=red>Support Thread</font></a>" : "";
-    $template['display_webPage'] = $template['WebPageURL'] ? "<a class='ca_tooltip' title='Click to go to the web page of the author' href='".$template['WebPageURL']."' target='_blank'><font color='red'>Web Page</font></a></font>" : "";
+    $template['display_webPage'] = $template['WebPageURL'] ? "<a class='ca_tooltip' title='Click to go to {$template['SortAuthor']}&#39;s web page' href='".$template['WebPageURL']."' target='_blank'><font color='red'>Web Page</font></a></font>" : "";
 
     if ( $template['display_Support'] && $template['display_Project'] ) { $template['display_Project'] = "&nbsp;&nbsp;&nbsp".$template['display_Project'];}
     if ( $template['display_webPage'] && ( $template['display_Project'] || $template['display_Support'] ) ) { $template['display_webPage'] = "&nbsp;&nbsp;&nbsp;".$template['display_webPage']; }
@@ -587,7 +587,7 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker,$pageNumb
           } else {
             $template['display_dockerInstall']   = "<input class='ca_tooltip' type='submit' style='margin:0px' title='Click to install the application' value='Add' formtarget='$tabMode' formmethod='post' formaction='AddContainer?xmlTemplate=default:".addslashes($template['Path'])."'>";
             $template['display_dockerInstall']   = $template['BranchID'] ? "<input class='ca_tooltip' type='button' style='margin:0px' title='Click to install the application' value='Add' onclick='displayTags(&quot;$ID&quot;);'>" : $template['display_dockerInstall'];
-            }
+          }
         }
       } else {
         $template['display_dockerDisable'] = "<font color='red'>Docker Not Enabled</font>";
@@ -785,11 +785,7 @@ function suggestSearch($filter,$displayFlag) {
 ########################################################################################
 
 function dockerNavigate($num_pages, $pageNumber) {
-  $returnValue = getPageNavigation($pageNumber,$num_pages * 25, true);
-
-#  $returnValue .= "<span style='float:right;position:relative;bottom:30px'><input type='button' value='Display Recommended' onclick='doSearch();'></span>";
-
-  return $returnValue;
+  return getPageNavigation($pageNumber,$num_pages * 25, true);
 }
 
 ##############################################################
@@ -838,6 +834,7 @@ function displaySearchResults($pageNumber,$viewMode) {
         $result['Description'] = $template['Description'];
         $result['Description'] = str_replace("'","&#39;",$result['Description']);
         $result['Description'] = str_replace('"',"&quot;",$result['Description']);
+        $result['Icon'] = $template['IconWeb'];
       }
     }
     $result['display_stars'] = $result['Stars'] ? "<img src='/plugins/$plugin/images/red-star.png' style='height:20px;width:20px'> <strong>".$result['Stars']."</strong>" : "";
@@ -848,17 +845,19 @@ function displaySearchResults($pageNumber,$viewMode) {
       $t .= "<td>";
       $t .= "<center>".$result['display_official_short']."</center>";
 
-      $t .= "<center>Author: </strong><font size='3'><a style='cursor:pointer' onclick='mySearch(this.innerHTML);' title='Search Containers From Author'>".$result['Author']."</a></font></center>";
+      $t .= "<center>Author: </strong><font size='3'><a class='ca_tooltip' style='cursor:pointer' onclick='mySearch(this.innerHTML);' title='Search For Containers From {$result['Author']}'>{$result['Author']}</a></font></center>";
       $t .= "<center>".$result['display_stars']."</center>";
 
       $description = "Click to go to the dockerHub website for this container";
       if ( $result['Description'] ) {
-        $description = $result['Description']."&#13;&#13;$description";
+        $description = $result['Description']."<br><br>$description";
       }
-
-      $t .= "<figure><center><a href='".$result['DockerHub']."' title='$description' target='_blank'>";
+      $description =str_replace("'","&#39;",$description);
+      $description = str_replace('"',"&#34;",$description);
+      
+      $t .= "<figure><center><a class='ca_tooltip' href='".$result['DockerHub']."' title='$description' target='_blank'>";
       $t .= "<img style='width:".$iconSize."px;height:".$iconSize."px;' src='".$result['Icon']."' onError='this.src=\"/plugins/$plugin/images/question.png\";'></a>";
-      $t .= "<figcaption><strong><center><font size='3'><a style='cursor:pointer' onclick='mySearch(this.innerHTML);' title='Search For Similar Containers'>".$result['Name']."</a></font></center></strong></figcaption></figure>";
+      $t .= "<figcaption><strong><center><font size='3'><a class='ca_tooltip' style='cursor:pointer' onclick='mySearch(this.innerHTML);' title='Search For Similar Containers'>".$result['Name']."</a></font></center></strong></figcaption></figure>";
       $t .= "<center><input type='button' value='Add' onclick='dockerConvert(&#39;".$result['ID']."&#39;)' style='margin:0px'></center>";
       $t .= "</td>";
 
@@ -882,12 +881,12 @@ function displaySearchResults($pageNumber,$viewMode) {
       }
     }
     if ( $viewMode == "table" ) {
-      $t .= "<tr><td><a href='".$result['DockerHub']."' target='_blank' title='Click to go to the dockerHub website for this container'>";
+      $t .= "<tr><td><a class='ca_tooltip' href='".$result['DockerHub']."' target='_blank' title='Click to go to the dockerHub website for this container'>";
       $t .= "<img src='".$result['Icon']."' onError='this.src=\"/plugins/$plugin/images/question.png\";' style='width:".$iconSize."px;height:".$iconSize."px;'>";
       $t .= "</a></td>";
       $t .= "<td><input type='button' value='Add' onclick='dockerConvert(&#39;".$result['ID']."&#39;)';></td>";
-      $t .= "<td><a style='cursor:pointer' onclick='mySearch(this.innerHTML);' title='Search Similar Containers'>".$result['Name']."</a></td>";
-      $t .= "<td><a style='cursor:pointer' onclick='mySearch(this.innerHTML);' title='Search Containers From Author'>".$result['Author']."</a></td>";
+      $t .= "<td><a class='ca_tooltip' style='cursor:pointer' onclick='mySearch(this.innerHTML);' title='Search Similar Containers'>".$result['Name']."</a></td>";
+      $t .= "<td><a class='ca_tooltip' style='cursor:pointer' onclick='mySearch(this.innerHTML);' title='Search For More Containers From {$result['Author']}'>{$result['Author']}</a></td>";
       $t .= "<td>".$result['display_stars']."</td>";
       $t .= "<td>";
       $t .= $result['display_official'];
@@ -1418,10 +1417,6 @@ case 'search_dockerhub':
     $o['ID'] = $i;
     $searchName = str_replace("docker-","",$o['Name']);
     $searchName = str_replace("-docker","",$searchName);
-    $iconMatch = searchArray($communityTemplates,"DockerHubName",$searchName);
-    if ( $iconMatch !== false) {
-      $o['Icon'] = $communityTemplates[$iconMatch]['Icon'];
-    }
 
     $dockerResults[$i] = $o;
     $i=++$i;

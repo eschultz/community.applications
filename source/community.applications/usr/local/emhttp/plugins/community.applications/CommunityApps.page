@@ -61,24 +61,6 @@ input.allButtons {margin:-1px;}
 <link type="text/css" rel="stylesheet" href="/plugins/community.applications/styles/tooltipster.css">
 <?endif;?>
 <script>
-jQuery(document).ready(function() {
-  var offset = 250;
-  var duration = 500;
-  jQuery(window).scroll(function() {
-    if (jQuery(this).scrollTop() > offset) {
-      jQuery('.back-to-top').fadeIn(duration);
-    } else {
-      jQuery('.back-to-top').fadeOut(duration);
-    }
-  });
-  
-  jQuery('.back-to-top').click(function(event) {
-    event.preventDefault();
-    jQuery('html, body').animate({scrollTop: 0}, duration);
-    return false;
-  })
-});
-
 var URL = "/plugins/<?=$plugin?>/include/exec.php";
 var monitorInterval;
 var last = $('input[name$="tabs"]').length;
@@ -152,69 +134,22 @@ var categoryDesc = {
   All: "All Available Applications"
   };
 
-function enableIcon(icon,enable) {
-  $(icon).each(function() {
-    var source = $(this).attr("src");
-    source = source.replace(".png","");
-    source = source.replace("Disabled","");
-    if ( ! enable) {
-      source = source + "Disabled";
-      $(this).css("cursor","normal");
-    } else {
-      $(this).css("cursor","pointer");
-    }
-    $(this).attr("src",source + ".png");
-  });
-}
-
-function setToolTip() {
-  $('.ca_infoPopup').attr('title','Loading...');
-  $('.ca_appPopup').attr('title','Loading...');
-  $('.ca_tooltip').tooltipster({delay:[1000,1],timer:15000, animation:'grow', arrow:true, trigger:'custom', triggerOpen:{mouseenter: true}, triggerClose:{click:true,scroll:true,mouseleave:true}});
-  $('.ca_infoPopup').tooltipster({
-    contentAsHTML: true,
-    maxWidth:550,
-    minWidth:550,
-    animation: 'grow',
-    trigger: 'custom',
-    triggerOpen: {mouseenter:true,click:true,touchstart:true},
-    triggerClose:{click:true,scroll:true,mouseleave:true,delay:1},
-    interactive: true,
-    viewportAware: true,
-    functionInit: function(instance,helper) {
-      var origin = $(helper.origin);
-      var appNumber = origin.attr('data-appNumber');
-      $.post("/plugins/community.applications/scripts/showInfo.php",{action:'none',appNumber:appNumber},function(data) {
-        if (data) {
-          instance.content(data);
-        }
-      });
-    }
-  });     
-  $('.ca_appPopup').tooltipster({
-    contentAsHTML: true,
-    maxWidth:550,
-    minWidth:550,
-    animation: 'grow',
-    arrow:true,
-    trigger: 'custom',
-    triggerOpen: {mouseenter:true,click:true,touchstart:true},
-    triggerClose:{click:true,scroll:true,mouseleave:true,delay:1},
-    interactive: true,
-    viewportAware: true,
-    functionInit: function(instance,helper) {
-      var origin = $(helper.origin);
-      var appNumber = origin.attr('data-appNumber');
-      $.post("/plugins/community.applications/scripts/showDesc.php",{action:'none',appNumber:appNumber},function(data) {
-        if (data) {
-          instance.content(data);
-        }
-      });
-    }
-  });      
-}
-
 $(function(){
+  var backtotopoffset = 250;
+  var backtotopduration = 500;
+  $(window).scroll(function() {
+    if ($(this).scrollTop() > backtotopoffset) {
+      $('.back-to-top').fadeIn(backtotopduration);
+    } else {
+      $('.back-to-top').fadeOut(backtotopduration);
+    }
+  });
+  $('.back-to-top').click(function(event) {
+    event.preventDefault();
+    $('html, body').animate({scrollTop: 0}, backtotopduration);
+    return false;
+  });
+  
   <?if ($tabbed):?>
     $('.tabs').append("<span id='searchFilter' class='status vhshift' style='display:none'><input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input class='ca_staticTips' type='button' id='updateButton' value='Legacy Mode' title='Switches CA to Legacy Mode (until the next appfeed update) - Not generally recommended' onclick='forceUpdateButton()' disabled><?if ( $toolTipsterAllowed == "false"):?><input type='button' value='CA Modules' onclick='caModules();'></span><?endif;?>");
     for (var x=1; x<last; x++) $('#tab'+x).bind({click:function(){$('#searchFilter').hide();}});
@@ -391,6 +326,71 @@ $(function(){
   getContent(true,'INITIALIZE','None Selected');
   $('#searchBox').keyup(function(e) {if(e.which == 13){doSearch(false);}});
 });
+
+function enableIcon(icon,enable) {
+  $(icon).each(function() {
+    var source = $(this).attr("src");
+    source = source.replace(".png","");
+    source = source.replace("Disabled","");
+    if ( ! enable) {
+      source = source + "Disabled";
+      $(this).css("cursor","normal");
+    } else {
+      $(this).css("cursor","pointer");
+    }
+    $(this).attr("src",source + ".png");
+  });
+}
+
+function setToolTip() {
+  $('.ca_infoPopup').attr('title','Loading...');
+  $('.ca_appPopup').attr('title','Loading...');
+  $('.ca_tooltip').tooltipster({contentAsHTML:true,delay:[1000,1],timer:15000, animation:'grow', arrow:true, trigger:'custom', triggerOpen:{mouseenter: true}, triggerClose:{click:true,scroll:true,mouseleave:true}});
+  $('.ca_infoPopup').tooltipster({
+    contentAsHTML: true,
+    maxWidth:550,
+    minWidth:550,
+    animation: 'grow',
+    trigger: 'custom',
+    triggerOpen: {mouseenter:true,click:true,touchstart:true},
+    triggerClose:{click:true,scroll:true,mouseleave:true,delay:1},
+    interactive: true,
+    viewportAware: true,
+    functionInit: function(instance,helper) {
+      var origin = $(helper.origin);
+      var appNumber = origin.attr('data-appNumber');
+      $.post("/plugins/community.applications/scripts/showInfo.php",{action:'none',appNumber:appNumber},function(data) {
+        if (data) {
+          instance.content(data);
+        }
+      });
+    }
+  });     
+  $('.ca_appPopup').tooltipster({
+    contentAsHTML: true,
+    maxWidth:550,
+    minWidth:550,
+    animation: 'grow',
+    arrow:true,
+    trigger: 'custom',
+    triggerOpen: {mouseenter:true,click:true,touchstart:true},
+    triggerClose:{click:true,scroll:false,mouseleave:true,delay:1},
+    interactive: true,
+    viewportAware: true,
+    functionInit: function(instance,helper) {
+      var origin = $(helper.origin);
+      var appNumber = origin.attr('data-appNumber');
+      $.post("/plugins/community.applications/scripts/showDesc.php",{action:'none',appNumber:appNumber},function(data) {
+        if (data) {
+          instance.content(data);
+        }
+      });
+    },
+    functionReady: function(instance,helper) {
+      $('.ca_apptooltip').tooltipster({contentAsHTML:true,delay:[1000,1],timer:15000, animation:'grow', arrow:true, trigger:'custom', triggerOpen:{mouseenter: true}, triggerClose:{click:true,scroll:true,mouseleave:true}});
+    }
+  });   
+}
 
 function changeCategory(button,subSwitch) {
   var description = button.value;
@@ -642,6 +642,7 @@ function changeDockerView(viewButton) {
       $('#templates_content').html(data);
       $("#Total").html(totalDisplayed);
       readMore();
+      setToolTip();
     }
   });
 }
@@ -841,6 +842,7 @@ function dockerSearch(pageNumber) {
       $('#templates_content').html(data);
       readMore();
       myCloseAlert();
+      setToolTip();
     }
   });
 }
@@ -878,6 +880,7 @@ function clearSearchBox() {
 }
 
 function installPlugin(pluginURL) {
+  $(".ca_appPopup").tooltipster('close');
   openBox('/plugins/dynamix.plugin.manager/scripts/plugin&arg1=install&arg2='+pluginURL,'Install Plugin',600,900,true);
 }
 
@@ -1095,6 +1098,7 @@ function calculateAppdataSize() {
 }
 
 function installPLGupdate(filename,plgName) {
+  $(".ca_appPopup").tooltipster('close');
   openBox('/plugins/community.applications/scripts/updatePLG.sh&arg1='+filename,'Update '+plgName,600,900,true);
 }
 
@@ -1150,6 +1154,7 @@ function pinnedApps(button) {
 function displayTags(leadTemplate) {
   $.post(URL,{action:'displayTags',leadTemplate:leadTemplate},function(data) {
     if (data) {
+      $(".ca_appPopup").tooltipster('close');
       swal({
         title: "Choose A Branch To Install",
         text: data,
@@ -1164,7 +1169,8 @@ function displayTags(leadTemplate) {
 }
 </script>
 <FORM method="get" id="myForm">
-> For help with this plugin, click here (a new tab will open with the help file)  <strong><font size="2"><a href="Settings/caHelp" target="_blank">HELP</a></font></strong>
+> For help with this plugin, click here (a new tab will open with the help file)  <strong><font size="2"><a href="Settings/caHelp" target="_blank">HELP</a></font></strong><br>
+> <img src='/plugins/community.applications/images/SectionIcon.png' height='50px'> - This chooses which "section" to display (Available Apps, Installed Apps, Previously Installed Apps, Pinned Apps, additional CA Modules<br>
 
 <img id='sectionIcon' src='/plugins/community.applications/images/SectionIcon.png' height='50px' class='ca_section' style='cursor:pointer;'>
 <img id='sortIcon' class='ca_toolsView' title='change view' height='50px' style='cursor:normal;position:relative;' src='/plugins/community.applications/images/ViewIcon.png'>

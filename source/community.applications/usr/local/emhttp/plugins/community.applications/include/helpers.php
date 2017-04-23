@@ -319,6 +319,7 @@ function fixTemplates($template) {
   }
   if ( is_array($template['SortAuthor']) ) {                 # due to cmer
     $template['SortAuthor'] = $template['SortAuthor'][0];
+    $template['Author'] = $template['SortAuthor'];
   }
   if ( is_array($template['Repository']) ) {                 # due to cmer
     $template['Repository'] = $template['Repository'][0];

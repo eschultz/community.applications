@@ -31,7 +31,6 @@ if ( ! $cfg['hideIncompatible'] )  { $cfg['hideIncompatible'] = "true"; }
 if ( ! $cfg['separateInstalled'] ) { $cfg['separateInstalled'] = "true"; }
 if ( ! $cfg['maxPerPage'] )        { $cfg['maxPerPage'] = "25"; }
 if ( ! $cfg['hideDeprecated'] )    { $cfg['hideDeprecated'] = "true"; }
-if ( ! $cfg['tooltipster'] )       { $cfd['tooltipster'] = "true"; }
 
 # Get the available repositories and setup the display for favourites
 
@@ -78,14 +77,6 @@ Time to display applications as new / updated:
   </select>
 
 > This setting determines how long an application will be displayed as "new"
-
-Utilize New UI:
-: <select name='tooltipster' size='1'>
-  <?=mk_option($cfg['tooltipster'],"true", "Yes (default)")?>
-  <?=mk_option($cfg['tooltipster'],"false", "No")?>
-  </select> * Only takes effect on 6.3.3+
-  
-> This setting will utilize a new UI for unRaid 6.3.3+.  However, if you have problems with this UI, you can forcibly set the old legacy UI with this setting
 
 Initial View Mode:
 : <select name="viewMode" size="1">
