@@ -120,7 +120,7 @@ if ( ! $template['Plugin'] ) {
       $templateDescription .= "&nbsp;&nbsp;<a class='ca_apptooltip' title='Click to reinstall the application using default values' href='AddContainer?xmlTemplate=default:".addslashes($template['Path'])."' target='$tabMode'><img src='/plugins/community.applications/images/install.png' height='40px'></a>&nbsp;&nbsp;";
       $edit                 = "&nbsp;&nbsp;<a class='ca_apptooltip' title='Click to edit the application values' href='UpdateContainer?xmlTemplate=edit:".addslashes($info[$name]['template'])."' target='$tabMode'><img src='/plugins/community.applications/images/edit.png' height='40px'></a>&nbsp;&nbsp;";
       $templateDescription .= $template['BranchID'] ? "&nbsp;&nbsp;<input class='ca_apptooltip' type='button' title='Click to reinstall the application using default values' value='Add' onclick='displayTags(&quot;$ID&quot;);'>&nbsp;&nbsp;" : $edit;
-      if ( $info[$name]['url'] ) {
+      if ( $info[$name]['url'] && $info[$name]['running'] ) {
         $templateDescription .= "&nbsp;&nbsp;<a class='ca_apptooltip' href='{$info[$name]['url']}' target='_blank' title='Click To Go To The App&#39;s UI'><img src='/plugins/community.applications/images/WebPage.png' height='40px'></a>&nbsp;&nbsp;";
       }
     } else {
