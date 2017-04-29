@@ -165,7 +165,6 @@ $(function(){
     $("#maxPerPage").val("-1");
   }
   $('.ca_staticTips').tooltipster({
-    delay:[<?=$cfg['hoverTime']?>,1],
     timer:15000,
     animation:'grow',
     arrow:true,
@@ -176,7 +175,6 @@ $(function(){
   $('.ca_toolsView').tooltipster({
     trigger: 'custom',
     triggerOpen: {mouseenter:true,click:true,touchstart:true},
-    delay:[<?=$cfg['hoverTime']?>,1],
     contentAsHTML: true,
     animation: 'grow',
     arrow: true,
@@ -215,7 +213,6 @@ $(function(){
   $('.ca_credits').tooltipster({
     trigger: 'custom',
     triggerOpen: {mouseenter:true,click:true,touchstart:true},
-    delay:[<?=$cfg['hoverTime']?>,1],
     contentAsHTML: true,
     maxWidth:550,
     minWidth:550,
@@ -232,11 +229,10 @@ $(function(){
   $('.ca_section').tooltipster({
     trigger: 'custom',
     triggerOpen: {mouseenter:true,click:true,touchstart:true},
-    delay:[<?=$cfg['hoverTime']?>,1],
     contentAsHTML: true,
     animation: 'grow',
     arrow: true,
-    triggerClose:{click:true,scroll:true,mouseleave:true,delay:1},
+    triggerClose:{click:true,scroll:true,mouseleave:true},
     interactive: true,
     viewportAware: true,
     functionBefore: function(instance,helper) {
@@ -258,7 +254,6 @@ $(function(){
   $('.ca_categories').tooltipster({
     trigger: 'custom',
     triggerOpen: {mouseenter:true,click:true,touchstart:true},
-    delay:[<?=$cfg['hoverTime']?>,1],
     contentAsHTML: true,
     animation: 'grow',
     arrow: true,
@@ -292,7 +287,6 @@ $(function(){
     trigger: 'custom',
     triggerOpen: {mouseenter:true,click:true,touchstart:true},
     contentAsHTML: true,
-    delay:[<?=$cfg['hoverTime']?>,1],
     animation: 'grow',
     arrow: true,
     triggerClose:{click:true,scroll:true,mouseleave:true,delay:1},
