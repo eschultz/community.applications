@@ -2,8 +2,8 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.applications">
 <!ENTITY author    "Andrew Zawadzki">
-<!ENTITY version   "2017.04.24a">
-<!ENTITY md5       "febaa5e983ac5cef0fe0b652f5ded6e6">
+<!ENTITY version   "2017.04.29">
+<!ENTITY md5       "5a0641f792a57907a56dd31186f41962">
 <!ENTITY launch    "Settings/PluginSettings">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/community.applications">
@@ -13,6 +13,11 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
+###2017.04.29
+- Fix Compatibility with Internet Explorer and Opera
+- Fix Button incorrectly displaying on an installed application utilizing Branches
+- Fix Changelog not displaying for CA when update is available
+
 ###2017.04.24a
 - Don't display webUI link if docker app is not running
 

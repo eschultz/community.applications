@@ -178,7 +178,7 @@ $(function(){
       var origin = $(helper.origin);
       var source = origin.attr("src");
       
-      if ( source.includes("Disabled") ) {
+      if ( source.indexOf("Disabled") > 1 ) {
         var displayContent = "Changing Of Views Disabled";
       } else {
         var myID = origin.attr('id');
@@ -231,7 +231,7 @@ $(function(){
     functionBefore: function(instance,helper) {
       var origin = $(helper.origin);
       var source = origin.attr("src");
-      if ( source.includes("Disabled") ) {
+      if ( source.indexOf("Disabled") > 1 ) {
         var displayContent = "Changing Of Sections Disabled";
       } else {
         var currentSection = $("#sortorder").attr("data-section");
@@ -256,7 +256,7 @@ $(function(){
     functionBefore: function(instance,helper) {
       var origin = $(helper.origin);
       var source = origin.attr("src");
-      if ( source.includes("Disabled") ) {
+      if ( source.indexOf("Disabled") > 1 ) {
         var displayContent = "Changing Of Categories Disabled In This Section";
       } else {
         var currentCategory = $("#sortorder").attr("data-main_category");
@@ -288,7 +288,7 @@ $(function(){
     functionBefore: function(instance,helper) {
       var origin = $(helper.origin);
       var source = origin.attr("src");
-      if ( source.includes("Disabled") ) {
+      if ( source.indexOf("Disabled") > 1 ) {
         var displayContent = "No Subcategories Available To Display";
       } else {
         var currentSub = $("#sortorder").attr("data-subcategory");
@@ -334,9 +334,6 @@ function enableIcon(icon,enable) {
     source = source.replace("Disabled","");
     if ( ! enable) {
       source = source + "Disabled";
-      $(this).css("cursor","normal");
-    } else {
-      $(this).css("cursor","pointer");
     }
     $(this).attr("src",source + ".png");
   });
@@ -1179,7 +1176,7 @@ function displayTags(leadTemplate) {
 > <img src='/plugins/community.applications/images/SectionIcon.png' height='50px'> - This chooses which "section" to display (Available Apps, Installed Apps, Previously Installed Apps, Pinned Apps, additional CA Modules<br>
 
 <img id='sectionIcon' src='/plugins/community.applications/images/SectionIcon.png' height='50px' class='ca_section' style='cursor:pointer;'>
-<img id='sortIcon' class='ca_toolsView' title='change view' height='50px' style='cursor:normal;position:relative;left:-10px;' src='/plugins/community.applications/images/ViewIcon.png'>
+<img id='sortIcon' class='ca_toolsView' title='change view' height='50px' style='cursor:pointer;position:relative;left:-10px;' src='/plugins/community.applications/images/ViewIcon.png'>
 <img id='categoryIcon' class='ca_categories' title='Select Category' height='50px' style='cursor:pointer;position:relative;left:-20px;' src='/plugins/community.applications/images/CategoryIcon.png'>
 <img id='subcategoryIcon' class='ca_subcategories' title='Select Sub Category' height='50px' style='cursor:pointer;position:relative;left:-30px;' src='/plugins/community.applications/images/SubCategoryIcon.png'>
 <font size='2'><b>Current Section: <font color='red'><span id='currentSection'>Available Apps</span></font></b></font>
