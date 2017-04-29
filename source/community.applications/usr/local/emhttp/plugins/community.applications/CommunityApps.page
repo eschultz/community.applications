@@ -1179,16 +1179,16 @@ function displayTags(leadTemplate) {
 > <img src='/plugins/community.applications/images/SectionIcon.png' height='50px'> - This chooses which "section" to display (Available Apps, Installed Apps, Previously Installed Apps, Pinned Apps, additional CA Modules<br>
 
 <img id='sectionIcon' src='/plugins/community.applications/images/SectionIcon.png' height='50px' class='ca_section' style='cursor:pointer;'>
-<img id='sortIcon' class='ca_toolsView' title='change view' height='50px' style='cursor:normal;position:relative;' src='/plugins/community.applications/images/ViewIcon.png'>
-<img id='categoryIcon' class='ca_categories' title='Select Category' height='50px' style='cursor:pointer;position:relative;' src='/plugins/community.applications/images/CategoryIcon.png'>
-<img id='subcategoryIcon' class='ca_subcategories' title='Select Sub Category' height='50px' style='cursor:pointer;position:relative;' src='/plugins/community.applications/images/SubCategoryIcon.png'>
+<img id='sortIcon' class='ca_toolsView' title='change view' height='50px' style='cursor:normal;position:relative;left:-10px;' src='/plugins/community.applications/images/ViewIcon.png'>
+<img id='categoryIcon' class='ca_categories' title='Select Category' height='50px' style='cursor:pointer;position:relative;left:-20px;' src='/plugins/community.applications/images/CategoryIcon.png'>
+<img id='subcategoryIcon' class='ca_subcategories' title='Select Sub Category' height='50px' style='cursor:pointer;position:relative;left:-30px;' src='/plugins/community.applications/images/SubCategoryIcon.png'>
 <font size='2'><b>Current Section: <font color='red'><span id='currentSection'>Available Apps</span></font></b></font>
 <img class='ca_staticTips' height='35px' src='/plugins/community.applications/images/resource.png' id='monitor' title='Resource Monitor' style='margin:0px;cursor:pointer;float:right;'><br>
 <strong><font size='3'><span id="Category"></span></strong></font><span id="Total1" style='float: right';>Total Found: <strong><font size="3"><span id="Total"></span></font></strong><span>&nbsp;&nbsp;Results/page: <select id='maxPerPage' class='narrow' onchange='changePage(&quot;1&quot;);'><option value='-1'>All</option><option value='10'>10</option><option value='25'>25</option><option value='50'>50</option><option value='100'>100</option></select></span></span>
 </span><br>
 
 <?if ( $upgradeAvailable ) :?>
-<span id='upgradeAvailable'><center> <font color='red'>An update to Community Applications is Available. Click <a onclick=installPLGupdate('community.applications.plg',"CommunityApplications"); style=cursor:pointer>HERE</a> to install the update  <img src='/plugins/community.applications/images/information.png' onclick='showInfo("CA","Community Applications");' style='cursor:pointer'></center></font></span>
+<span id='upgradeAvailable'><center> <font color='red'>An update to Community Applications is Available. Click <a onclick=installPLGupdate('community.applications.plg',"CommunityApplications"); style=cursor:pointer>HERE</a> to install the update  <img class='ca_infoPopup' src='/plugins/community.applications/images/information.png' data-appnumber='CA' style='cursor:pointer'></center></font></span>
 <?endif?>
 <div class='dockerSearch' style='display:none'><center><input type=button class='initDockerSearch' value='Get more results from dockerHub'></input></center></div>
 <span id='templates_content'></span>

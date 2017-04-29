@@ -101,7 +101,7 @@ $templateDescription .= $template['stars'] ? "<tr><td nowrap>$color<strong>Star 
 
 if ( $template['Date'] ) {
   $niceDate = date("F j, Y",$template['Date']);
-  $templateDescription .= "<tr><td nowrap>$color<strong>Date Updated: </strong></td><td>$color$niceDate</td></tr>";
+  $templateDescription .= "<tr class='ca_apptooltip' title='Note that not all authors / maintainers keep up to date on date updated / changelogs'><td nowrap>$color<strong>Date Updated: </strong></td><td>$color$niceDate</td></tr>";
 }
 $templateDescription .= $template['MinVer'] ? "<tr><td nowrap>$color<b>Minimum OS:</strong></td><td>{$color}unRaid v".$template['MinVer']."</td></tr>" : "";
 $templateDescription .= $template['MaxVer'] ? "<tr><td nowrap>$color<strong>Max OS:</strong></td><td>{$color}unRaid v".$template['MaxVer']."</td></tr>" : "";
@@ -118,8 +118,7 @@ if ( ! $template['Plugin'] ) {
   if ( $communitySettings['dockerRunning'] ) {
     if ( $selected ) {
       $templateDescription .= "&nbsp;&nbsp;<a class='ca_apptooltip' title='Click to reinstall the application using default values' href='AddContainer?xmlTemplate=default:".addslashes($template['Path'])."' target='$tabMode'><img src='/plugins/community.applications/images/install.png' height='40px'></a>&nbsp;&nbsp;";
-      $edit                 = "&nbsp;&nbsp;<a class='ca_apptooltip' title='Click to edit the application values' href='UpdateContainer?xmlTemplate=edit:".addslashes($info[$name]['template'])."' target='$tabMode'><img src='/plugins/community.applications/images/edit.png' height='40px'></a>&nbsp;&nbsp;";
-      $templateDescription .= $template['BranchID'] ? "&nbsp;&nbsp;<input class='ca_apptooltip' type='button' title='Click to reinstall the application using default values' value='Add' onclick='displayTags(&quot;$ID&quot;);'>&nbsp;&nbsp;" : $edit;
+      $templateDescription .= "&nbsp;&nbsp;<a class='ca_apptooltip' title='Click to edit the application values' href='UpdateContainer?xmlTemplate=edit:".addslashes($info[$name]['template'])."' target='$tabMode'><img src='/plugins/community.applications/images/edit.png' height='40px'></a>&nbsp;&nbsp;";
       if ( $info[$name]['url'] && $info[$name]['running'] ) {
         $templateDescription .= "&nbsp;&nbsp;<a class='ca_apptooltip' href='{$info[$name]['url']}' target='_blank' title='Click To Go To The App&#39;s UI'><img src='/plugins/community.applications/images/WebPage.png' height='40px'></a>&nbsp;&nbsp;";
       }
