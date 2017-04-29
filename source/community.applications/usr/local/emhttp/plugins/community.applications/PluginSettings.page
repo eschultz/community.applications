@@ -16,22 +16,6 @@ $toolTipsterAllowed = version_compare($vars['version'],"6.3.3",">=") ? "true" : 
 $plugin = "community.applications";
 $cfg = parse_plugin_cfg($plugin);
 
-if ( ! $cfg['remindTime'] )        { $cfg['remindTime'] = "-14 Days"; }
-if ( ! $cfg['maxColumn'] )         { $cfg['maxColumn'] = "5"; }
-if ( ! $cfg['timeNew'] )           { $cfg['timeNew'] = "-3 Months"; }
-if ( ! $cfg['viewMode'] )          { $cfg['viewMode'] = "detail"; }
-if ( ! $cfg['iconSize'] )          { $cfg['iconSize'] = "96"; }
-if ( ! $cfg['autoUpdate'] )        { $cfg['autoUpdate'] = "no"; }
-if ( ! $cfg['webIcon'] )           { $cfg['webIcon'] = "true"; }
-if ( ! $cfg['dockerSearch'] )      { $cfg['dockerSearch'] = "no"; }
-if ( ! $cfg['dockerIcon'] )        { $cfg['dockerIcon'] = "yes"; }
-if ( ! $cfg['superCategory'] )     { $cfg['superCategory'] = "true"; }
-if ( ! $cfg['newWindow'] )         { $cfg['newWindow'] = "_self"; }
-if ( ! $cfg['hideIncompatible'] )  { $cfg['hideIncompatible'] = "true"; }
-if ( ! $cfg['separateInstalled'] ) { $cfg['separateInstalled'] = "true"; }
-if ( ! $cfg['maxPerPage'] )        { $cfg['maxPerPage'] = "25"; }
-if ( ! $cfg['hideDeprecated'] )    { $cfg['hideDeprecated'] = "true"; }
-
 # Get the available repositories and setup the display for favourites
 
 if ( ! is_dir("/tmp/community.applications/tempFiles") ) {
@@ -86,6 +70,11 @@ Initial View Mode:
   </select>
 
 > This setting determines the view mode when initially loading the docker tab
+
+Hover Time delay (miliseconds):
+: <input type="number" name="hoverTime" class="narrow" maxlength="5" value="<?=$cfg['hoverTime']?>" placeholder="1000">
+
+> This setting determines how long you have to hover over any element prior to the pop up appearing
 
 Favourite Repository:
 : <select name="favourite" size="1">

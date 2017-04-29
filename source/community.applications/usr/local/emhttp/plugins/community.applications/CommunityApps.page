@@ -164,10 +164,19 @@ $(function(){
     $("#maxPerPage").prop("disabled",true);
     $("#maxPerPage").val("-1");
   }
-  $('.ca_staticTips').tooltipster({delay:[1000,1],timer:15000, animation:'grow', arrow:true, trigger:'custom', triggerOpen:{mouseenter: true}, triggerClose:{click:true,scroll:true,mouseleave:true}});
+  $('.ca_staticTips').tooltipster({
+    delay:[<?=$cfg['hoverTime']?>,1],
+    timer:15000,
+    animation:'grow',
+    arrow:true,
+    trigger:'custom',
+    triggerOpen:{mouseenter: true},
+    triggerClose:{click:true,scroll:true,mouseleave:true}
+  });
   $('.ca_toolsView').tooltipster({
     trigger: 'custom',
     triggerOpen: {mouseenter:true,click:true,touchstart:true},
+    delay:[<?=$cfg['hoverTime']?>,1],
     contentAsHTML: true,
     animation: 'grow',
     arrow: true,
@@ -206,6 +215,7 @@ $(function(){
   $('.ca_credits').tooltipster({
     trigger: 'custom',
     triggerOpen: {mouseenter:true,click:true,touchstart:true},
+    delay:[<?=$cfg['hoverTime']?>,1],
     contentAsHTML: true,
     maxWidth:550,
     minWidth:550,
@@ -222,6 +232,7 @@ $(function(){
   $('.ca_section').tooltipster({
     trigger: 'custom',
     triggerOpen: {mouseenter:true,click:true,touchstart:true},
+    delay:[<?=$cfg['hoverTime']?>,1],
     contentAsHTML: true,
     animation: 'grow',
     arrow: true,
@@ -247,6 +258,7 @@ $(function(){
   $('.ca_categories').tooltipster({
     trigger: 'custom',
     triggerOpen: {mouseenter:true,click:true,touchstart:true},
+    delay:[<?=$cfg['hoverTime']?>,1],
     contentAsHTML: true,
     animation: 'grow',
     arrow: true,
@@ -280,6 +292,7 @@ $(function(){
     trigger: 'custom',
     triggerOpen: {mouseenter:true,click:true,touchstart:true},
     contentAsHTML: true,
+    delay:[<?=$cfg['hoverTime']?>,1],
     animation: 'grow',
     arrow: true,
     triggerClose:{click:true,scroll:true,mouseleave:true,delay:1},
@@ -342,7 +355,16 @@ function enableIcon(icon,enable) {
 function setToolTip() {
   $('.ca_infoPopup').attr('title','Loading...');
   $('.ca_appPopup').attr('title','Loading...');
-  $('.ca_tooltip').tooltipster({contentAsHTML:true,delay:[1000,1],timer:15000, animation:'grow', arrow:true, trigger:'custom', triggerOpen:{mouseenter: true}, triggerClose:{click:true,scroll:true,mouseleave:true}});
+  $('.ca_tooltip').tooltipster({
+    contentAsHTML:true,
+    delay:[<?=$cfg['hoverTime']?>,1],
+    timer:15000,
+    animation:'grow',
+    arrow:true,
+    trigger:'custom',
+    triggerOpen:{mouseenter: true},
+    triggerClose:{click:true,scroll:true,mouseleave:true}
+  });
   $('.ca_infoPopup').tooltipster({
     contentAsHTML: true,
     maxWidth:550,
@@ -350,7 +372,8 @@ function setToolTip() {
     animation: 'grow',
     trigger: 'custom',
     triggerOpen: {mouseenter:true,click:true,touchstart:true},
-    triggerClose:{click:true,scroll:true,mouseleave:true,delay:1},
+    triggerClose:{click:true,scroll:true,mouseleave:true},
+    delay:[<?=$cfg['hoverTime']?>,1],
     interactive: true,
     viewportAware: true,
     functionInit: function(instance,helper) {
@@ -371,7 +394,8 @@ function setToolTip() {
     arrow:true,
     trigger: 'custom',
     triggerOpen: {mouseenter:true,click:true,touchstart:true},
-    triggerClose:{click:true,scroll:false,mouseleave:true,delay:1},
+    triggerClose:{click:true,scroll:false,mouseleave:true},
+    delay:[<?=$cfg['hoverTime']?>,1],
     interactive: true,
     viewportAware: true,
     functionInit: function(instance,helper) {
@@ -384,7 +408,15 @@ function setToolTip() {
       });
     },
     functionReady: function(instance,helper) {
-      $('.ca_apptooltip').tooltipster({contentAsHTML:true,delay:[1000,1],timer:15000, animation:'grow', arrow:true, trigger:'custom', triggerOpen:{mouseenter: true}, triggerClose:{click:true,scroll:true,mouseleave:true}});
+      $('.ca_apptooltip').tooltipster({
+        contentAsHTML:true,
+        delay:[<?=$cfg['hoverTime']?>,1],
+        timer:15000,
+        animation:'grow',
+        arrow:true, trigger:'custom',
+        triggerOpen:{mouseenter: true},
+        triggerClose:{click:true,scroll:true,mouseleave:true}
+      });
     }
   });   
 }
