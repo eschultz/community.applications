@@ -138,6 +138,7 @@ function DownloadCommunityTemplates() {
         $o['DonateImg'] = $o['DonateImg'] ? $o['DonateImg'] : $Repo['donateimg'];
         $o['WebPageURL'] = $Repo['web'];
         $o['Logo'] = $Repo['logo'];
+        $o['Profile'] = $Repo['profile'];
         fixSecurity($o,$o);
         $o = fixTemplates($o);
         $o['Compatible'] = versionCheck($o);
@@ -259,6 +260,7 @@ function DownloadApplicationFeed() {
       $o['DonateLink'] = $Repositories[$RepoIndex]['donatelink'];
       $o['WebPageURL'] = $Repositories[$RepoIndex]['web'];
       $o['Logo']       = $Repositories[$RepoIndex]['logo'];
+      $o['Profile']    = $Repositories[$RepoIndex]['profile'];
     }
     $o['DonateText'] = $file['DonateText'] ? $file['DonateText'] : $o['DonateText'];
     $o['DonateLink'] = $file['DonateLink'] ? $file['DonateLink'] : $o['DonateLink'];

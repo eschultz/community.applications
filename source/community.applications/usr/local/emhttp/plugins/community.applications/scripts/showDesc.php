@@ -82,7 +82,11 @@ $templateDescription .= ($template['Beta'] == "true") ? "<figcaption><font size=
 $templateDescription .= "</figure>";
 $templateDescription .= "</td><td></td><td><table><tr><td>$color<strong>Author: </strong></td><td>$color".$template['Author']."</td></tr>";
 $templateDescription .= "<tr><td>$color<strong>Repository: </strong></td><td>$color";
-$templateDescription .= $template['Forum'] ? "<a href='".$template['Forum']."' target='_blank'>".$template['RepoName']."</a>" : $template['RepoName'];
+$templateDescription .= $template['Forum'] ? "<b><a style='color:white;' href='".$template['Forum']."' target='_blank'>".$template['RepoName']."</a></b>" : "<b>{$template['RepoName']}</b>";
+if ( $template['Profile'] ) {
+  $profileDescription = $template['Plugin'] ? "Author" : "Maintainer";
+  $templateDescription .= "&nbsp;&nbsp;&nbsp;&nbsp;<b><a style='color:white' href='{$template['Profile']}' target='_blank'>($profileDescription Profile)</a></b>";
+}
 $templateDescription .= "</td></tr>";
 $templateDescription .= ($template['Private'] == "true") ? "<tr><td></td><td><font color=red>Private Repository</font></td></tr>" : "";
 $templateDescription .= "<tr><td>$color<strong>Categories: </strong></td><td>$color".$template['Category']."</td></tr>";
