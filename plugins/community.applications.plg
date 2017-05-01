@@ -2,8 +2,8 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.applications">
 <!ENTITY author    "Andrew Zawadzki">
-<!ENTITY version   "2017.04.29b">
-<!ENTITY md5       "80fec66fcf93d8b35dc609e6232bc0e4">
+<!ENTITY version   "2017.04.30">
+<!ENTITY md5       "8cf6be062ed92d254cbe49f8bd74f56a">
 <!ENTITY launch    "Settings/PluginSettings">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/community.applications">
@@ -13,6 +13,9 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
+###2017.04.30
+- Added: Ability to jump directly to an author / maintainer's profile (to help with selecting whether to install or not)
+
 ###2017.04.29a
 - Added: Adjustable setting for "hover time" before a popup appears
 
