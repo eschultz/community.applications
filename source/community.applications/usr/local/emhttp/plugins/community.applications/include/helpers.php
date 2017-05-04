@@ -772,7 +772,14 @@ function toNumericArray($template) {
     $template['display_dateUpdated'],     #64
     $template['display_iconClickable'],   #65
     $template['display_dockerName'],      #66
-    $template['Path']                     #67
+    $template['Path'],                    #67
+    $template['display_pluginInstallIcon'],#68
+    $template['display_dockerDefaultIcon'],#69
+    $template['display_dockerEditIcon'],  #70
+    $template['display_dockerReinstallIcon'], #71
+    $template['display_dockerInstallIcon'], #72
+    $template['display_pluginSettingsIcon'], #73
+    $template['dockerWebIcon']              #74
   );
 }
   

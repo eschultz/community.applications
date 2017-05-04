@@ -2,8 +2,8 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.applications">
 <!ENTITY author    "Andrew Zawadzki">
-<!ENTITY version   "2017.04.30">
-<!ENTITY md5       "8cf6be062ed92d254cbe49f8bd74f56a">
+<!ENTITY version   "2017.05.04">
+<!ENTITY md5       "cd363b8e70db67843875cc4a33851be3">
 <!ENTITY launch    "Settings/PluginSettings">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/community.applications">
@@ -13,6 +13,9 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
+###2017.05.04
+- Add Install / Edit / WebUI icons to icon details mode
+
 ###2017.04.30
 - Added: Ability to jump directly to an author / maintainer's profile (to help with selecting whether to install or not)
 
