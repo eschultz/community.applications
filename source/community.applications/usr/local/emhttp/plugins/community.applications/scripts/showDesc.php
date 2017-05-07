@@ -56,7 +56,6 @@ foreach ($displayed as $file) {
     break;
   }
 }
-echo $ID;
 $ID = $appNumber;
 $repoIndex = searchArray($repos,"name",$template['RepoName']);
 $webPageURL = $repos[$repoIndex]['web'];
