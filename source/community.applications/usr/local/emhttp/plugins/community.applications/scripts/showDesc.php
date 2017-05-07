@@ -38,7 +38,7 @@ if ( ! $appNumber ) {
   $color="<font color='white'>";
 }
 
-$file = readJsonFile($communityPaths['community-templates-info']);
+#$file = readJsonFile($communityPaths['community-templates-info']);
 $repos = readJsonFile($communityPaths['Repositories']);
 if ( ! $repos ) {
   $repos = array();
@@ -47,14 +47,16 @@ $displayed = readJsonFile($communityPaths['community-templates-displayed']);
 foreach ($displayed as $file) {
   foreach ($file as $template) {
     if ( $template['ID'] == $appNumber ) {
-      break;
       $breakFlag = true;
+      break;
+
     }
   }
   if ( $breakFlag ) {
     break;
   }
 }
+echo $ID;
 $ID = $appNumber;
 $repoIndex = searchArray($repos,"name",$template['RepoName']);
 $webPageURL = $repos[$repoIndex]['web'];
