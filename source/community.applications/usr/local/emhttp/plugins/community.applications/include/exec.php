@@ -589,7 +589,7 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker,$pageNumb
           if ( $info[$name]['url'] && $info[$name]['running'] ) {
             $template['dockerWebIcon'] = "<a class='ca_tooltip' href='{$info[$name]['url']}' target='_blank' title='Click To Go To The App&#39;s UI'><img src='/plugins/community.applications/images/WebPage.png' height='40px'></a>&nbsp;&nbsp;";
           }
-          } else {
+        } else {
           if ( $template['MyPath'] ) {
             $template['display_dockerReinstall'] = "<input class='ca_tooltip' type='submit' style='margin:0px' title='Click to reinstall the application' value='Reinstall' formtarget='$tabMode' formmethod='post' formaction='AddContainer?xmlTemplate=user:".addslashes($template['MyPath'])."'>";
             $template['display_dockerReinstallIcon'] = "<a class='ca_tooltip' title='Click to reinstall' href='UpdateContainer?xmlTemplate=user:".addslashes($template['MyPath'])."' target='$tabMode'><img src='/plugins/community.applications/images/install.png' height='40px'></a>";
@@ -967,7 +967,7 @@ case 'get_content':
         if (is_file($communityPaths['updateErrors'])) {
           echo "<table><td><td colspan='5'><br><center>The following errors occurred:<br><br>";
           echo "<strong>".file_get_contents($communityPaths['updateErrors'])."</strong></center></td></tr></table>";
-          echo "<script>$('#templateSortButtons,#total1,#sortIcon').hide();$('#sortButtons').hide();</script>";
+          echo "<script>$('#templateSortButtons,#total1').hide();$('#sortButtons').hide();</script>";
           echo changeUpdateTime();
           echo caGetMode();
           break;

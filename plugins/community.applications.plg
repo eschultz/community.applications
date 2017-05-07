@@ -2,8 +2,8 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.applications">
 <!ENTITY author    "Andrew Zawadzki">
-<!ENTITY version   "2017.05.04a">
-<!ENTITY md5       "acd3ecc96f48c61d7de83dee8d0bfd0d">
+<!ENTITY version   "2017.05.07">
+<!ENTITY md5       "f8d867a3d3dcbed5eac74616e1b4a23e">
 <!ENTITY launch    "Settings/PluginSettings">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/community.applications">
@@ -13,6 +13,9 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
+###2017.05.07
+- Fixed: Regression error on apppop up for previous apps
+
 ###2017.05.04
 - Add Install / Edit / WebUI icons to icon details mode
 

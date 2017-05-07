@@ -44,9 +44,14 @@ if ( ! $repos ) {
   $repos = array();
 }
 $displayed = readJsonFile($communityPaths['community-templates-displayed']);
-
-foreach ($file as $template) {
-  if ( $template['ID'] == $appNumber ) {
+foreach ($displayed as $file) {
+  foreach ($file as $template) {
+    if ( $template['ID'] == $appNumber ) {
+      break;
+      $breakFlag = true;
+    }
+  }
+  if ( $breakFlag ) {
     break;
   }
 }
@@ -127,8 +132,12 @@ if ( ! $template['Plugin'] ) {
         $templateDescription .= "&nbsp;&nbsp;<a class='ca_apptooltip' href='{$info[$name]['url']}' target='_blank' title='Click To Go To The App&#39;s UI'><img src='/plugins/community.applications/images/WebPage.png' height='40px'></a>&nbsp;&nbsp;";
       }
     } else {
-      $install              = "&nbsp;&nbsp;<a class='ca_apptooltip' title='Click to install the application' href='AddContainer?xmlTemplate=default:".addslashes($template['Path'])."' target='$tabMode'><img src='/plugins/community.applications/images/install.png' height='40px'></a>&nbsp;&nbsp;";
-      $templateDescription .= $template['BranchID'] ? "&nbsp;&nbsp;<a style='cursor:pointer' class='ca_apptooltip' title='Click to install the application' onclick='displayTags(&quot;$ID&quot;);'><img src='/plugins/community.applications/images/install.png' height='40px'></a>&nbsp;&nbsp;" : $install;
+      if ( $template['MyPath'] ) {
+        $templateDescription .= "&nbsp;&nbsp;<a class='ca_apptooltip' title='Click to reinstall the application' href='AddContainer?xmlTemplate=user:".addslashes($template['MyPath'])."' target='$tabMode'><img src='/plugins/community.applications/images/install.png' height='40px'></a>&nbsp;&nbsp;";
+      } else {
+        $install              = "&nbsp;&nbsp;<a class='ca_apptooltip' title='Click to install the application' href='AddContainer?xmlTemplate=default:".addslashes($template['Path'])."' target='$tabMode'><img src='/plugins/community.applications/images/install.png' height='40px'></a>&nbsp;&nbsp;";
+        $templateDescription .= $template['BranchID'] ? "&nbsp;&nbsp;<a style='cursor:pointer' class='ca_apptooltip' title='Click to install the application' onclick='displayTags(&quot;$ID&quot;);'><img src='/plugins/community.applications/images/install.png' height='40px'></a>&nbsp;&nbsp;" : $install;
+      }
     }
   }  
 } else {
