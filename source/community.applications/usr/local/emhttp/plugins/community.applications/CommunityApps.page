@@ -370,7 +370,7 @@ function setToolTip() {
     delay:[<?=$cfg['hoverTime']?>,1],
     interactive: true,
     viewportAware: true,
-    functionInit: function(instance,helper) {
+    functionBefore: function(instance,helper) {
       var origin = $(helper.origin);
       var appNumber = origin.attr('data-appNumber');
       $.post("/plugins/community.applications/scripts/showInfo.php",{action:'none',appNumber:appNumber},function(data) {
@@ -392,7 +392,7 @@ function setToolTip() {
     delay:[<?=$cfg['hoverTime']?>,1],
     interactive: true,
     viewportAware: true,
-    functionInit: function(instance,helper) {
+    functionBefore: function(instance,helper) {
       var origin = $(helper.origin);
       var appNumber = origin.attr('data-appNumber');
       $.post("/plugins/community.applications/scripts/showDesc.php",{action:'none',appNumber:appNumber},function(data) {

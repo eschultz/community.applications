@@ -45,17 +45,27 @@ if ( ! $repos ) {
 }
 $displayed = readJsonFile($communityPaths['community-templates-displayed']);
 foreach ($displayed as $file) {
-  foreach ($file as $template) {
-    if ( $template['ID'] == $appNumber ) {
-      $breakFlag = true;
-      break;
-
-    }
-  }
-  if ( $breakFlag ) {
+  $index = searchArray($file,"ID",$appNumber);
+  if ( $index === false ) {
+    continue;
+  } else {
+    $template = $file[$index];
+    $Displayed = true;
     break;
   }
 }
+# handle case where the app being asked to display isn't on the most recent displayed list (ie: multiple browser tabs open)
+if ( ! $template ) {
+  $file = readJsonFile($communityPaths['community-templates-info']);
+  $index = searchArray($file,"ID",$appNumber);
+  if ( $index === false ) {
+    echo "Something really wrong happened";
+    return;
+  }
+  $template = $file[$index];
+  $Displayed = false;
+}
+
 $ID = $appNumber;
 $repoIndex = searchArray($repos,"name",$template['RepoName']);
 $webPageURL = $repos[$repoIndex]['web'];
@@ -86,7 +96,9 @@ if ( $color ) {
 $templateDescription .= "<center><table><tr><td><figure style='margin:0px'><img id='icon' src='".$template['Icon']."' style='width:96px;height:96px' onerror='this.src=&quot;/plugins/community.applications/images/question.png&quot;';>";
 $templateDescription .= ($template['Beta'] == "true") ? "<figcaption><font size='1' color='red'><center><strong>(beta)</strong></center></font></figcaption>" : "";
 $templateDescription .= "</figure>";
-$templateDescription .= "</td><td></td><td><table><tr><td>$color<strong>Author: </strong></td><td>$color".$template['Author']."</td></tr>";
+$templateDescription .= "</td><td></td><td><table>";
+$templateDescription .= "<tr><td>$color<strong>App Name:</strong></td><td>$color{$template['Name']}</td></tr>";
+$templateDescription .= "<tr><td>$color<strong>Author: </strong></td><td>$color".$template['Author']."</td></tr>";
 $templateDescription .= "<tr><td>$color<strong>Repository: </strong></td><td>$color";
 $templateDescription .= $template['Forum'] ? "<b><a style='color:white;' href='".$template['Forum']."' target='_blank'>".$template['RepoName']."</a></b>" : "<b>{$template['RepoName']}</b>";
 if ( $template['Profile'] ) {
@@ -124,39 +136,40 @@ $templateDescription .= "<center>";
 $templateDescription .= "<form method='get'>";
 $templateDescription .= "<input type='hidden' name='csrf_token' value='$csrf_token'>";
 
-if ( ! $template['Plugin'] ) {
-  if ( $communitySettings['dockerRunning'] ) {
-    if ( $selected ) {
-      $templateDescription .= "&nbsp;&nbsp;<a class='ca_apptooltip' title='Click to reinstall the application using default values' href='AddContainer?xmlTemplate=default:".addslashes($template['Path'])."' target='$tabMode'><img src='/plugins/community.applications/images/install.png' height='40px'></a>&nbsp;&nbsp;";
-      $templateDescription .= "&nbsp;&nbsp;<a class='ca_apptooltip' title='Click to edit the application values' href='UpdateContainer?xmlTemplate=edit:".addslashes($info[$name]['template'])."' target='$tabMode'><img src='/plugins/community.applications/images/edit.png' height='40px'></a>&nbsp;&nbsp;";
-      if ( $info[$name]['url'] && $info[$name]['running'] ) {
-        $templateDescription .= "&nbsp;&nbsp;<a class='ca_apptooltip' href='{$info[$name]['url']}' target='_blank' title='Click To Go To The App&#39;s UI'><img src='/plugins/community.applications/images/WebPage.png' height='40px'></a>&nbsp;&nbsp;";
+if ( $Displayed ) {
+  if ( ! $template['Plugin'] ) {
+    if ( $communitySettings['dockerRunning'] ) {
+      if ( $selected ) {
+        $templateDescription .= "&nbsp;&nbsp;<a class='ca_apptooltip' title='Click to reinstall the application using default values' href='AddContainer?xmlTemplate=default:".addslashes($template['Path'])."' target='$tabMode'><img src='/plugins/community.applications/images/install.png' height='40px'></a>&nbsp;&nbsp;";
+        $templateDescription .= "&nbsp;&nbsp;<a class='ca_apptooltip' title='Click to edit the application values' href='UpdateContainer?xmlTemplate=edit:".addslashes($info[$name]['template'])."' target='$tabMode'><img src='/plugins/community.applications/images/edit.png' height='40px'></a>&nbsp;&nbsp;";
+        if ( $info[$name]['url'] && $info[$name]['running'] ) {
+          $templateDescription .= "&nbsp;&nbsp;<a class='ca_apptooltip' href='{$info[$name]['url']}' target='_blank' title='Click To Go To The App&#39;s UI'><img src='/plugins/community.applications/images/WebPage.png' height='40px'></a>&nbsp;&nbsp;";
+        }
+      } else {
+        if ( $template['MyPath'] ) {
+          $templateDescription .= "&nbsp;&nbsp;<a class='ca_apptooltip' title='Click to reinstall the application' href='AddContainer?xmlTemplate=user:".addslashes($template['MyPath'])."' target='$tabMode'><img src='/plugins/community.applications/images/install.png' height='40px'></a>&nbsp;&nbsp;";
+        } else {
+          $install              = "&nbsp;&nbsp;<a class='ca_apptooltip' title='Click to install the application' href='AddContainer?xmlTemplate=default:".addslashes($template['Path'])."' target='$tabMode'><img src='/plugins/community.applications/images/install.png' height='40px'></a>&nbsp;&nbsp;";
+          $templateDescription .= $template['BranchID'] ? "&nbsp;&nbsp;<a style='cursor:pointer' class='ca_apptooltip' title='Click to install the application' onclick='displayTags(&quot;$ID&quot;);'><img src='/plugins/community.applications/images/install.png' height='40px'></a>&nbsp;&nbsp;" : $install;
+        }
+      } 
+    }  
+  } else {
+    $pluginName = basename($template['PluginURL']);
+    if ( file_exists("/var/log/plugins/$pluginName") ) {
+      $pluginSettings = isset($template['CAlink']) ? $template['CAlink'] : getPluginLaunch($pluginName);
+      if ( $pluginSettings ) {
+        $templateDescription .= "<a class='ca_apptooltip' title='Click to go to the plugin settings' href='$pluginSettings'><img src='/plugins/community.applications/images/WebPage.png' height='40px'></a>";
       }
     } else {
-      if ( $template['MyPath'] ) {
-        $templateDescription .= "&nbsp;&nbsp;<a class='ca_apptooltip' title='Click to reinstall the application' href='AddContainer?xmlTemplate=user:".addslashes($template['MyPath'])."' target='$tabMode'><img src='/plugins/community.applications/images/install.png' height='40px'></a>&nbsp;&nbsp;";
-      } else {
-        $install              = "&nbsp;&nbsp;<a class='ca_apptooltip' title='Click to install the application' href='AddContainer?xmlTemplate=default:".addslashes($template['Path'])."' target='$tabMode'><img src='/plugins/community.applications/images/install.png' height='40px'></a>&nbsp;&nbsp;";
-        $templateDescription .= $template['BranchID'] ? "&nbsp;&nbsp;<a style='cursor:pointer' class='ca_apptooltip' title='Click to install the application' onclick='displayTags(&quot;$ID&quot;);'><img src='/plugins/community.applications/images/install.png' height='40px'></a>&nbsp;&nbsp;" : $install;
-      }
+      $buttonTitle = $template['MyPath'] ? "Reinstall Plugin" : "Install Plugin";
+      $templateDescription .= "&nbsp;&nbsp;<a style='cursor:pointer' class='ca_apptooltip' title='Click to install this plugin' onclick=installPlugin('".$template['PluginURL']."');><img src='/plugins/community.applications/images/install.png' height='40px'></a>&nbsp;&nbsp;";
     }
-  }  
-} else {
-  $pluginName = basename($template['PluginURL']);
-  if ( file_exists("/var/log/plugins/$pluginName") ) {
-    $pluginSettings = isset($template['CAlink']) ? $template['CAlink'] : getPluginLaunch($pluginName);
-    if ( $pluginSettings ) {
-      $templateDescription .= "<a class='ca_apptooltip' title='Click to go to the plugin settings' href='$pluginSettings'><img src='/plugins/community.applications/images/WebPage.png' height='40px'></a>";
+    if ( checkPluginUpdate($template['PluginURL']) ) {
+      $templateDescription .= "&nbsp;&nbsp;<a class='ca_apptooltip' title='Update Available.  Click To Install' onclick='installPLGupdate(&quot;".basename($template['PluginURL'])."&quot;,&quot;".$template['Name']."&quot;);' style='cursor:pointer'><img src='/plugins/community.applications/images/update.png' height='40px'></a>&nbsp;&nbsp;";
     }
-  } else {
-    $buttonTitle = $template['MyPath'] ? "Reinstall Plugin" : "Install Plugin";
-    $templateDescription .= "&nbsp;&nbsp;<a style='cursor:pointer' class='ca_apptooltip' title='Click to install this plugin' onclick=installPlugin('".$template['PluginURL']."');><img src='/plugins/community.applications/images/install.png' height='40px'></a>&nbsp;&nbsp;";
-  }
-  if ( checkPluginUpdate($template['PluginURL']) ) {
-    $templateDescription .= "&nbsp;&nbsp;<a class='ca_apptooltip' title='Update Available.  Click To Install' onclick='installPLGupdate(&quot;".basename($template['PluginURL'])."&quot;,&quot;".$template['Name']."&quot;);' style='cursor:pointer'><img src='/plugins/community.applications/images/update.png' height='40px'></a>&nbsp;&nbsp;";
   }
 }
-
 $templateDescription .= "</form>";
 $templateDescription .= "<br></center></center>";
 $templateDescription .= $template['Description'];
