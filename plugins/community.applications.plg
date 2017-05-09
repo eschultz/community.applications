@@ -2,8 +2,8 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.applications">
 <!ENTITY author    "Andrew Zawadzki">
-<!ENTITY version   "2017.05.07">
-<!ENTITY md5       "4766accff90b94809013539d6e052b84">
+<!ENTITY version   "2017.05.08">
+<!ENTITY md5       "fecc1e61a9736e6d8cd2c3145313a0cf">
 <!ENTITY launch    "Settings/PluginSettings">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/community.applications">
@@ -13,6 +13,11 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
+###2017.05.08
+- Enhanced: Speed up generation of displays
+- Enhanced: Properly handle edge cases of multiple browser tabs open and stale CA sessions displaying popups
+- Added / Restored: Ability to install / edit from Icon mode without hitting popup.
+
 ###2017.05.07
 - Fixed: Regression error on apppop up for previous apps
 
