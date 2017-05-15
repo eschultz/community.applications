@@ -502,11 +502,13 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker,$pageNumb
   $ct = "<br>".getPageNavigation($pageNumber,count($file),false)."<br>";
   $ct .= $skin[$viewMode]['header'].$skin[$viewMode]['sol'];
   $displayTemplate = $skin[$viewMode]['template'];
-  if ( $viewMode == "detail" ) {
-    $communitySettings['maxColumn'] = 2; 
-    $communitySettings['viewMode'] = "icon";
+  $communitySettings['maxColumn'] = $communitySettings['maxIconColumns'];
+  if ( $viewMode == 'detail' ) {
+#      $communitySettings['maxColumn'] = 3; 
+      $communitySettings['maxColumn'] = $communitySettings['maxDetailColumns'];
+      $communitySettings['viewMode'] = "icon";
   }
-
+  
   $columnNumber = 0;
   $appCount = 0;
   $startingApp = ($pageNumber -1) * $communitySettings['maxPerPage'] + 1;

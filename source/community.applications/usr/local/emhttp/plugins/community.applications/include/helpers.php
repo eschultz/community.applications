@@ -690,9 +690,11 @@ function getRedirectedURL($url) {
 function getMaxColumns($windowWidth) {
   global $communitySettings;
   
-  if ($windowWidth < 2000) $communitySettings['maxDetailColumns'] = 3;
-  if ($windowWidth < 1500) $communitySettings['maxDetailColumns'] = 2;
-  if ($windowWidth < 1000) $communitySettings['maxDetailColumns'] = 1;
+  $communitySettings['maxDetailColumns'] = 4;  $communitySettings['maxIconColumns'] = 12;
+  if ($windowWidth < 2500)  { $communitySettings['maxDetailColumns'] = 3; $communitySettings['maxIconColumns'] = 6; }
+  if ($windowWidth < 1800)  { $communitySettings['maxDetailColumns'] = 2; $communitySettings['maxIconColumns'] = 5; }
+  if ($windowWidth < 1000)  { $communitySettings['maxDetailColumns'] = 1; $communitySettings['maxIconColumns'] = 2; }
+  file_put_contents("/tmp/blah",$windowWidth);
 }
   
 
