@@ -309,6 +309,9 @@ function fixTemplates($template) {
   if ( ! is_string($template['Description']) ) {
     $template['Description'] = "";
   }
+  if ( is_array($template['Category']) ) {
+    $template['Category'] = $template['Category'][0];        # due to lsio / CHBMB
+  }
   $template['Category'] = $template['Category'] ? $template['Category'] : "Uncategorized";
   if ( ! is_string($template['Category']) ) {
     $template['Category'] = "Uncategorized";
@@ -327,6 +330,7 @@ function fixTemplates($template) {
   if ( is_array($template['PluginURL']) ) {                  # due to coppit
     $template['PluginURL'] = $template['PluginURL'][1];
   }
+
   if ( strlen($template['Overview']) > 0 ) {
     $template['Description'] = $template['Overview'];
     $template['Description'] = preg_replace('#\[([^\]]*)\]#', '<$1>', $template['Description']);

@@ -46,7 +46,7 @@ if ( is_dir("/var/lib/docker/containers") ) {
 <style>
 .searchSubmit{font-family:'FontAwesome';width:29px;height:26px;border:1px solid #dadada;border-radius:0px 4px 4px 0px;font-size:11px;position:relative;padding:0px 2px;background:#DADADA;border:none;cursor:pointer;}
 table#templates_list tbody td.topRow{border-top:1px solid <?=$line_color?>;}
-.back-to-top {background: none;margin: 0;position: fixed;bottom: 50px;right: 0;width: 70px;height: 70px;z-index: 100;display: none;text-decoration: none;color: #ffffff;}
+.back-to-top {background: none;margin: 0;position: fixed;bottom: 40px;right: 0;width: 50px;height: 50px;z-index: 100;display: none;text-decoration: none;color: #ffffff;}
 input.appButtons {margin:0px;}
 input.viewButton {margin:1px;}
 input.sortButton {margin:1px;}
@@ -389,7 +389,7 @@ function setToolTip() {
     trigger: 'custom',
     triggerOpen: {mouseenter:true,click:true,touchstart:true},
     triggerClose:{click:true,scroll:false,mouseleave:true},
-    delay:[<?=$cfg['hoverTime']?>,1],
+    delay:[<?=$cfg['hoverTime']?>,1000],
     interactive: true,
     viewportAware: true,
     functionBefore: function(instance,helper) {
@@ -533,7 +533,7 @@ function myCloseAlert() {
 }
 
 function readMore() {
-  $('.desc_readmore').readmore({maxHeight:150});
+  $('.desc_readmore').readmore({maxHeight:100});
 }
 
 function doSearch(button) {
@@ -1228,7 +1228,7 @@ function displayTags(leadTemplate) {
 <a href="#" class="back-to-top" style="display: inline;"><img src='/plugins/community.applications/images/up.png' style='width:30px;height:30px' href="#" class="back-to-top"></img></a>
 <div class='dockerSearch' style='display:none'><center><input type=button class='initDockerSearch' value='Get more results from dockerHub'></input></center></div>
 <center>Last Change To Appfeed: <strong><span id='updateTime'></span></strong></center>
-<a href="Settings/caHelp" target='_blank'>CA Manual</a><a class='ca_credits' style='float:right;cursor:pointer'>Credits</a><br><br></span>
+<a href="Settings/caHelp" target='_blank'>CA Manual</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class='ca_credits' style='cursor:pointer'>Credits</a><br><br></span>
 <center><a href='https://forums.lime-technology.com/topic/55246-docker-faq/' target='_blank'>Docker FAQ</a></center>
 <center>Community Applications Version: <?=$installedVersion?></center>
 > <center>For support for this plugin, visit here: <a title='click for help' href="http://lime-technology.com/forum/index.php?topic=40262.0" target="_blank">http://lime-technology.com/forum/index.php?topic=40262.0</a></center>
