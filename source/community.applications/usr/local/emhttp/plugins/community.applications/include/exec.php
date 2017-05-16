@@ -502,10 +502,10 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker,$pageNumb
   $ct = "<br>".getPageNavigation($pageNumber,count($file),false)."<br>";
   $ct .= $skin[$viewMode]['header'].$skin[$viewMode]['sol'];
   $displayTemplate = $skin[$viewMode]['template'];
-  $communitySettings['maxColumn'] = $communitySettings['maxIconColumns'];
+#  $communitySettings['maxColumn'] = $communitySettings['maxIconColumns'];
   if ( $viewMode == 'detail' ) {
-#      $communitySettings['maxColumn'] = 3; 
-      $communitySettings['maxColumn'] = $communitySettings['maxDetailColumns'];
+      $communitySettings['maxColumn'] = 2; 
+#      $communitySettings['maxColumn'] = $communitySettings['maxDetailColumns'];
       $communitySettings['viewMode'] = "icon";
   }
   

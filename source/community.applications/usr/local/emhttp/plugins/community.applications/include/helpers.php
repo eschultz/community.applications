@@ -700,7 +700,6 @@ function getMaxColumns($windowWidth) {
   if ($windowWidth < 2500)  { $communitySettings['maxDetailColumns'] = 3; $communitySettings['maxIconColumns'] = 6; }
   if ($windowWidth < 1800)  { $communitySettings['maxDetailColumns'] = 2; $communitySettings['maxIconColumns'] = 5; }
   if ($windowWidth < 1000)  { $communitySettings['maxDetailColumns'] = 1; $communitySettings['maxIconColumns'] = 2; } */
-  file_put_contents("/tmp/blah",$windowWidth);
 }
   
 

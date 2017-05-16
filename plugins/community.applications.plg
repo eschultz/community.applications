@@ -2,8 +2,8 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.applications">
 <!ENTITY author    "Andrew Zawadzki">
-<!ENTITY version   "2017.05.08">
-<!ENTITY md5       "fecc1e61a9736e6d8cd2c3145313a0cf">
+<!ENTITY version   "2017.05.16">
+<!ENTITY md5       "0240e9788f7eb1218897fe0ac6260f2d">
 <!ENTITY launch    "Settings/PluginSettings">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/community.applications">
@@ -13,6 +13,11 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
+###2017.05.16
+- Fixed: Under certain circumstances the popup would disappear immediately when moving the mouse
+- Added: More fixes for common template author's mistakes
+- Minor skin changes in Icon Details mode
+
 ###2017.05.08
 - Enhanced: Speed up generation of displays
 - Enhanced: Properly handle edge cases of multiple browser tabs open and stale CA sessions displaying popups

@@ -91,13 +91,12 @@ $template['Description'] = trim($template['Description']);
 
 $templateDescription .= "<style>p { margin-left:20px;margin-right:20px }</style>";
 if ( $color ) {
-  $templateDescription .= "<br><br><br>";
+  $templateDescription .= "<center><font size='4'><strong>{$template['Name']}</strong></font></center><br><br><br>";
 }
 $templateDescription .= "<center><table><tr><td><figure style='margin:0px'><img id='icon' src='".$template['Icon']."' style='width:96px;height:96px' onerror='this.src=&quot;/plugins/community.applications/images/question.png&quot;';>";
 $templateDescription .= ($template['Beta'] == "true") ? "<figcaption><font size='1' color='red'><center><strong>(beta)</strong></center></font></figcaption>" : "";
 $templateDescription .= "</figure>";
 $templateDescription .= "</td><td></td><td><table>";
-$templateDescription .= "<tr><td>$color<strong>App Name:</strong></td><td>$color{$template['Name']}</td></tr>";
 $templateDescription .= "<tr><td>$color<strong>Author: </strong></td><td>$color".$template['Author']."</td></tr>";
 $templateDescription .= "<tr><td>$color<strong>Repository: </strong></td><td>$color";
 $templateDescription .= $template['Forum'] ? "<b><a style='color:white;' href='".$template['Forum']."' target='_blank'>".$template['RepoName']."</a></b>" : "<b>{$template['RepoName']}</b>";
