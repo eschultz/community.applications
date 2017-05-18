@@ -785,14 +785,14 @@ function getContent(init,category,description,newApp) {
       $("#MainCategory,#topLevelButton,#New").show();
       break;
     case 'NONE':
-      $("#NetworkCategory,#MediaServerCategory,#MediaAppCategory,#NONE,#ToolsCategory").hide();
+      $("#NetworkCategory,#MediaServerCategory,#MediaAppCategory,#NONE,#ToolsCategory,#Total1").hide();
       $("#MainCategory,#topLevelButton").show();
       break;
   }
   
   $('#BackToTop').hide();
   
-  if ( category != "NONE" ) {
+ if ( category != "NONE" ) {
     if ( category == "INITIALIZE" ) {
       category = "NONE";
       var initialize = true;
@@ -802,6 +802,7 @@ function getContent(init,category,description,newApp) {
       $("#MainCategory,#topLevelButton,#New").show();
       $(".allButtons").prop("disabled",false);
     }
+  }
     $("#Total").html("Searching...  <img src='/plugins/community.applications/images/spinner2.gif' style='height:30px;width:30px'>");
 
     if ( category == "New" ) { category = ""; }
@@ -821,7 +822,7 @@ function getContent(init,category,description,newApp) {
       $("#Category").html(description);
       $("#updateButton").prop("disabled",false);
     });
-  }
+//  }
   $('#BackToTop').show();
   $('.dockerSearch').hide();
   setSortOrder();
@@ -1314,7 +1315,7 @@ Sort Direction:
 <input class='allButtons' type=button id='tools' value='All Tools/Utilities'></input>
 </span>
 <div id='otherButtons'>
-<span style='float:right'>
+<span>
 <input class='allButtons' type=button id="NONE" value='All Categories' hidden></input>
 <span id='topLevelButton'>
 <input class='allButtons' type=button id="New" value='New/Updated'></input>
