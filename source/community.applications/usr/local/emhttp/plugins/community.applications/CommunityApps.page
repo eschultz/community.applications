@@ -176,7 +176,7 @@ $(function(){
     trigger: 'custom',
     triggerOpen: {mouseenter:true,click:true,touchstart:true},
     contentAsHTML: true,
-    animation: 'grow',
+    animation: 'none',
     arrow: true,
     triggerClose:{click:true,scroll:true,mouseleave:true,delay:1},
     interactive: true,
@@ -230,7 +230,7 @@ $(function(){
     trigger: 'custom',
     triggerOpen: {mouseenter:true,click:true,touchstart:true},
     contentAsHTML: true,
-    animation: 'grow',
+    animation: 'none',
     arrow: true,
     triggerClose:{click:true,scroll:true,mouseleave:true},
     interactive: true,
@@ -255,7 +255,7 @@ $(function(){
     trigger: 'custom',
     triggerOpen: {mouseenter:true,click:true,touchstart:true},
     contentAsHTML: true,
-    animation: 'grow',
+    animation: 'none',
     arrow: true,
     triggerClose:{click:true,scroll:true,mouseleave:true,delay:1},
     interactive: true,
@@ -287,7 +287,7 @@ $(function(){
     trigger: 'custom',
     triggerOpen: {mouseenter:true,click:true,touchstart:true},
     contentAsHTML: true,
-    animation: 'grow',
+    animation: 'none',
     arrow: true,
     triggerClose:{click:true,scroll:true,mouseleave:true,delay:1},
     interactive: true,
@@ -453,6 +453,7 @@ function changeCategory(button,subSwitch) {
         $("#sortorder").attr("data-selected_subcategory","tools");
         break;
       case "New":
+        enableIcon("#subcategoryIcon",false);
         newFlag = true;
         break;
       default:
@@ -760,22 +761,22 @@ function getContent(init,category,description,newApp) {
 
   switch (category) {
     case 'network:':
-      $("#MainCategory,#topLevelButton").hide();
+      $("#MainCategory").hide();
       $("#NetworkCategory,#NONE").show();
       $("#network").prop("disabled",true);
       break;
     case 'MediaApp:':
-      $("#MainCategory,#topLevelButton").hide();
+      $("#MainCategory").hide();
       $("#MediaAppCategory,#NONE").show();
       $("#MediaApp").prop("disabled",true);
       break;
     case 'MediaServer:':
-      $("#MainCategory,#topLevelButton").hide();
+      $("#MainCategory").hide();
       $("#MediaServerCategory,#NONE").show();
       $("#MediaServer").prop("disabled",true);
       break;
     case 'tools:':
-      $("#MainCategory,#topLevelButton").hide();
+      $("#MainCategory").hide();
       $("#ToolsCategory,#NONE").show();
       $("#tools").prop("disabled",true);
       break;
@@ -785,14 +786,14 @@ function getContent(init,category,description,newApp) {
       $("#MainCategory,#topLevelButton,#New").show();
       break;
     case 'NONE':
-      $("#NetworkCategory,#MediaServerCategory,#MediaAppCategory,#NONE,#ToolsCategory,#Total1").hide();
+      $("#NetworkCategory,#MediaServerCategory,#MediaAppCategory,#NONE,#ToolsCategory").hide();
       $("#MainCategory,#topLevelButton").show();
       break;
   }
   
   $('#BackToTop').hide();
   
- if ( category != "NONE" ) {
+  if ( category != "NONE" ) {
     if ( category == "INITIALIZE" ) {
       category = "NONE";
       var initialize = true;
@@ -802,7 +803,6 @@ function getContent(init,category,description,newApp) {
       $("#MainCategory,#topLevelButton,#New").show();
       $(".allButtons").prop("disabled",false);
     }
-  }
     $("#Total").html("Searching...  <img src='/plugins/community.applications/images/spinner2.gif' style='height:30px;width:30px'>");
 
     if ( category == "New" ) { category = ""; }
@@ -822,7 +822,7 @@ function getContent(init,category,description,newApp) {
       $("#Category").html(description);
       $("#updateButton").prop("disabled",false);
     });
-//  }
+  }
   $('#BackToTop').show();
   $('.dockerSearch').hide();
   setSortOrder();
@@ -1315,9 +1315,9 @@ Sort Direction:
 <input class='allButtons' type=button id='tools' value='All Tools/Utilities'></input>
 </span>
 <div id='otherButtons'>
-<span>
-<input class='allButtons' type=button id="NONE" value='All Categories' hidden></input>
+<span style='float:right'>
 <span id='topLevelButton'>
+&nbsp;&nbsp;&nbsp;&nbsp;
 <input class='allButtons' type=button id="New" value='New/Updated'></input>
 <input class='allButtons' type=button id="UNCATEGORIZED" value='Uncategorized'></input>
 <input class='allButtons' type=button id="All" value='All Apps'></input>
