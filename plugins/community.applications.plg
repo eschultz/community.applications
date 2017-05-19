@@ -2,8 +2,8 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.applications">
 <!ENTITY author    "Andrew Zawadzki">
-<!ENTITY version   "2017.05.16">
-<!ENTITY md5       "0240e9788f7eb1218897fe0ac6260f2d">
+<!ENTITY version   "2017.05.19">
+<!ENTITY md5       "baa231d3f7623e78282b5917e7a56bda">
 <!ENTITY launch    "Settings/PluginSettings">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/community.applications">
@@ -13,6 +13,10 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
+###2017.05.19
+- Fixed: Display anomalies introduced by unRaid 6.3.4
+- Fixed: Minor issues with category / subcategory buttons
+
 ###2017.05.16
 - Fixed: Under certain circumstances the popup would disappear immediately when moving the mouse
 - Added: More fixes for common template author's mistakes
