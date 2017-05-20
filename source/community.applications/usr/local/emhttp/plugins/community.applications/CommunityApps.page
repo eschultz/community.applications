@@ -28,6 +28,7 @@ if ( ! is_file("/boot/config/plugins/$plugin/accepted") ) {
 }
 $vars = parse_ini_file("/var/local/emhttp/var.ini");
 $toolTipsterIncluded = version_compare($vars['version'],"6.3.3",">=") ? "true" : "false";
+$unRaid64 = (version_compare($vars['version'],"6.4.0-rc0",">=")) || (is_file("/usr/local/emhttp/plugins/dynamix/styles/dynamix-gray.css")) ? "true" : "false";
 
 $tabMode = $cfg['newWindow'];
 $line_color = $display['theme']=='black' ? '#202020' : '#E8E8E8';
@@ -136,9 +137,10 @@ var categoryDesc = {
 
 $(function(){
   $("#sortorder").attr("data-oldWindowWidth",getWindowWidth());
-  $("#debugging").html("test");
+  <?if ( $unRaid64 == "true" ) : ?>
   $(window).bind('resize', function(e){
-    var window.resizeEvt;
+  $("#debugging").html("got here");
+    window.resizeEvt;
     $(window).resize(function(){
       var newWidth = getWindowWidth();
       var oldWidth = $("#sortorder").attr("data-oldWindowWidth");
@@ -153,6 +155,7 @@ $(function(){
       }
     });
   });
+  <?endif;?>
 
   var backtotopoffset = 250;
   var backtotopduration = 500;
