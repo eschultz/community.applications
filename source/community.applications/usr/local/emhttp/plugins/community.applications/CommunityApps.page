@@ -135,14 +135,22 @@ var categoryDesc = {
   };
 
 $(function(){
+  $("#sortorder").attr("data-oldWindowWidth",getWindowWidth());
+  $("#debugging").html("test");
   $(window).bind('resize', function(e){
-    window.resizeEvt;
+    var window.resizeEvt;
     $(window).resize(function(){
-    $("#templates_content").html("");
-      clearTimeout(window.resizeEvt);
-      window.resizeEvt = setTimeout(function(){
-        changeSortOrder(null,null,null);
-      }, 100);
+      var newWidth = getWindowWidth();
+      var oldWidth = $("#sortorder").attr("data-oldWindowWidth");
+      if ( Math.abs(newWidth - oldWidth) > 20 ) {
+      $("#debugging").html(newWidth+" "+$("#sortorder").attr("data-oldWindowWidth"));
+        $("#sortorder").attr("data-oldWindowWidth",newWidth);
+        $("#templates_content").html("");
+        clearTimeout(window.resizeEvt);
+        window.resizeEvt = setTimeout(function(){
+          changeSortOrder(null,null,null);
+        }, 100);
+      }
     });
   });
 
@@ -277,13 +285,10 @@ $(function(){
       if ( source.indexOf("Disabled") > 1 ) {
         var displayContent = "Changing Of Categories Disabled In This Section";
       } else {
-        var currentCategory = $("#sortorder").attr("data-main_category");
         var selectedCategory = $("#sortorder").attr("data-selected_category");
         $(".allButtons").prop("disabled",false);
         $("#"+selectedCategory).prop("disabled",true);
-        var otherContent = $("#otherButtons").html();
-        var displayContent = $("#"+currentCategory).html();
-        displayContent = displayContent + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + otherContent;
+        var displayContent = $("#MainCategory").html();
       }
       instance.content(displayContent);
     },functionReady: function(instance,helper) {
@@ -314,7 +319,6 @@ $(function(){
         $(".allButtons").prop("disabled",false);
         $("#"+selectedCategory).prop("disabled",true);
         var displayContent = $(currentSub).html();
-        displayContent = displayContent
       }
       instance.content(displayContent);
     },functionReady: function(instance,helper) {
@@ -332,8 +336,7 @@ $(function(){
   $("#calculateAppdata").click(function()                  { calculateAppdataSize(); });
   $(".initDockerSearch").click(function()                  { initDockerSearch(); });
   $(".moduleButton").click(function()                      { caModules(); });
-  $(".allButtons").click(function()                        { changeCategory(this);
-  });
+  $(".allButtons").click(function()                        { changeCategory(this); });
   myAlert("Updating Content","Retrieving the latest application Lists","/plugins/community.applications/images/spinner2.gif","40x40");
   $.post(URL,{action:'force_update'});
 
@@ -517,9 +520,7 @@ function changePage(pageNumber) {
 }
 
 function getWindowWidth() {
-  var windowWidth = $(window).width();
-  $("#windowWidth").html(windowWidth);
-  return windowWidth;
+  return $(window).width();
 }
 
 function myAlert(description,textdescription,textimage,imagesize, outsideClick, showCancel, showConfirm, alertType) {
@@ -585,7 +586,7 @@ function doSearch(button) {
     $("#Category").html("All Recommended Applications");
   }
   
-  $("#sortButtons,#MainCategory,#topLevelButton").show();
+  $("#sortButtons,#MainCategory").show();
   enableIcon("#sortIcon",true);
   $("#NetworkCategory,#MediaAppCategory,#MediaServerCategory,#NONE,#ToolsCategory").hide();
 
@@ -794,11 +795,11 @@ function getContent(init,category,description,newApp) {
     case '':
       $("#All").prop("disabled",true);
       $("#NetworkCategory,#MediaServerCategory,#MediaAppCategory,#NONE,#ToolsCategory").hide();
-      $("#MainCategory,#topLevelButton,#New").show();
+      $("#MainCategory,#New").show();
       break;
     case 'NONE':
       $("#NetworkCategory,#MediaServerCategory,#MediaAppCategory,#NONE,#ToolsCategory").hide();
-      $("#MainCategory,#topLevelButton").show();
+      $("#MainCategory").show();
       break;
   }
   
@@ -811,7 +812,7 @@ function getContent(init,category,description,newApp) {
       enableButtons();
       $("#All").prop("disabled",true);
       $("#NetworkCategory,#MediaServerCategory,#MediaAppCategory,#NONE,#ToolsCategory,#Total1").hide();
-      $("#MainCategory,#topLevelButton,#New").show();
+      $("#MainCategory,#New").show();
       $(".allButtons").prop("disabled",false);
     }
     $("#Total").html("Searching...  <img src='/plugins/community.applications/images/spinner2.gif' style='height:30px;width:30px'>");
@@ -1075,7 +1076,7 @@ function appStore() {
   $("#monitor,.appButtons,.allButtons").prop("disabled",false);
   $("#AppStore").prop("disabled",true);
   $(".resourceMonitor,#NetworkCategory,#MediaAppCategory,#MediaServerCategory,#ToolsCategory,#NONE").hide();
-  $("#AppsOnly,#templates_content,#MainCategory,#topLevelButton,#topLevelButton").show();
+  $("#AppsOnly,#templates_content,#MainCategory").show();
   getContent(true,'INITIALIZE','None Selected');
   $('#searchBox').keyup(function(e) {if(e.which == 13){doSearch(false);}});
   $("#Category").html("None Selected");
@@ -1293,6 +1294,10 @@ Sort Direction:
 <input class='allButtons' type=button id='toolsALL' value='Tools/Utilities'></input>
 <input class='allButtons' type=button id='other' value='Other'></input>
 <input class='allButtons' type=button id='Plugins' value='Plugins'></input>
+&nbsp;&nbsp;&nbsp;&nbsp;
+<input class='allButtons' type=button id="New" value='New/Updated'></input>
+<input class='allButtons' type=button id="UNCATEGORIZED" value='Uncategorized'></input>
+<input class='allButtons' type=button id="All" value='All Apps'></input>
 </span>
 <span id='NetworkCategory'>
 <input class='allButtons' type=button id='networkweb' value='Web Servers'></input>
@@ -1325,15 +1330,6 @@ Sort Direction:
 <input class='allButtons' type=button id='toolssystem' value='System Tools'></input>
 <input class='allButtons' type=button id='tools' value='All Tools/Utilities'></input>
 </span>
-<div id='otherButtons'>
-<span style='float:right'>
-<span id='topLevelButton'>
-&nbsp;&nbsp;&nbsp;&nbsp;
-<input class='allButtons' type=button id="New" value='New/Updated'></input>
-<input class='allButtons' type=button id="UNCATEGORIZED" value='Uncategorized'></input>
-<input class='allButtons' type=button id="All" value='All Apps'></input>
-</span>
-</div>
 </div>
 </span>
 <span id='sortorder' data-sortorder='' data-docker='' data-section='AppStore' data-main_category='MainCategory'></span>
