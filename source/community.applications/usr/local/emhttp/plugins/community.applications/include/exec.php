@@ -24,7 +24,6 @@ $DockerTemplates = new DockerTemplates();
 
 $communitySettings = parse_plugin_cfg("$plugin");
 $communitySettings['appFeed']       = "true"; # set default for deprecated setting
-$communitySettings['superCategory'] = "false"; # remove option.  Instead add in mod comments on every beta app.
 $communitySettings['maxPerPage'] = getPost("maxPerPage",$communitySettings['maxPerPage']);
 
 # adjust display according to 6.4.0 CSS
@@ -36,7 +35,7 @@ $unRaid64 = (version_compare($vars['version'],"6.4.0-rc0",">=")) || (is_file("/u
 if ( $communitySettings['favourite'] != "None" ) {
   $officialRepo = str_replace("*","'",$communitySettings['favourite']);
   $separateOfficial = true;
-  $communitySettings['maxPerPage'] = "-1";  # Pages do not work when favourite repos are set.  Really need to think about how to do it better
+#  $communitySettings['maxPerPage'] = "-1";  # Pages do not work when favourite repos are set.  Really need to think about how to do it better
 }
 
 if ( is_dir("/var/lib/docker/containers") ) {
@@ -448,29 +447,16 @@ function display_apps($viewMode,$pageNumber=1) {
       $logos = readJsonFile($communityPaths['logos']);
       $display .= $logos[$officialRepo] ? "<img src='".$logos[$officialRepo]."' style='width:48px'>&nbsp;&nbsp;" : "";
       $display .= "<font size='4' color='purple' id='OFFICIAL'>$officialRepo</font></b></center><br>";
-      $display .= my_display_apps($viewMode,$officialApplications,$runningDockers,$imagesDocker);
+      $display .= my_display_apps($viewMode,$officialApplications,$runningDockers,$imagesDocker,1,true);
     }
   }
 
   if ( count($communityApplications) ) {
-    if ( $communitySettings['superCategory'] == "true" || $separateOfficial ) {
+    if ( $separateOfficial ) {
       $navigate[] = "<a href='#COMMUNITY'>Community Supported Applications</a>";
       $display .= "<center><b><font size='4' color='purple' id='COMMUNITY'>Community Supported Applications</font></b></center><br>";
     }
     $display .= my_display_apps($viewMode,$communityApplications,$runningDockers,$imagesDocker,$pageNumber);
-  }
-
-  if ( $communitySettings['superCategory'] == "true" || $separateOfficial ) {
-    if ( count($betaApplications) ) {
-      $navigate[] = "<a href='#BETA'>Beta Applications</a>";
-      $display .= "<center><b><font size='4' color='purple' id='BETA'>Beta / Work In Progress Applications</font></b></center><br>";
-      $display .= my_display_apps($viewMode,$betaApplications,$runningDockers,$imagesDocker,$pageNumber);
-    }
-    if ( count($privateApplications) ) {
-      $navigate[] = "<a href='#PRIVATE'>Private Applications</a>";
-      $display .= "<center><b><font size='4' color='purple' id='PRIVATE'>Applications From Private Repositories</font></b></center><br>";
-      $display .= my_display_apps($viewMode,$privateApplications,$runningDockers,$imagesDocker,$pageNumber);
-    }
   }
 
   unset($navigate[0]);
@@ -492,7 +478,7 @@ function display_apps($viewMode,$pageNumber=1) {
   echo $display;
 }
 
-function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker,$pageNumber=1) {
+function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker,$pageNumber=1,$officialFlag=false) {
   global $communityPaths, $info, $communitySettings, $plugin, $unRaid64;
 
   $pinnedApps = getPinnedApps();
@@ -504,7 +490,9 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker,$pageNumb
   $communitySettings['viewMode'] = $viewMode;
 
   $skin = readJsonFile($communityPaths['defaultSkin']);
-  $ct = "<br>".getPageNavigation($pageNumber,count($file),false)."<br>";
+  if ( ! $officialFlag ) {
+    $ct = "<br>".getPageNavigation($pageNumber,count($file),false)."<br>";
+  }
   $ct .= $skin[$viewMode]['header'].$skin[$viewMode]['sol'];
   $displayTemplate = $skin[$viewMode]['template'];
   if ( $unRaid64 ) {
@@ -517,7 +505,7 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker,$pageNumb
   
   $columnNumber = 0;
   $appCount = 0;
-  $startingApp = ($pageNumber -1) * $communitySettings['maxPerPage'] + 1;
+  $startingApp = $officialFlag ? 1 : ($pageNumber -1) * $communitySettings['maxPerPage'] + 1;
   $startingAppCounter = 0;
   
   foreach ($file as $template) {
@@ -651,13 +639,17 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker,$pageNumb
  
     $ct .= $t;
     $count++;
-    if ( $count == $communitySettings['maxPerPage'] ) {
-      break;
+    if ( ! $officialFlag ) {
+      if ( $count == $communitySettings['maxPerPage'] ) {
+        break;
+      }
     }
   }
   $ct .= $skin[$viewMode]['footer'];
   $ct .= caGetMode();
-  $ct .= "<br>".getPageNavigation($pageNumber,count($file),false)."<br>";
+  if ( ! $officialFlag ) {
+    $ct .= "<br>".getPageNavigation($pageNumber,count($file),false)."<br>";
+  }
 
   return $ct;
 }
@@ -1074,34 +1066,14 @@ case 'get_content':
       } else continue;
     }
 
-    if ( $communitySettings['superCategory'] == "true" ) {
-      if ( $template['Beta'] == "true" ) {
-        $beta[] = $template;
-      } else {
-        if ( $template['Private'] == "true" ) {
-          $privateApplications[] = $template;
-        } else {
-          if ( $separateOfficial ) {
-            if ( $template['RepoName'] == $officialRepo ) {
-              $official[] = $template;
-            } else {
-              $display[] = $template;
-            }
-          } else {
-            $display[] = $template;
-          }
-        }
-      }
-    } else {
-      if ( $separateOfficial ) {
-        if ( $template['RepoName'] == $officialRepo ) {
-          $official[] = $template;
-        } else {
-          $display[] = $template;
-        }
+    if ( $separateOfficial ) {
+      if ( $template['RepoName'] == $officialRepo ) {
+        $official[] = $template;
       } else {
         $display[] = $template;
       }
+    } else {
+      $display[] = $template;
     }
   }
 

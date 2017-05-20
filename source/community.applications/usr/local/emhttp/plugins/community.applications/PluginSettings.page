@@ -112,8 +112,7 @@ Default Number Of Results Per Page:
   <?=mk_option($cfg['maxPerPage'], "50", "50")?>
   <?=mk_option($cfg['maxPerPage'], "75", "75")?>
   <?=mk_option($cfg['maxPerPage'], "100", "100")?>
-  <?=mk_option($cfg['maxPerPage'], "-1", "All Results")?>
-  </select> * ignored if favourite repository has been set
+  </select>
   
 > This setting determines how many results per page to display
 

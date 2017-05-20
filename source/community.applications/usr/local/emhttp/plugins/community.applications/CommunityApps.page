@@ -22,6 +22,7 @@ if ( $installedVersion < $upgradeVersion ) {
 }
 $plugin = "community.applications";
 $cfg = parse_plugin_cfg($plugin);
+if ( $cfg['maxPerPage'] == -1 ) { $cfg['maxPerPage'] = 100; }          # deprecated show all results
 
 if ( ! is_file("/boot/config/plugins/$plugin/accepted") ) {
   $firstRun = "true";
@@ -137,7 +138,7 @@ var categoryDesc = {
 
 $(function(){
   $("#sortorder").attr("data-oldWindowWidth",getWindowWidth());
-  <?if ( $unRaid64 == "true" ) : ?>
+  <?if ( $unRaid64 == "true" ) : ?>            // function to resize everything on demand
   $(window).bind('resize', function(e){
     window.resizeEvt;
     $(window).resize(function(){
@@ -182,10 +183,7 @@ $(function(){
   if ( "<?=$firstRun?>" == "true" ) { $("#appWarning").show(); }
   if ( "<?=$dockerRunning?>" == "false" ) { $("#monitor").hide(); }
   $("#maxPerPage").val("<?=$cfg['maxPerPage']?>");
-  if ( "<?=$cfg['favourite']?>" != "None" ) { 
-    $("#maxPerPage").prop("disabled",true);
-    $("#maxPerPage").val("-1");
-  }
+
   $('.ca_staticTips').tooltipster({
     timer:15000,
     animation:'none',
@@ -697,10 +695,10 @@ function changeSortOrder(button,buttonClass,previousApps) {
     $("#"+button).prop("disabled", true);
   }
 
-/*   if ( button == "Date" || button == "Downloads" ) {
+  if ( button == "Date" || button == "Downloads" ) {
     $("#Down").prop("disabled", true);
     $("#Up").prop("disabled", false);
-  } */
+  }
 
   var sortOrder = getSortOrder();
   if ( $("#sortorder").attr("data-docker") ) {
@@ -820,8 +818,7 @@ function getContent(init,category,description,newApp) {
     }
     $("#Total").html("Searching...  <img src='/plugins/community.applications/images/spinner2.gif' style='height:30px;width:30px'>");
 
-    if ( category == "New" ) { category = ""; }
-    if ( category == "All" ) { category = ""; }
+    if ( (category == "New") || (category == "All") ) { category = ""; }
 
     var sortOrder = getSortOrder();
     var maxPerPage = getPerPage();
@@ -950,7 +947,6 @@ function previousApps(button,installed) {
 
   $("#Total").html("Searching... <img src='/plugins/community.applications/images/spinner2.gif' style='height:30px;width:30px'>");
   $("#templates_content,.resourceMonitor,.dockerSearch,#AppsOnly").hide();
-//  $("#templates_content").html("<center><font size='3'>Searching</font></center>");
   $("#templates_content,#sortButtons,#Total1,#templateSortButtons").show();
   enableIcon("#sortIcon",true);
 
@@ -1146,7 +1142,7 @@ function calculateAppdataSize() {
 
 function installPLGupdate(filename,plgName) {
   $(".ca_appPopup").tooltipster('close');
-  openBox('/plugins/community.applications/scripts/updatePLG.sh&arg1='+filename,'Update '+plgName,600,900,true);
+  my_openBox('/plugins/community.applications/scripts/updatePLG.sh&arg1='+filename,'Update '+plgName,600,900,false);
 }
 
 function startCadvisor() {
@@ -1230,7 +1226,7 @@ function displayTags(leadTemplate) {
 <img id='subcategoryIcon' class='ca_subcategories' title='Select Sub Category' height='50px' style='cursor:pointer;position:relative;' src='/plugins/community.applications/images/SubCategoryIcon.png'>
 <font size='2'><b>Current Section: <font color='red'><span id='currentSection'>Available Apps</span></font></b></font>
 <img class='ca_staticTips' height='35px' src='/plugins/community.applications/images/resource.png' id='monitor' title='Resource Monitor' style='margin:0px;cursor:pointer;float:right;'><br>
-<strong><font size='3'><span id="Category"></span></strong></font><span id="Total1" style='float: right';>Total Found: <strong><font size="3"><span id="Total"></span></font></strong><span>&nbsp;&nbsp;Results/page: <select id='maxPerPage' class='narrow' onchange='changePage(&quot;1&quot;);'><option value='-1'>All</option><option value='10'>10</option><option value='25'>25</option><option value='50'>50</option><option value='100'>100</option></select></span></span>
+<strong><font size='3'><span id="Category"></span></strong></font><span id="Total1" style='float: right';>Total Found: <strong><font size="3"><span id="Total"></span></font></strong><span>&nbsp;&nbsp;Results/page: <select id='maxPerPage' class='narrow' onchange='changePage(&quot;1&quot;);'><option value='10'>10</option><option value='25'>25</option><option value='50'>50</option><option value='100'>100</option></select></span></span>
 </span><br>
 
 <?if ( $upgradeAvailable ) :?>

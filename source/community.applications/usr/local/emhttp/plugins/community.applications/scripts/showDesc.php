@@ -38,7 +38,6 @@ if ( ! $appNumber ) {
   $color="<font color='white'>";
 }
 
-#$file = readJsonFile($communityPaths['community-templates-info']);
 $repos = readJsonFile($communityPaths['Repositories']);
 if ( ! $repos ) {
   $repos = array();
@@ -126,7 +125,9 @@ if ( $template['Date'] ) {
 }
 $templateDescription .= $template['MinVer'] ? "<tr><td nowrap>$color<b>Minimum OS:</strong></td><td>{$color}unRaid v".$template['MinVer']."</td></tr>" : "";
 $templateDescription .= $template['MaxVer'] ? "<tr><td nowrap>$color<strong>Max OS:</strong></td><td>{$color}unRaid v".$template['MaxVer']."</td></tr>" : "";
-$templateDescription .= $template['downloads'] ? "<tr><td>$color<strong>Downloads:</strong></td><td>{$color}".$template['downloads']."</td></tr>" : "";
+$templateDescription .= "<tr><td>$color<strong>Downloads:</strong></td><td>$color";
+$templateDescription .= $template['downloads'] ? $template['downloads'] : "Could Not Determine";
+$templateDescription .= "</td></tr>";
 $templateDescription .= $template['Licence'] ? "<tr><td>$color<strong>Licence:</strong></td><td>$color".$template['Licence']."</td></tr>" : "";
   
 $templateDescription .= "</table></td></tr></table>";
