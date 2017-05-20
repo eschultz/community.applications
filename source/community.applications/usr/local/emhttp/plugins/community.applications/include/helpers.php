@@ -696,10 +696,8 @@ function getMaxColumns($windowWidth) {
   
   $communitySettings['maxDetailColumns'] = floor($windowWidth / 600);
   $communitySettings['maxIconColumns'] = floor($windowWidth / 250);
-/*   $communitySettings['maxDetailColumns'] = 4;  $communitySettings['maxIconColumns'] = 12;
-  if ($windowWidth < 2500)  { $communitySettings['maxDetailColumns'] = 3; $communitySettings['maxIconColumns'] = 6; }
-  if ($windowWidth < 1800)  { $communitySettings['maxDetailColumns'] = 2; $communitySettings['maxIconColumns'] = 5; }
-  if ($windowWidth < 1000)  { $communitySettings['maxDetailColumns'] = 1; $communitySettings['maxIconColumns'] = 2; } */
+  if ( ! $communitySettings['maxDetailColumns'] ) $communitySettings['maxDetailColumns'] = 1;
+  if ( ! $communitySettings['maxIconColumns'] ) $communitySettings['maxIconColumns'] = 1;
 }
   
 

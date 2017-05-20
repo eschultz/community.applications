@@ -139,12 +139,12 @@ $(function(){
   $("#sortorder").attr("data-oldWindowWidth",getWindowWidth());
   <?if ( $unRaid64 == "true" ) : ?>
   $(window).bind('resize', function(e){
-  $("#debugging").html("got here");
     window.resizeEvt;
     $(window).resize(function(){
       var newWidth = getWindowWidth();
       var oldWidth = $("#sortorder").attr("data-oldWindowWidth");
-      if ( Math.abs(newWidth - oldWidth) > 20 ) {
+      
+      if ( Math.floor(newWidth / 600) != Math.floor(oldWidth / 600) ) {
       $("#debugging").html(newWidth+" "+$("#sortorder").attr("data-oldWindowWidth"));
         $("#sortorder").attr("data-oldWindowWidth",newWidth);
         $("#templates_content").html("");
@@ -920,7 +920,14 @@ function clearSearchBox() {
 
 function installPlugin(pluginURL) {
   $(".ca_appPopup").tooltipster('close');
-  openBox('/plugins/dynamix.plugin.manager/scripts/plugin&arg1=install&arg2='+pluginURL,'Install Plugin',600,900,true);
+  my_openBox('/plugins/dynamix.plugin.manager/scripts/plugin&arg1=install&arg2='+pluginURL,'Install Plugin',600,900,true);
+}
+
+function my_openBox(cmd,title,height,width,load) {
+  // open shadowbox window (run in foreground)
+  var run = cmd.split('?')[0].substr(-4)=='.php' ? cmd : '/logging.htm?cmd='+cmd+'&csrf_token=<?=$var['csrf_token']?>';
+  var options = load ? {modal:true,onClose:function(){  changeSortOrder(null,null,null);}} : {modal:true};
+  Shadowbox.open({content:run, player:'iframe', title:title, height:height, width:width, options:options});
 }
 
 function previousApps(button,installed) {

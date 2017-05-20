@@ -40,13 +40,13 @@ $caCredits = "
         <td><font color='SteelBlue'>Application Feed</font></td>
       </tr>
       <tr>
-        <td><img src='http://i.imgur.com/VFMJTol.jpg' width='48px' height='48px'></td>
-        <td><strong><font color='SteelBlue'>Sparklyballs</font></strong></td>
+        <td><img src='https://github.com/Squidly271/plugin-repository/raw/master/minion.thumb.jpg.b6e9d9eebd4588a36dd4511eee285133.jpg' width='48px' height='48px'></td>
+        <td><strong><font color='SteelBlue'>CHBMB</font></strong></td>
         <td><font color='SteelBlue'>Additional Testing</font></td>
       </tr>
       <tr>
-        <td><img src='https://github.com/Squidly271/plugin-repository/raw/master/minion.thumb.jpg.b6e9d9eebd4588a36dd4511eee285133.jpg' width='48px' height='48px'></td>
-        <td><strong><font color='SteelBlue'>CHBMB</font></strong></td>
+        <td><img src='https://forums.lime-technology.com/uploads/monthly_2017_02/kumaavatar.jpg.2c6c0e10ac6852b7f2ef0bc3c88b2299.jpg' width='48px' height='48px'></td>
+        <td><strong><font color='SteelBlue'>gridrunner</font></strong></td>
         <td><font color='SteelBlue'>Additional Testing</font></td>
       </tr>
     </table></center>

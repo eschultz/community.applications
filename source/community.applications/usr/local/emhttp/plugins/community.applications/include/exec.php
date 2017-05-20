@@ -25,8 +25,13 @@ $DockerTemplates = new DockerTemplates();
 $communitySettings = parse_plugin_cfg("$plugin");
 $communitySettings['appFeed']       = "true"; # set default for deprecated setting
 $communitySettings['superCategory'] = "false"; # remove option.  Instead add in mod comments on every beta app.
-
 $communitySettings['maxPerPage'] = getPost("maxPerPage",$communitySettings['maxPerPage']);
+
+# adjust display according to 6.4.0 CSS
+
+$vars = parse_ini_file("/var/local/emhttp/var.ini");
+$unRaid64 = (version_compare($vars['version'],"6.4.0-rc0",">=")) || (is_file("/usr/local/emhttp/plugins/dynamix/styles/dynamix-gray.css"));
+
 
 if ( $communitySettings['favourite'] != "None" ) {
   $officialRepo = str_replace("*","'",$communitySettings['favourite']);
@@ -488,7 +493,7 @@ function display_apps($viewMode,$pageNumber=1) {
 }
 
 function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker,$pageNumber=1) {
-  global $communityPaths, $info, $communitySettings, $plugin;
+  global $communityPaths, $info, $communitySettings, $plugin, $unRaid64;
 
   $pinnedApps = getPinnedApps();
   $iconSize = $communitySettings['iconSize'];
@@ -502,11 +507,12 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker,$pageNumb
   $ct = "<br>".getPageNavigation($pageNumber,count($file),false)."<br>";
   $ct .= $skin[$viewMode]['header'].$skin[$viewMode]['sol'];
   $displayTemplate = $skin[$viewMode]['template'];
-  $communitySettings['maxColumn'] = $communitySettings['maxIconColumns'];
+  if ( $unRaid64 ) {
+    $communitySettings['maxColumn'] = $communitySettings['maxIconColumns'];
+  }
   if ( $viewMode == 'detail' ) {
-#      $communitySettings['maxColumn'] = 2; 
-      $communitySettings['maxColumn'] = $communitySettings['maxDetailColumns'];
-      $communitySettings['viewMode'] = "icon";
+    $communitySettings['maxColumn'] = $unRaid64 ? $communitySettings['maxDetailColumns'] : 2;
+    $communitySettings['viewMode'] = "icon";
   }
   
   $columnNumber = 0;
