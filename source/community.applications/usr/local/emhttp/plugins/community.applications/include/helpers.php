@@ -778,7 +778,7 @@ function toNumericArray($template) {
     $template['display_updateAvail'],     #63  *** NO LONGER USED - USE #38 instead
     $template['display_dateUpdated'],     #64
     $template['display_iconClickable'],   #65
-    $template['display_dockerName'],      #66
+    str_replace("-"," ",$template['display_dockerName']),      #66
     $template['Path'],                    #67
     $template['display_pluginInstallIcon'],#68
     $template['display_dockerDefaultIcon'],#69

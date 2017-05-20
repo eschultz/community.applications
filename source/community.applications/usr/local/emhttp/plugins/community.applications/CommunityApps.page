@@ -135,6 +135,17 @@ var categoryDesc = {
   };
 
 $(function(){
+  $(window).bind('resize', function(e){
+    window.resizeEvt;
+    $(window).resize(function(){
+    $("#templates_content").html("");
+      clearTimeout(window.resizeEvt);
+      window.resizeEvt = setTimeout(function(){
+        changeSortOrder(null,null,null);
+      }, 100);
+    });
+  });
+
   var backtotopoffset = 250;
   var backtotopduration = 500;
   $(window).scroll(function() {
@@ -166,7 +177,7 @@ $(function(){
   }
   $('.ca_staticTips').tooltipster({
     timer:15000,
-    animation:'grow',
+    animation:'none',
     arrow:true,
     trigger:'custom',
     triggerOpen:{mouseenter: true},
@@ -353,7 +364,7 @@ function setToolTip() {
     contentAsHTML:true,
     delay:[<?=$cfg['hoverTime']?>,1],
     timer:15000,
-    animation:'grow',
+    animation:'none',
     arrow:true,
     trigger:'custom',
     triggerOpen:{mouseenter: true},
@@ -363,7 +374,7 @@ function setToolTip() {
     contentAsHTML: true,
     maxWidth:550,
     minWidth:550,
-    animation: 'grow',
+    animation: 'none',
     trigger: 'custom',
     triggerOpen: {mouseenter:true,click:true,touchstart:true},
     triggerClose:{click:true,scroll:true,mouseleave:true},
@@ -384,7 +395,7 @@ function setToolTip() {
     contentAsHTML: true,
     maxWidth:550,
     minWidth:550,
-    animation: 'grow',
+    animation: 'none',
     arrow:true,
     trigger: 'custom',
     triggerOpen: {mouseenter:true,click:true,touchstart:true},
@@ -406,7 +417,7 @@ function setToolTip() {
         contentAsHTML:true,
         delay:[1000,1],
         timer:15000,
-        animation:'grow',
+        animation:'none',
         arrow:true, trigger:'custom',
         triggerOpen:{mouseenter: true},
         triggerClose:{click:true,scroll:true,mouseleave:true}
