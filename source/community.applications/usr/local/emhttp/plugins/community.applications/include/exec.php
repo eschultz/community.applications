@@ -252,7 +252,6 @@ function DownloadApplicationFeed() {
     if ( $o['Plugin'] ) {
       $o['Author']        = $o['PluginAuthor'];
       $o['Repository']    = $o['PluginURL'];
-      $o['PluginURL']     = $o['Repository'];
       $o['Category']      .= " Plugins: ";
       $o['SortAuthor']    = $o['Author'];
       $o['SortName']      = $o['Name'];
@@ -1593,20 +1592,14 @@ case 'previous_apps':
       $filename = pathinfo($template['Repository'],PATHINFO_BASENAME);
 
       if ( file_exists("/var/log/plugins/$filename") ) {
-        $localURL = plugin("pluginURL","/var/log/plugins/$filename");
-        $remoteURL = $template['PluginURL'];
-        if ( $localURL != $remoteURL ) { $localURL = getRedirectedURL($localURL); $remoteURL = getRedirectedURL($remoteURL);} # Get the redirected URL just incase that's the problem
-        if ( $localURL == $remoteURL ) {
-          $template['MyPath'] = "/var/log/plugins/$filename";
-          $template['Uninstall'] = true;
-          if ( checkPluginUpdate($filename) ) {
-            $template['UpdateAvailable'] = true;
-          }
-          if ( $template['Blacklist'] ) {
-            continue;
-          }
-          $displayed[] = $template;
+        if ( $template['Blacklist'] ) {
+          continue;
         }
+        $template['MyPath'] = "/var/log/plugins/$filename";
+        $template['Uninstall'] = true;
+        $template['UpdateAvailable'] = checkPluginUpdate($filename);
+
+        $displayed[] = $template;
       }
     }
   } else {
@@ -1616,11 +1609,12 @@ case 'previous_apps':
       foreach ($file as $template) {
         if ( $oldplug == pathinfo($template['Repository'],PATHINFO_BASENAME) ) {
           if ( ! file_exists("/boot/config/plugins/$oldplug") ) {
-            $template['Removable'] = true;
-            $template['MyPath'] = "/boot/config/plugins-removed/$oldplug";
             if ( $template['Blacklist'] ) {
               continue;
             }
+            $template['Removable'] = true;
+            $template['MyPath'] = "/boot/config/plugins-removed/$oldplug";
+
             $displayed[] = $template;
             break;
           }
@@ -1631,7 +1625,6 @@ case 'previous_apps':
 
   $displayedApplications['community'] = $displayed;
   writeJsonFile($communityPaths['community-templates-displayed'],$displayedApplications);
-  logger("finished");
   echo "ok";
   break;
 
@@ -1661,6 +1654,25 @@ case 'uninstall_application':
   echo "ok";
   break;
 
+case 'updatePLGstatus':
+  $filename = getPost("filename","");
+  $displayed = readJsonFile($communityPaths['community-templates-displayed']);
+  $superCategories = array_keys($displayed);
+  foreach ($superCategories as $category) {
+    foreach ($displayed[$category] as $template) {
+      if ( strpos($template['PluginURL'],$filename) ) {
+        $template['UpdateAvailable'] = checkPluginUpdate($filename);
+      }
+      $newDisplayed[$category][] = $template;
+    }
+  }
+  writeJsonFile($communityPaths['community-templates-displayed'],$newDisplayed);
+  echo "ok";
+  break;
+  
+            
+  
+  
 #######################
 #                     #
 # Uninstalls a docker #

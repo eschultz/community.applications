@@ -179,7 +179,7 @@ Enable additional search results from dockerHub?
 : <input type="submit" name="#apply" value="Apply" id='Apply'><input type="button" id="DONE" value="Done" onclick="done()">
 
 
-<center>For support for this plugin, visit here: <a href="http://lime-technology.com/forum/index.php?topic=40262.0" target="_blank">http://lime-technology.com/forum/index.php?topic=40262.0</a></center>
+<center>For support for this plugin, visit here: <a href="https://forums.lime-technology.com/topic/38582-plug-in-community-applications/" target="_blank">https://forums.lime-technology.com/topic/38582-plug-in-community-applications/</a></center>
 
 </form>
 > <center><a href='https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7M7CBCVU732XG' target='_blank'><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif"></a></center>

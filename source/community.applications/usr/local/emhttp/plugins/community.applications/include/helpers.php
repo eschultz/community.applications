@@ -34,7 +34,6 @@ function my_parse_ini_string($string, $mode=false,$scanner_mode=INI_SCANNER_NORM
 function checkPluginUpdate($filename) {
   global $unRaidVersion;
 
-  logger($filename);
   $filename = basename($filename);
   $installedVersion = plugin("version","/var/log/plugins/$filename");
   if ( is_file("/tmp/plugins/$filename") ) {
@@ -331,7 +330,10 @@ function fixTemplates($template) {
   if ( is_array($template['PluginURL']) ) {                  # due to coppit
     $template['PluginURL'] = $template['PluginURL'][1];
   }
-
+  if ( $template['PluginURL'] ) {                            # due to bonienl
+    $template['PluginURL'] = str_replace("raw.github.com","raw.githubusercontent.com",$template['PluginURL']);
+    $template['Repository'] = $template['PluginURL'];
+  }
   if ( strlen($template['Overview']) > 0 ) {
     $template['Description'] = $template['Overview'];
     $template['Description'] = preg_replace('#\[([^\]]*)\]#', '<$1>', $template['Description']);
@@ -479,72 +481,11 @@ function readXmlFile($xmlfile) {
   }
   if ( $o['Plugin'] ) {
     $o['Author']     = $o['PluginAuthor'];
-    $o['Repository'] = getRedirectedURL($o['PluginURL']);
-    $o['Category']   .= " Plugins: ";
-    $o['SortAuthor'] = $o['Author'];
-    $o['SortName']   = $o['Name'];
-  }
-  return $o;
-  
-/*   $doc = new DOMDocument();
-  @$doc->load($xmlfile);
-  if ( ! $doc ) { return false; }
-
-  if ($doc->getElementsByTagName( "Branch" )->item(0)->nodeValue) {
-    var_dump($doc->getElementsByTagName("Branch"));
-  }
-  $o['Path']        = $xmlfile;
-  $o['Repository']  = stripslashes($doc->getElementsByTagName( "Repository" )->item(0)->nodeValue);
-  $o['Author']      = preg_replace("#/.*#", "", $o['Repository']);
-  $o['Name']        = stripslashes($doc->getElementsByTagName( "Name" )->item(0)->nodeValue);
-  $o['DockerHubName'] = strtolower($o['Name']);
-  $o['Beta']        = strtolower(stripslashes($doc->getElementsByTagName( "Beta" )->item(0)->nodeValue));
-  $o['Base']        = $doc->getElementsByTagName( "BaseImage" )->item(0)->nodeValue;
-  $o['Changes']     = $doc->getElementsByTagName( "Changes" )->item(0)->nodeValue;
-  $o['Date']        = $doc->getElementsByTagName( "Date" ) ->item(0)->nodeValue;
-  $o['Project']     = $doc->getElementsByTagName( "Project" ) ->item(0)->nodeValue;
-  $o['SortAuthor']  = $o['Author'];
-  $o['SortName']    = $o['Name'];
-  $o['MinVer']      = $doc->getElementsByTagName( "MinVer" ) ->item(0)->nodeValue;
-  $o['MaxVer']      = $doc->getElementsByTagName( "MaxVer" ) ->item(0)->nodeValue;
-  $o['Overview']    = $doc->getElementsByTagName("Overview")->item(0)->nodeValue;
-  if ( strlen($o['Overview']) > 0 ) {
-    $o['Description'] = stripslashes($doc->getElementsByTagName( "Overview" )->item(0)->nodeValue);
-    $o['Description'] = preg_replace('#\[([^\]]*)\]#', '<$1>', $o['Description']);
-  } else {
-    $o['Description'] = $doc->getElementsByTagName( "Description" )->item(0)->nodeValue;
-    $o['Description'] = fixDescription($o['Description']);
-  }
-  $o['Plugin']      = $doc->getElementsByTagName( "Plugin" ) ->item(0)->nodeValue;
-  $o['PluginURL']   = $doc->getElementsByTagName( "PluginURL" ) ->item(0)->nodeValue;
-  $o['PluginAuthor']= $doc->getElementsByTagName( "PluginAuthor" ) ->item(0)->nodeValue;
-
-# support both spellings
-  $o['Licence']     = $doc->getElementsByTagName( "License" ) ->item(0)->nodeValue;
-  $o['Licence']     = $doc->getElementsByTagName( "Licence" ) ->item(0)->nodeValue;
-  $o['Category']    = $doc->getElementsByTagName ("Category" )->item(0)->nodeValue;
-
-  if ( $o['Plugin'] ) {
-    $o['Author']     = $o['PluginAuthor'];
     $o['Repository'] = $o['PluginURL'];
     $o['Category']   .= " Plugins: ";
     $o['SortAuthor'] = $o['Author'];
     $o['SortName']   = $o['Name'];
   }
-  $o['Description'] = preg_replace('#\[([^\]]*)\]#', '<$1>', $o['Description']);
-  $o['Overview']    = $doc->getElementsByTagName("Overview")->item(0)->nodeValue;
-
-  $o['Forum']       = $Repo['forum'];
-  $o['Support']     = ($doc->getElementsByTagName( "Support" )->length ) ? $doc->getElementsByTagName( "Support" )->item(0)->nodeValue : $Repo['forum'];
-  $o['Support']     = $o['Support'];
-  $o['Icon']        = stripslashes($doc->getElementsByTagName( "Icon" )->item(0)->nodeValue);
-  $o['DonateText']  = $doc->getElementsByTagName("DonateText")->item(0)->nodeValue;
-  $o['DonateLink']  = $doc->getElementsByTagName( "DonateLink")->item(0)->nodeValue;
-  if ( $doc->getElementsByTagName("DonateImage")->item(0)->nodeValue ) {
-    $o['DonateImg'] = $doc->getElementsByTagName( "DonateImage")->item(0)->nodeValue;
-  } else {
-    $o['DonateImg']   = $doc->getElementsByTagName( "DonateImg")->item(0)->nodeValue;
-  } */
   return $o;
 }
 
