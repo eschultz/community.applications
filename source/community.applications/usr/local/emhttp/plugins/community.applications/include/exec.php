@@ -1631,6 +1631,7 @@ case 'previous_apps':
 
   $displayedApplications['community'] = $displayed;
   writeJsonFile($communityPaths['community-templates-displayed'],$displayedApplications);
+  logger("finished");
   echo "ok";
   break;
 

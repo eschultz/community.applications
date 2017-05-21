@@ -917,13 +917,13 @@ function clearSearchBox() {
 
 function installPlugin(pluginURL) {
   $(".ca_appPopup").tooltipster('close');
-  my_openBox('/plugins/dynamix.plugin.manager/scripts/plugin&arg1=install&arg2='+pluginURL,'Install Plugin',600,900,true);
+  my_openBox('/plugins/dynamix.plugin.manager/scripts/plugin&arg1=install&arg2='+pluginURL,'Install Plugin',600,900,true,"changeSortOrder(null,null,null)");
 }
 
-function my_openBox(cmd,title,height,width,load) {
+function my_openBox(cmd,title,height,width,load,func) {
   // open shadowbox window (run in foreground)
   var run = cmd.split('?')[0].substr(-4)=='.php' ? cmd : '/logging.htm?cmd='+cmd+'&csrf_token=<?=$var['csrf_token']?>';
-  var options = load ? {modal:true,onClose:function(){  changeSortOrder(null,null,null);}} : {modal:true};
+  var options = load ? {modal:true,onClose:function(){ eval(func); }} : {modal:true};
   Shadowbox.open({content:run, player:'iframe', title:title, height:height, width:width, options:options});
 }
 
@@ -1142,7 +1142,10 @@ function calculateAppdataSize() {
 
 function installPLGupdate(filename,plgName) {
   $(".ca_appPopup").tooltipster('close');
-  my_openBox('/plugins/community.applications/scripts/updatePLG.sh&arg1='+filename,'Update '+plgName,600,900,false);
+  my_openBox('/plugins/community.applications/scripts/updatePLG.sh&arg1='+filename,'Update '+plgName,600,900,true,"checkPLGupdate(filename)");
+}
+function checkPLGupdate(filename) {
+  $("#debugging").html(filename);
 }
 
 function startCadvisor() {

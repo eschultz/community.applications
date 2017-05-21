@@ -34,6 +34,7 @@ function my_parse_ini_string($string, $mode=false,$scanner_mode=INI_SCANNER_NORM
 function checkPluginUpdate($filename) {
   global $unRaidVersion;
 
+  logger($filename);
   $filename = basename($filename);
   $installedVersion = plugin("version","/var/log/plugins/$filename");
   if ( is_file("/tmp/plugins/$filename") ) {
@@ -43,7 +44,7 @@ function checkPluginUpdate($filename) {
   }
   if ( $installedVersion < $upgradeVersion ) {
     $unRaid = plugin("unRAID","/tmp/plugins/$filename");
-    if ( $unRaid === false || version_compare($unRaidVersion['version'],$unRaid,">=") ) {
+    if ( $unRaid === false || version_compare($unRaidVersion,$unRaid,">=") ) {
       return true;
     } else {
       return false;
