@@ -43,7 +43,6 @@ if ( $communitySettings['favourite'] != "None" ) {
   $separateOfficial = true;
 #  $communitySettings['maxPerPage'] = "-1";  # Pages do not work when favourite repos are set.  Really need to think about how to do it better
 }
-
 if ( is_dir("/var/lib/docker/containers") ) {
   $communitySettings['dockerRunning'] = "true";
 } else {
