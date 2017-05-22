@@ -200,7 +200,7 @@ $(function(){
     animation: 'fade',
     arrow: true,
     delay: [1000, 2000],
-    triggerClose:{click:true,scroll:true,mouseleave:true,delay:1},
+    triggerClose:{click:true,scroll:true,mouseleave:true,delay:1000},
     interactive: true,
     viewportAware: true,
     functionBefore: function(instance,helper) {
