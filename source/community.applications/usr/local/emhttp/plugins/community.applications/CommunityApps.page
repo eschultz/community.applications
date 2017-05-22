@@ -137,24 +137,27 @@ var categoryDesc = {
   All: "All Available Applications"
   };
 
-$(function(){
-  $("#sortorder").attr("data-oldWindowWidth",getWindowWidth());
+function resizeDisplay() {
   <?if ( $unRaid64 == "true" ) : ?>            // function to resize everything on demand
-  $(window).bind('resize', function(e){
-    window.resizeEvt;
-    $(window).resize(function(){
-      var newWidth = getWindowWidth();
-      var oldWidth = $("#sortorder").attr("data-oldWindowWidth");
-      $("#sortorder").attr("data-oldWindowWidth",newWidth);
-      $("#templates_content").html("");
-      clearTimeout(window.resizeEvt);
-      window.resizeEvt = setTimeout(function(){
-        $("#templates_content").html(" ");
-        changeSortOrder(null,null,null);
-      }, 100);
-    });
+  window.resizeEvt;
+  $(window).resize(function(){
+    var newWidth = getWindowWidth();
+    var oldWidth = $("#sortorder").attr("data-oldWindowWidth");
+    $("#sortorder").attr("data-oldWindowWidth",newWidth);
+    if ( Math.floor( newWidth / 200 ) == Math.floor( oldWidth / 200 ) ) { return; }
+    $("#templates_content").html("");
+    clearTimeout(window.resizeEvt);
+    window.resizeEvt = setTimeout(function(){
+      $("#templates_content").html(" ");
+      changeSortOrder(null,null,null);
+    }, 100);
   });
   <?endif;?>
+}
+
+$(function(){
+  $("#sortorder").attr("data-oldWindowWidth",getWindowWidth());
+
 
   var backtotopoffset = 250;
   var backtotopduration = 500;
@@ -1225,6 +1228,7 @@ function displayTags(leadTemplate) {
 }
 </script>
 <FORM method="get" id="myForm">
+<body onresize='resizeDisplay();'>
 > For help with this plugin, click here (a new tab will open with the help file)  <strong><font size="2"><a href="Settings/caHelp" target="_blank">HELP</a></font></strong><br>
 > <img src='/plugins/community.applications/images/SectionIcon.png' height='50px'> - This chooses which "section" to display (Available Apps, Installed Apps, Previously Installed Apps, Pinned Apps, additional CA Modules<br>
 
@@ -1348,6 +1352,7 @@ Sort Direction:
 </div>
 </span>
 <span id='sortorder' data-sortorder='' data-docker='' data-section='AppStore' data-main_category='MainCategory'></span>
+</body>
 </FORM>
 <span id='debugging'></span>
 

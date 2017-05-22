@@ -734,27 +734,38 @@ function appOfDay($file) {
   $currentDay = intval(time() / 86400);
   if ( $oldAppDay == $currentDay ) {
     $app = readJsonFile($communityPaths['appOfTheDay']);
-    if ( $app ) $flag = true;
   }
-  
-  while ( true ) {
-    if ( ! $flag ) {
-      $app[0] = mt_rand(0,count($file) -1);
-      $app[1] = mt_rand(0,count($file) -1);
+  if ( ! $app ) {
+    for ( $ii=0; $ii<10; $ii++ ) {
+      $flag = false;
+      if ( $app[$ii] ) {
+        $flag = checkRandomApp($app[$ii]);
+      }
+      if ( ! $flag ) {
+        while (true ) {
+          $randomApp = mt_rand(0,count($file) -1);
+          $flag = checkRandomApp($randomApp);
+          if ( $flag ) {
+            break;
+          }
+        }
+      }
+      $app[$ii] = $randomApp;
     }
-    $flag = false;
-    if ($app[0] == $app[1]) continue;
-    if ( ! $file[$app[0]]['Displayable'] || ! $file[$app[1]]['Displayable'] ) continue;
-    if ( ! $file[$app[0]]['Compatible'] || ! $file[$app[1]]['Compatible'] ) continue;
-    if ( $file[$app[0]]['Blacklist'] || $file[$app[1]]['Blacklist'] ) continue;
-    if ( $file[$app[0]]['ModeratorComment'] || $file[$app[1]]['ModeratorComment'] ) continue;
-    if ( $file[$app[0]]['Deprecated'] || $file[$app[1]]['Deprecated'] ) continue;
-    break;
   }
   writeJsonFile($communityPaths['appOfTheDay'],$app);
   return $app;
 }
+function checkRandomApp($randomApp) {
+  global $file;
 
+  if ( ! $file[$randomApp]['Displayable'] ) return false;
+  if ( ! $file[$randomApp]['Compatible'] ) return false;
+  if ( $file[$randomApp]['Blacklist'] ) return false;
+  if ( $file[$randomApp]['ModeratorComment'] ) return false;
+  if ( $file[$randomApp]['Deprecated'] ) return false;
+  return true;
+}
 ##########################################################################
 #                                                                        #
 # function that comes up with alternate search suggestions for dockerHub #
@@ -991,7 +1002,10 @@ case 'get_content':
       $displayApplications = array();
       if ( count($file) > 200) {
         $appsOfDay = appOfDay($file);
-        $displayApplications['community'] = array($file[$appsOfDay[0]],$file[$appsOfDay[1]]);
+        for ($i=0;$i<$communitySettings['maxDetailColumns'];$i++) {
+          $displayApplications['community'][] = $file[$appsOfDay[$i]];
+        }
+#        $displayApplications['community'] = array($file[$appsOfDay[0]],$file[$appsOfDay[1]]);
         writeJsonFile($communityPaths['community-templates-displayed'],$displayApplications);
         echo "<script>$('#templateSortButtons,#sortButtons').hide();enableIcon('#sortIcon',false);</script>";
         echo "<br><center><font size='4' color='purple'><b>Random Apps Of The Day</b></font><br><br>";
