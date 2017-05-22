@@ -7,9 +7,6 @@
 require_once("/usr/local/emhttp/plugins/community.applications/include/paths.php");
 require_once("/usr/local/emhttp/plugins/dynamix/include/Wrappers.php");
 
-$unRaidSettings = my_parse_ini_file($communityPaths['unRaidVersion']);
-$unRaidVersion = $unRaidSettings['version'];
-if ($unRaidVersion == "6.2") $unRaidVersion = "6.2.0";
 
 ####################################################################################################
 #                                                                                                  #
@@ -634,10 +631,10 @@ function getRedirectedURL($url) {
 ###########################################################
 
 function getMaxColumns($windowWidth) {
-  global $communitySettings;
+  global $communitySettings, $templateSkin;
   
-  $communitySettings['maxDetailColumns'] = floor($windowWidth / 600);
-  $communitySettings['maxIconColumns'] = floor($windowWidth / 250);
+  $communitySettings['maxDetailColumns'] = floor($windowWidth / $templateSkin['detail']['templateWidth']);
+  $communitySettings['maxIconColumns'] = floor($windowWidth / $templateSkin['icon']['templateWidth']);
   if ( ! $communitySettings['maxDetailColumns'] ) $communitySettings['maxDetailColumns'] = 1;
   if ( ! $communitySettings['maxIconColumns'] ) $communitySettings['maxIconColumns'] = 1;
 }

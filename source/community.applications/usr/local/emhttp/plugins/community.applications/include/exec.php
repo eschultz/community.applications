@@ -16,6 +16,12 @@ require_once("/usr/local/emhttp/plugins/community.applications/include/xmlHelper
 $plugin = "community.applications";
 $DockerTemplates = new DockerTemplates();
 
+$unRaidSettings = my_parse_ini_file($communityPaths['unRaidVersion']);
+$unRaidVersion = $unRaidSettings['version'];
+if ($unRaidVersion == "6.2") $unRaidVersion = "6.2.0";
+
+$templateSkin = readJsonFile($communityPaths['defaultSkin']);
+
 ################################################################################
 #                                                                              #
 # Set up any default settings (when not explicitely set by the settings module #
@@ -647,7 +653,7 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker,$pageNumb
   $ct .= $skin[$viewMode]['footer'];
   $ct .= caGetMode();
   if ( ! $officialFlag ) {
-    $ct .= "<br>".getPageNavigation($pageNumber,count($file),false)."<br>";
+    $ct .= "<br>".getPageNavigation($pageNumber,count($file),false)."<br><br><br>";
   }
 
   return $ct;
