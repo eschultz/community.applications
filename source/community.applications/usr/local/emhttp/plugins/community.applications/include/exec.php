@@ -31,7 +31,6 @@ $templateSkin = readJsonFile($communityPaths['defaultSkin']);
 $communitySettings = parse_plugin_cfg("$plugin");
 $communitySettings['appFeed']       = "true"; # set default for deprecated setting
 $communitySettings['maxPerPage'] = getPost("maxPerPage",$communitySettings['maxPerPage']);
-
 # adjust display according to 6.4.0 CSS
 
 $vars = parse_ini_file("/var/local/emhttp/var.ini");
@@ -77,7 +76,7 @@ if (!is_link("/usr/local/emhttp/state/plugins/$plugin")) symlink($communityPaths
 #################################################################
 
 function DownloadCommunityTemplates() {
-  global $communityPaths, $infoFile, $plugin, $communitySettings;
+  global $communityPaths, $infoFile, $plugin, $communitySettings, $statistics;
 
   $betaComment = "<font color='purple'>The author of this template has designated it to be a beta.  You may experience issues with this application</font>";
   $moderation = readJsonFile($communityPaths['moderation']);
@@ -94,6 +93,8 @@ function DownloadCommunityTemplates() {
   if ( ! is_array($Repos) ) {
     return false;
   }
+  $statistics['repository'] = count($Repos);
+  
   $appCount = 0;
   $myTemplates = array();
 
@@ -133,7 +134,10 @@ function DownloadCommunityTemplates() {
         }
         if ( ! $o['Repository'] ) {
           if ( ! $o['Plugin'] ) {
+            $statistics['invalidXML']++;
             continue;
+          } else {
+            $statistics['totalApplications']++;
           }
         }
         
@@ -163,6 +167,13 @@ function DownloadCommunityTemplates() {
           } else {
             $o['ModeratorComment'] = $betaComment;
           }
+        }
+        if ( $o['Blacklist'] ) {
+          $statistics['blacklist']++;
+          unset($o);
+          continue;
+        } else {
+          $statistics['totalApplications']++;
         }
         $o['Category'] = str_replace("Status:Beta","",$o['Category']);    # undo changes LT made to my xml schema for no good reason
         $o['Category'] = str_replace("Status:Stable","",$o['Category']);
@@ -202,6 +213,7 @@ function DownloadCommunityTemplates() {
       }
     }
   }
+  writeJsonFile($communityPaths['statistics'],$statistics);
   writeJsonFile($communityPaths['community-templates-info'],$myTemplates);
   file_put_contents($communityPaths['LegacyMode'],"active");
   return true;
@@ -210,18 +222,20 @@ function DownloadCommunityTemplates() {
 #  DownloadApplicationFeed MUST BE CALLED prior to DownloadCommunityTemplates in order for private repositories to be merged correctly.
 
 function DownloadApplicationFeed() {
-  global $communityPaths, $infoFile, $plugin, $communitySettings;
+  global $communityPaths, $infoFile, $plugin, $communitySettings, $statistics;
 
   $betaComment = "<font color='purple'>The author of this template has designated it to be a beta.  You may experience issues with this application</font>";
   $moderation = readJsonFile($communityPaths['moderation']);
   if ( ! is_array($moderation) ) {
     $moderation = array();
   }
+  $statistics['moderation'] = count($moderation);
 
   $Repositories = readJsonFile($communityPaths['Repositories']);
   if ( ! $Repositories ) {
     $Repositories = array();
   }
+  $statistics['repository'] = count($Repositories);
   $downloadURL = randomFile();
 
   if ($download = download_url($communityPaths['application-feed'],$downloadURL) ){
@@ -232,13 +246,15 @@ function DownloadApplicationFeed() {
 
   unlink($downloadURL);
   $i = 0;
-
+  $statistics['totalApplications'] = count($ApplicationFeed['applist']);
+  
   $myTemplates = array();
 
   foreach ($ApplicationFeed['applist'] as $file) {
     if ( ! $file['Repository'] ) {
       if ( ! $file['Plugin'] ) {
-      continue;
+        $statistics['invalidXML']++;
+        continue;
       }
     }
     unset($o);
@@ -260,6 +276,9 @@ function DownloadApplicationFeed() {
       $o['Category']      .= " Plugins: ";
       $o['SortAuthor']    = $o['Author'];
       $o['SortName']      = $o['Name'];
+      $statistics['plugin']++;
+    } else {
+      $statistics['docker']++;
     }
     $RepoIndex = searchArray($Repositories,"name",$o['RepoName']);
     if ( $RepoIndex != false ) {
@@ -287,6 +306,7 @@ function DownloadApplicationFeed() {
       $file = array_merge($file, $moderation[$o['Repository']]);
     }
     if ($o['Blacklist']) {
+      $statistics['blacklist']++;
       unset($o);
       continue;
     }
@@ -345,6 +365,7 @@ function DownloadApplicationFeed() {
     $templateXML = makeXML($file);
     file_put_contents($o['Path'],$templateXML);
   }
+  writeJsonFile($communityPaths['statistics'],$statistics);
   writeJsonFile($communityPaths['community-templates-info'],$myTemplates);
   @unlink($communityPaths['LegacyMode']);
   return true;
@@ -2020,6 +2041,53 @@ case 'populateModules':
   writeJsonFile($communityPaths['community-templates-displayed'],$displayed);  
   echo "done";
   break;
-  
+case 'statistics':
+  $statistics = readJsonFile($communityPaths['statistics']);
+  $moderation = readJsonFile($communityPaths['moderation']);
+  $statistics['totalModeration'] = count($moderation);
+  foreach ($moderation as $mod) {
+    if ($mod['Blacklist'] ) {$statistics['completeBlacklist']++;}
+    if ($mod['Deprecated'] ) { $statistics['totalDeprecated']++;}
+  }
+  if ( is_file($communityPaths['lastUpdated-old']) ) {
+    $appFeedTime = readJsonFile($communityPaths['lastUpdated-old']);
+  } else {
+    $appFeedTime['last_updated_timestamp'] = filemtime($communityPaths['community-templates-info']);
+  }
+  $updateTime = date("F d Y H:i",$appFeedTime['last_updated_timestamp']);
+  $updateTime = ( is_file($communityPaths['LegacyMode']) ) ? "N/A - Legacy Mode Active<br>Statistics Not Populated" : $updateTime;
+
+  $color = "<font color='coral'>";
+  echo "<div style='overflow:scroll; max-height:550px; height:550px; overflow-x:hidden; overflow-y:auto;'><center><img src='/plugins/community.applications/images/CA.png'><br><font size='6' color='white'>Community Applications</font><br><br>";
+  echo "<center><font size='3'>Application Feed Statistics</font></center><br><br>";
+  echo "<table>";
+  echo "<tr>";
+  echo "<td><b>{$color}Application List Current As Of</b></td><td>$color$updateTime</td>";
+  echo "</tr><tr>";
+  echo "<td><b>{$color}Total Number Of Templates</b></td><td>$color{$statistics['totalApplications']}</td>";
+  echo "</tr><tr>";
+  echo "<td><b>{$color}Total Number Of Repositories</b></td><td>$color{$statistics['repository']}</td>";
+  echo "</tr><tr>";
+  echo "<td><b>{$color}Total Number Of Docker Applications</b></td><td>$color{$statistics['docker']}</td>";
+  echo "</tr><tr>";
+  echo "<td><b>{$color}Total Number Of Plugins</b></td><td>$color{$statistics['plugin']}</td>";
+  echo "</tr><tr>";
+  echo "<td><b>{$color}Total Number Of Template Errors Fixed Automatically</b></td><td>$color{$statistics['caFixed']}</td>";
+  echo "</tr><tr>";
+  echo "<td><b>{$color}Total Number Of Invalid Templates</b></td><td>$color{$statistics['invalidXML']}</td>";
+  echo "</tr><tr>";
+  echo "<td><b>{$color}Total Number Of Blacklisted Applications Found In Appfeed</b></td><td>$color{$statistics['blacklist']}</td>";
+  echo "</tr><tr>";
+  echo "<td><b>{$color}Total Number Of Blacklisted Applications</b></td><td>$color{$statistics['completeBlacklist']}</td>";
+  echo "</tr><tr>";
+  echo "<td><b>{$color}Total Number Of Deprecated Applications</b></td><td>$color{$statistics['totalDeprecated']}</td>";
+  echo "</tr><tr>";
+  echo "<td><b>{$color}Total Number Of Moderation Entries</b></td><td>$color{$statistics['totalModeration']}</td>";
+  echo "</tr>";
+  echo "</table>";
+  echo "<center><a href='https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7M7CBCVU732XG' target='_blank'><img height='25px' src='https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif'></a></center>";
+  echo "<center>Ensuring only safe applications are present is a full time job</center><br>";
+
+  break;
 }
 ?>

@@ -287,14 +287,27 @@ function highlight($text, $search) {
 ########################################################
 
 function fixTemplates($template) {
+  global $statistics;
+  
   if ( is_array($template['Support']) ) {
     unset($template['Support']);
+    $statistics['caFixed']++;
   }
-  if ( ! is_string($template['Name'])  ) $template['Name']=" ";
-  if ( ! is_string($template['Author']) ) $template['Author']=" ";
-  if ( ! is_string($template['Description']) ) $template['Description']=" "; 
+  if ( ! is_string($template['Name'])  ) {
+    $template['Name']=" ";
+    $statistics['caFixed']++;
+  }
+  if ( ! is_string($template['Author']) ) { 
+    $template['Author']=" ";
+    $statistics['caFixed']++;
+  }    
+  if ( ! is_string($template['Description']) ) { 
+    $template['Description']=" "; 
+    $statistics['caFixed']++;
+  }    
   if ( is_array($template['Beta']) ) {
     $template['Beta'] = "false";
+    $statistics['caFixed']++;
   } else {
     $template['Beta'] = strtolower(stripslashes($template['Beta']));
   }
@@ -305,13 +318,16 @@ function fixTemplates($template) {
   }
   if ( ! is_string($template['Description']) ) {
     $template['Description'] = "";
+    $statistics['caFixed']++;
   }
   if ( is_array($template['Category']) ) {
     $template['Category'] = $template['Category'][0];        # due to lsio / CHBMB
+    $statistics['caFixed']++;
   }
   $template['Category'] = $template['Category'] ? $template['Category'] : "Uncategorized";
   if ( ! is_string($template['Category']) ) {
     $template['Category'] = "Uncategorized";
+    $statistics['caFixed']++;
   }
   
   if ( !is_string($template['Overview']) ) {
@@ -320,12 +336,15 @@ function fixTemplates($template) {
   if ( is_array($template['SortAuthor']) ) {                 # due to cmer
     $template['SortAuthor'] = $template['SortAuthor'][0];
     $template['Author'] = $template['SortAuthor'];
+    $statistics['caFixed']++;
   }
   if ( is_array($template['Repository']) ) {                 # due to cmer
     $template['Repository'] = $template['Repository'][0];
+    $statistics['caFixed']++;
   }
   if ( is_array($template['PluginURL']) ) {                  # due to coppit
     $template['PluginURL'] = $template['PluginURL'][1];
+    $statistics['caFixed']++;
   }
   if ( $template['PluginURL'] ) {                            # due to bonienl
     $template['PluginURL'] = str_replace("raw.github.com","raw.githubusercontent.com",$template['PluginURL']);
@@ -358,8 +377,8 @@ function fixTemplates($template) {
       $template['Category'] .= " Status:Beta";
     }
   }
-  $template['PopUpDescription'] = fixPopUpDescription($template['Description']);
 
+  $template['PopUpDescription'] = fixPopUpDescription($template['Description']);
   return $template;
 }
 
@@ -451,6 +470,8 @@ function versionCheck($template) {
 ###############################################
 
 function readXmlFile($xmlfile) {
+  global $statistics;
+  
   $xml = file_get_contents($xmlfile);
   $o = TypeConverter::xmlToArray($xml,TypeConverter::XML_GROUP);
   if ( ! $o ) { return false; }
@@ -482,6 +503,9 @@ function readXmlFile($xmlfile) {
     $o['Category']   .= " Plugins: ";
     $o['SortAuthor'] = $o['Author'];
     $o['SortName']   = $o['Name'];
+    $statistics['plugin']++;
+  } else {
+    $statistics['docker']++;
   }
   return $o;
 }
