@@ -662,8 +662,32 @@ function getMaxColumns($windowWidth) {
   if ( ! $communitySettings['maxDetailColumns'] ) $communitySettings['maxDetailColumns'] = 1;
   if ( ! $communitySettings['maxIconColumns'] ) $communitySettings['maxIconColumns'] = 1;
 }
-  
 
+#######################
+#                     #
+# Creates an ini file #
+#                     #
+#######################
+
+function create_ini_file($settings,$mode=false) {
+  if ( $mode ) {
+    $keys = array_keys($settings);
+
+    foreach ($keys as $key) {
+      $iniFile .= "[$key]\r\n";
+      $entryKeys = array_keys($settings[$key]);
+      foreach ($entryKeys as $entry) {
+        $iniFile .= $entry.'="'.$settings[$key][$entry].'"'."\r\n";
+      }
+    }
+  } else {
+    $entryKeys = array_keys($settings);
+    foreach ($entryKeys as $entry) {
+      $iniFile .= $entry.'="'.$settings[$entry].'"'."\r\n";
+    }
+  }
+  return $iniFile;
+}
 
 ############################################################################
 #                                                                          #

@@ -2087,7 +2087,15 @@ case 'statistics':
   echo "</table>";
   echo "<center><a href='https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7M7CBCVU732XG' target='_blank'><img height='25px' src='https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif'></a></center>";
   echo "<center>Ensuring only safe applications are present is a full time job</center><br>";
-
+  break;
+case 'changeSettings':
+  file_put_contents($communityPaths['pluginSettings'],create_ini_file($communitySettings,false));
+  echo "settings updated";
+  break;
+case 'changeViewModeSettings':
+  $communitySettings['viewMode'] = getPost("view",$communitySettings['viewMode']);
+  file_put_contents($communityPaths['pluginSettings'],create_ini_file($communitySettings,false));
+  echo "ok";
   break;
 }
 ?>

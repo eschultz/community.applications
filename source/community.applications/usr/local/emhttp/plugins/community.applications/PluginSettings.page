@@ -62,15 +62,6 @@ Time to display applications as new / updated:
 
 > This setting determines how long an application will be displayed as "new"
 
-Initial View Mode:
-: <select name="viewMode" size="1">
-  <?=mk_option($cfg['viewMode'], "table", "Tables")?>
-  <?=mk_option($cfg['viewMode'], "detail", "Icons Details (Default)")?>
-  <?=mk_option($cfg['viewMode'], "icon", "Icons")?>
-  </select>
-
-> This setting determines the view mode when initially loading the docker tab
-
 Hover Time delay (miliseconds):
 : <input type="number" name="hoverTime" class="narrow" maxlength="5" value="<?=$cfg['hoverTime']?>" placeholder="1000">
 
@@ -104,17 +95,6 @@ Number of columns (icon mode only):
   </select>
 
 > This setting determines changes the number of columns displayed in icon mode.
-
-Default Number Of Results Per Page:
-: <select name='maxPerPage' size='1'>
-  <?=mk_option($cfg['maxPerPage'], "10", "10 (default)")?>
-  <?=mk_option($cfg['maxPerPage'], "25", "25")?>
-  <?=mk_option($cfg['maxPerPage'], "50", "50")?>
-  <?=mk_option($cfg['maxPerPage'], "75", "75")?>
-  <?=mk_option($cfg['maxPerPage'], "100", "100")?>
-  </select>
-  
-> This setting determines how many results per page to display
 
 <!-- Group Beta and Private Apps into "Super Categories":
 : <select name="superCategory" size="1">

@@ -158,7 +158,6 @@ function resizeDisplay() {
 $(function(){
   $("#sortorder").attr("data-oldWindowWidth",getWindowWidth());
 
-
   var backtotopoffset = 250;
   var backtotopduration = 500;
   $(window).scroll(function() {
@@ -224,7 +223,8 @@ $(function(){
       instance.content(displayContent);
     },
     functionReady: function(instance,helper) {
-      $(".viewButton,.sortButton,.dirButton").click(function() { changeSortOrder(this.id,$(this).attr("class")); });
+      $(".viewButton").click(function() { updateViewMode(this.id,$(this).attr("class")); });
+      $(".sortButton,.dirButton").click(function() { changeSortOrder(this.id,$(this).attr("class")); });
       $(".resourceSort,.resourceDir").click(function() { changeResource(this.id,$(this).attr("class")); });
     },
     functionAfter: function(instance,helper) {
@@ -353,12 +353,9 @@ $(function(){
   });      
   
   $("#monitor").click(function()                           { Monitor(); });
-  $(".viewButton,.sortButton,.dirButton").click(function() { changeSortOrder(this.id,$(this).attr("class")); });
-  $(".resourceSort,.resourceDir").click(function()         { changeResource(this.id,$(this).attr("class")); });
   $("#calculateAppdata").click(function()                  { calculateAppdataSize(); });
   $(".initDockerSearch").click(function()                  { initDockerSearch(); });
   $(".moduleButton").click(function()                      { caModules(); });
-  $(".allButtons").click(function()                        { changeCategory(this); });
   myAlert("Updating Content","Retrieving the latest application Lists","/plugins/community.applications/images/spinner2.gif","40x40");
   $.post(URL,{action:'force_update'});
 
@@ -1246,6 +1243,28 @@ function displayTags(leadTemplate) {
     }
   });
 }
+
+function changeDisplayed() {
+  var maxPerPage = $("#maxPerPage").val();
+  $.post(URL,{action:'changeSettings',maxPerPage:maxPerPage},function(data) {
+    if (data) {
+      changePage('1');
+    }
+  });
+}
+
+function updateViewMode(id,buttonClass) {
+  var maxPerPage = $("#maxPerPage").val();
+  if ( id == "viewTable" )  { var view = "table"; }
+  if ( id == "viewDetail" ) { var view = "detail"; }
+  if ( id == "viewIcon" )   { var view = "icon"; }
+  $.post(URL,{action:'changeViewModeSettings',maxPerPage:maxPerPage,view:view},function(data) {
+    if (data) {
+      changeSortOrder(id,buttonClass);
+    }
+  });
+}
+  
 </script>
 <FORM method="get" id="myForm">
 <body onresize='resizeDisplay();'>
@@ -1263,7 +1282,7 @@ function displayTags(leadTemplate) {
 <img id='subcategoryIcon' class='ca_subcategories' title='Select Sub Category' height='50px' style='cursor:pointer;position:relative;' src='/plugins/community.applications/images/SubCategoryIcon.png'>
 <font size='2'><b>Current Section: <font color='red'><span id='currentSection'>Available Apps</span></font></b></font>
 <img class='ca_staticTips' height='35px' src='/plugins/community.applications/images/resource.png' id='monitor' title='Resource Monitor' style='margin:0px;cursor:pointer;float:right;'><br>
-<strong><font size='3'><span id="Category"></span></strong></font><span id="Total1" style='float: right';>Total Found: <strong><font size="3"><span id="Total"></span></font></strong><span>&nbsp;&nbsp;Results/page: <select id='maxPerPage' class='narrow' onchange='changePage(&quot;1&quot;);'><option value='10'>10</option><option value='25'>25</option><option value='50'>50</option><option value='100'>100</option></select></span></span>
+<strong><font size='3'><span id="Category"></span></strong></font><span id="Total1" style='float: right';>Total Found: <strong><font size="3"><span id="Total"></span></font></strong><span>&nbsp;&nbsp;Results/page: <select id='maxPerPage' class='narrow' onchange='changeDisplayed();'><option value='10'>10</option><option value='25'>25</option><option value='50'>50</option><option value='100'>100</option></select></span></span>
 </span><br>
 
 <?if ( $upgradeAvailable ) :?>
