@@ -773,7 +773,7 @@ function toNumericArray($template) {
     $template['display_dockerReinstallIcon'], #71
     $template['display_dockerInstallIcon'], #72
     $template['display_pluginSettingsIcon'], #73
-    $template['dockerWebIcon'],             #74
+    $template['dockerWebIcon']             #74
   );
 }
   
