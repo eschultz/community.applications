@@ -144,7 +144,19 @@ function resizeDisplay() {
     var newWidth = getWindowWidth();
     var oldWidth = $("#sortorder").attr("data-oldWindowWidth");
     $("#sortorder").attr("data-oldWindowWidth",newWidth);
-    if ( Math.floor( newWidth / 200 ) == Math.floor( oldWidth / 200 ) ) { return; }
+    var view = JSON.parse($("#sortorder").attr("data-sortorder"));
+    switch ( view.viewMode ) {
+      case '#viewDetail':
+        var divisor = <?=$template['detail']['templateWidth']?>;
+        break;
+      case '#viewIcon':
+        var divisor = <?=$template['icon']['templateWidth']?>;
+        break;
+      default:
+        return;
+        break;
+    }
+    if ( Math.floor( newWidth / divisor ) == Math.floor( oldWidth / divisor ) ) { return; }
     $("#templates_content").html("");
     clearTimeout(window.resizeEvt);
     window.resizeEvt = setTimeout(function(){
@@ -1271,7 +1283,7 @@ function updateViewMode(id,buttonClass) {
 <div id='appWarning' style='display:none'><center><img src='https://raw.githubusercontent.com/Squidly271/community.applications/master/webImages/Warning2.png' height='50px' width='50px'><br>
 <font size='2' color='red'>Note: All Applications listed here are 3rd party additions to unRaid.<br>Neither the authors of Community Applications nor Limetech make any warranty as to the suitability of any applications listed herein</font>
 <br><input type='button' value='Dismiss Warning' onclick='dismissWarning();'></input></center></div>
-<span style='float:right;'><a class='ca_staticTips' title='Display The CA Manual' href="Settings/caHelp" target='_blank'>CA Manual</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class='ca_staticTips' href='/PluginSettings' title='General Settings'>Settings</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class='ca_stats' title='Gathering Statistics' style='cursor:pointer;'>Statistics</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class='ca_credits' style='cursor:pointer'>Credits</a></span>
+<span style='float:right;'><a class='ca_staticTips' title='Display The CA Manual' href="Settings/caHelp" target='_blank'>CA Manual</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class='ca_stats' title='Gathering Statistics' style='cursor:pointer;'>Statistics</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class='ca_credits' style='cursor:pointer'>Credits</a></span>
 <br>
 > For help with this plugin, click here (a new tab will open with the help file)  <strong><font size="2"><a href="Settings/caHelp" target="_blank">HELP</a></font></strong><br>
 > <img src='/plugins/community.applications/images/SectionIcon.png' height='50px'> - This chooses which "section" to display (Available Apps, Installed Apps, Previously Installed Apps, Pinned Apps, additional CA Modules<br>

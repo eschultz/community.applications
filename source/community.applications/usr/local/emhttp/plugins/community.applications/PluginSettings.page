@@ -75,15 +75,6 @@ Favourite Repository:
 
 > Set this option to your favourite repository, so that it's applications will display first
 
-Icon Size (icon mode only):
-: <select name="iconSize" size="1">
-  <?=mk_option($cfg['iconSize'], "48", "Small")?>
-  <?=mk_option($cfg['iconSize'], "96", "Large (Default)")?>
-  </select>
-
-> This setting set the size of the application icon display in icon mode
-
-<?if ($unRaid64 == "false"):?>
 Number of columns (icon mode only):
 : <select name="maxColumn" size="1">
   <?=mk_option($cfg['maxColumn'], "3", "3")?>
@@ -97,7 +88,6 @@ Number of columns (icon mode only):
   </select>
 
 > This setting determines changes the number of columns displayed in icon mode.
-<?endif;?>
 
 Show already installed apps within available apps:
 : <select name='separateInstalled' size='1'>

@@ -657,10 +657,12 @@ function getRedirectedURL($url) {
 function getMaxColumns($windowWidth) {
   global $communitySettings, $templateSkin;
   
+  $communitySettings['windowWidth'] = $windowWidth;
   $communitySettings['maxDetailColumns'] = floor($windowWidth / $templateSkin['detail']['templateWidth']);
   $communitySettings['maxIconColumns'] = floor($windowWidth / $templateSkin['icon']['templateWidth']);
   if ( ! $communitySettings['maxDetailColumns'] ) $communitySettings['maxDetailColumns'] = 1;
   if ( ! $communitySettings['maxIconColumns'] ) $communitySettings['maxIconColumns'] = 1;
+  
 }
 
 #######################
@@ -771,7 +773,7 @@ function toNumericArray($template) {
     $template['display_dockerReinstallIcon'], #71
     $template['display_dockerInstallIcon'], #72
     $template['display_pluginSettingsIcon'], #73
-    $template['dockerWebIcon']              #74
+    $template['dockerWebIcon'],             #74
   );
 }
   

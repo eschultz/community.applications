@@ -31,8 +31,9 @@ $templateSkin = readJsonFile($communityPaths['defaultSkin']);
 $communitySettings = parse_plugin_cfg("$plugin");
 $communitySettings['appFeed']       = "true"; # set default for deprecated setting
 $communitySettings['maxPerPage'] = getPost("maxPerPage",$communitySettings['maxPerPage']);
-# adjust display according to 6.4.0 CSS
+$communitySettings['iconSize'] = 96;
 
+# adjust display according to 6.4.0 CSS
 $vars = parse_ini_file("/var/local/emhttp/var.ini");
 $unRaid64 = (version_compare($vars['version'],"6.4.0-rc0",">=")) || (is_file("/usr/local/emhttp/plugins/dynamix/styles/dynamix-gray.css"));
 
@@ -40,7 +41,6 @@ $unRaid64 = (version_compare($vars['version'],"6.4.0-rc0",">=")) || (is_file("/u
 if ( $communitySettings['favourite'] != "None" ) {
   $officialRepo = str_replace("*","'",$communitySettings['favourite']);
   $separateOfficial = true;
-#  $communitySettings['maxPerPage'] = "-1";  # Pages do not work when favourite repos are set.  Really need to think about how to do it better
 }
 if ( is_dir("/var/lib/docker/containers") ) {
   $communitySettings['dockerRunning'] = "true";
@@ -487,8 +487,7 @@ function display_apps($viewMode,$pageNumber=1) {
   unset($navigate[0]);
 
   if ( count($navigate) ) {
-    $bookmark = "Jump To: ";
-    $bookmark .= implode("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",$navigate);
+    $bookmark = "Jump To: ".implode("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",$navigate);
   }
 
   $display .= ( $totalApplications == 0 ) ? "<center><font size='3'>No Matching Content Found</font></center>" : "";
@@ -506,6 +505,8 @@ function display_apps($viewMode,$pageNumber=1) {
 function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker,$pageNumber=1,$officialFlag=false) {
   global $communityPaths, $info, $communitySettings, $plugin, $unRaid64;
 
+  $templateFormatArray = array(1 => $communitySettings['windowWidth']);      # this array is only used on header, sol, eol, footer
+
   $pinnedApps = getPinnedApps();
   $iconSize = $communitySettings['iconSize'];
   $tabMode = $communitySettings['newWindow'];
@@ -518,7 +519,7 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker,$pageNumb
   if ( ! $officialFlag ) {
     $ct = "<br>".getPageNavigation($pageNumber,count($file),false)."<br>";
   }
-  $ct .= $skin[$viewMode]['header'].$skin[$viewMode]['sol'];
+  $ct .= vsprintf($skin[$viewMode]['header'].$skin[$viewMode]['sol'],$templateFormatArray);
   $displayTemplate = $skin[$viewMode]['template'];
   if ( $unRaid64 ) {
     $communitySettings['maxColumn'] = $communitySettings['maxIconColumns'];
@@ -532,6 +533,7 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker,$pageNumb
   $appCount = 0;
   $startingApp = $officialFlag ? 1 : ($pageNumber -1) * $communitySettings['maxPerPage'] + 1;
   $startingAppCounter = 0;
+  
   
   foreach ($file as $template) {
     $startingAppCounter++;
@@ -656,10 +658,10 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker,$pageNumb
     if ( $communitySettings['viewMode'] == "icon" ) {
       if ( $columnNumber == $communitySettings['maxColumn'] ) {
         $columnNumber = 0;
-        $t .= $skin[$viewMode]['eol'].$skin[$viewMode]['sol'];
+        $t .= vsprintf($skin[$viewMode]['eol'].$skin[$viewMode]['sol'],$templateFormatArray);
       }
     } else {
-      $t .= $skin[$viewMode]['eol'].$skin[$viewMode]['sol'];
+      $t .= vsprintf($skin[$viewMode]['eol'].$skin[$viewMode]['sol'],$templateFormatArray);
     }
  
     $ct .= $t;
@@ -670,7 +672,7 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker,$pageNumb
       }
     }
   }
-  $ct .= $skin[$viewMode]['footer'];
+  $ct .= vsprintf($skin[$viewMode]['footer'],$templateFormatArray);
   $ct .= caGetMode();
   if ( ! $officialFlag ) {
     $ct .= "<br>".getPageNavigation($pageNumber,count($file),false)."<br><br><br>";
@@ -1026,7 +1028,6 @@ case 'get_content':
         for ($i=0;$i<$communitySettings['maxDetailColumns'];$i++) {
           $displayApplications['community'][] = $file[$appsOfDay[$i]];
         }
-#        $displayApplications['community'] = array($file[$appsOfDay[0]],$file[$appsOfDay[1]]);
         writeJsonFile($communityPaths['community-templates-displayed'],$displayApplications);
         echo "<script>$('#templateSortButtons,#sortButtons').hide();enableIcon('#sortIcon',false);</script>";
         echo "<br><center><font size='4' color='purple'><b>Random Apps Of The Day</b></font><br><br>";
