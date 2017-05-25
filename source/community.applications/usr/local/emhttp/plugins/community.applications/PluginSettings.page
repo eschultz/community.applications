@@ -44,6 +44,7 @@ foreach ($repoName as $display) {
   $displayOptions .= mk_option($cfg['favourite'], $optionName, $display);
 }
 
+$unRaid64 = (version_compare($vars['version'],"6.4.0-rc0",">=")) || (is_file("/usr/local/emhttp/plugins/dynamix/styles/dynamix-gray.css")) ? "true" : "false";
 ?>
 
 <form markdown="1" method="POST" action="/update.php" target="progressFrame">
@@ -82,6 +83,7 @@ Icon Size (icon mode only):
 
 > This setting set the size of the application icon display in icon mode
 
+<?if ($unRaid64 == "false"):?>
 Number of columns (icon mode only):
 : <select name="maxColumn" size="1">
   <?=mk_option($cfg['maxColumn'], "3", "3")?>
@@ -95,15 +97,8 @@ Number of columns (icon mode only):
   </select>
 
 > This setting determines changes the number of columns displayed in icon mode.
+<?endif;?>
 
-<!-- Group Beta and Private Apps into "Super Categories":
-: <select name="superCategory" size="1">
-  <?=mk_option($cfg['superCategory'], "true", "Yes (default)")?>
-  <?=mk_option($cfg['superCategory'], "false", "No")?>
-  </select>
-
-> This setting will group beta applications and private applications into their own "super category" separate from the main list
- -->
 Show already installed apps within available apps:
 : <select name='separateInstalled' size='1'>
   <?=mk_option($cfg['separateInstalled'], "true", "No (default)")?>

@@ -2056,7 +2056,10 @@ case 'statistics':
   }
   $updateTime = date("F d Y H:i",$appFeedTime['last_updated_timestamp']);
   $updateTime = ( is_file($communityPaths['LegacyMode']) ) ? "N/A - Legacy Mode Active<br>Statistics Not Populated" : $updateTime;
+  $defaultArray = Array('totalApplications' => 0, 'repository' => 0, 'docker' => 0, 'plugin' => 0, 'invalidXML' => 0, 'blacklist' => 0, 'completeBlacklist' =>0, 'totalDeprecated' => 0, 'totalModeration' => 0);
+  $statistics = array_merge($defaultArray,$statistics);  
 
+  
   $color = "<font color='coral'>";
   echo "<div style='overflow:scroll; max-height:550px; height:550px; overflow-x:hidden; overflow-y:auto;'><center><img src='/plugins/community.applications/images/CA.png'><br><font size='6' color='white'>Community Applications</font><br><br>";
   echo "<center><font size='3'>Application Feed Statistics</font></center><br><br>";
