@@ -661,16 +661,23 @@ function forceUpdate() {
   $("#updateTime").html("In Progress...");
   $("#Total").html("Updating...");
   clearSearchBox();
-  $.post(URL,{action:'force_update'},function(){getContent(true,'INITIALIZE','None Selected');});
-  $(".appButtons").prop("disabled",false);
+  $.post(URL,{action:'force_update'},function(data){
+    if (data) {
+      getContent(true,'INITIALIZE','None Selected');});
+      $(".appButtons").prop("disabled",false);
+    }
+  });
 }
 
 function forceUpdateButton() {
   var mode = $('#updateButton').val();
   if ( mode == 'appFeed Mode' ) {
-    $.post(URL,{action:'force_update_button'});
-    myAlert("Updating Content","Retrieving the latest application Lists","/plugins/community.applications/images/spinner2.gif","40x40");
-    forceUpdate();
+    $.post(URL,{action:'force_update_button'},function(data) {
+      if (data) {
+        myAlert("Updating Content","Retrieving the latest application Lists","/plugins/community.applications/images/spinner2.gif","40x40");
+        forceUpdate();
+      }
+    });
   } else {
     swal({
       title: "Switch To Legacy Mode?",

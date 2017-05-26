@@ -1202,6 +1202,7 @@ case 'force_update_button':
     file_put_contents($communityPaths['appFeedOverride'],"dunno");
   }
   @unlink($infoFile);
+  echo "ok";
   break;
 
 ####################################################################################
