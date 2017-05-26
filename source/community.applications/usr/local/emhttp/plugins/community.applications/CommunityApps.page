@@ -588,7 +588,7 @@ function doSearch(button) {
   var maxPerPage = getPerPage();
   $("#sortorder").attr("data-docker","");
   filter = filter.replace(/[^a-z0-9]/gi,' ')
-  filter = filter.trim();
+  filter = myTrim(filter);
   $('#searchBox').val(filter);
 
   $("#monitor,.appButtons,#maxPerPage").prop("disabled",false);
@@ -940,7 +940,7 @@ function dockerConvert(dockerID) {
   $.post(URL,{action:'convert_docker',ID:dockerID},function(data) {
     if (data) {
       myCloseAlert();
-      templateURL = "AddContainer?xmlTemplate=default:" + data.trim();
+      templateURL = "AddContainer?xmlTemplate=default:" + myTrim(data);
       window.open(templateURL,"<?=$tabMode?>");
       $("#Total").html(totalDisplayed);
     }
