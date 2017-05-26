@@ -1162,6 +1162,7 @@ case 'force_update':
       $latestUpdate['last_updated_timestamp'] = time();
       writeJsonFile($communityPaths['lastUpdated-old'],$latestUpdate);
     }
+    echo "ok";
     break;
   }
 
@@ -1187,6 +1188,7 @@ case 'force_update':
   } else {
     moderateTemplates();
   }
+  echo "ok";
   break;
 
 ####################################################################################################

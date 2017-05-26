@@ -368,15 +368,17 @@ $(function(){
   $("#calculateAppdata").click(function()                  { calculateAppdataSize(); });
   $(".initDockerSearch").click(function()                  { initDockerSearch(); });
   $(".moduleButton").click(function()                      { caModules(); });
-  myAlert("Updating Content","Retrieving the latest application Lists","/plugins/community.applications/images/spinner2.gif","40x40");
-  $.post(URL,{action:'force_update'});
 
   if ( "<?=$cfg['viewMode']?>" == "icon" )   $("#viewIcon").prop("disabled",true);
   if ( "<?=$cfg['viewMode']?>" == "table" )  $("#viewTable").prop("disabled",true);
   if ( "<?=$cfg['viewMode']?>" == "detail" ) $("#viewDetail").prop("disabled",true);
-
-  getContent(true,'INITIALIZE','None Selected');
-  $('#searchBox').keyup(function(e) {if(e.which == 13){doSearch(false);}});
+  myAlert("Updating Content","Retrieving the latest application Lists","/plugins/community.applications/images/spinner2.gif","40x40");
+  $.post(URL,{action:'force_update'}, function(data) {
+    if (data) {
+      getContent(true,'INITIALIZE','None Selected');
+      $('#searchBox').keyup(function(e) {if(e.which == 13){doSearch(false);}});
+    }
+  });
 });
 
 function enableIcon(icon,enable) {

@@ -708,7 +708,7 @@ mkdir -p /boot/config/plugins/community.applications
 echo ""
 echo "----------------------------------------------------"
 echo " &name; has been installed."
-echo " Copyright 2015-2016, Andrew Zawadzki"
+echo " Copyright 2015-2017, Andrew Zawadzki"
 echo " Version: &version;"
 echo "----------------------------------------------------"
 echo ""
