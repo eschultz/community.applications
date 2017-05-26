@@ -663,7 +663,7 @@ function forceUpdate() {
   clearSearchBox();
   $.post(URL,{action:'force_update'},function(data){
     if (data) {
-      getContent(true,'INITIALIZE','None Selected');});
+      getContent(true,'INITIALIZE','None Selected');
       $(".appButtons").prop("disabled",false);
     }
   });
