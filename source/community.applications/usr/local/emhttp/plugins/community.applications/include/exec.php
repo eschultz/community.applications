@@ -29,7 +29,7 @@ $templateSkin = readJsonFile($communityPaths['defaultSkin']);
 #                                                                              #
 ################################################################################
 
-$communitySettings = parse_plugin_cfg("$plugin");
+$communitySettings                  = parse_plugin_cfg("$plugin");
 $communitySettings['appFeed']       = "true"; # set default for deprecated setting
 $communitySettings['maxPerPage']    = getPost("maxPerPage",$communitySettings['maxPerPage']);
 $communitySettings['iconSize']      = 96;
