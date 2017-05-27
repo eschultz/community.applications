@@ -19,6 +19,7 @@ $DockerTemplates = new DockerTemplates();
 $unRaidSettings = my_parse_ini_file($communityPaths['unRaidVersion']);
 $unRaidVersion = $unRaidSettings['version'];
 if ($unRaidVersion == "6.2") $unRaidVersion = "6.2.0";
+$unRaid64 = (version_compare($unRaidVersion,"6.4.0-rc0",">=")) || (is_file("/usr/local/emhttp/plugins/dynamix/styles/dynamix-gray.css"));
 
 $templateSkin = readJsonFile($communityPaths['defaultSkin']);
 
@@ -30,13 +31,8 @@ $templateSkin = readJsonFile($communityPaths['defaultSkin']);
 
 $communitySettings = parse_plugin_cfg("$plugin");
 $communitySettings['appFeed']       = "true"; # set default for deprecated setting
-$communitySettings['maxPerPage'] = getPost("maxPerPage",$communitySettings['maxPerPage']);
-$communitySettings['iconSize'] = 96;
-
-# adjust display according to 6.4.0 CSS
-$vars = parse_ini_file("/var/local/emhttp/var.ini");
-$unRaid64 = (version_compare($vars['version'],"6.4.0-rc0",">=")) || (is_file("/usr/local/emhttp/plugins/dynamix/styles/dynamix-gray.css"));
-
+$communitySettings['maxPerPage']    = getPost("maxPerPage",$communitySettings['maxPerPage']);
+$communitySettings['iconSize']      = 96;
 
 if ( $communitySettings['favourite'] != "None" ) {
   $officialRepo = str_replace("*","'",$communitySettings['favourite']);
@@ -448,11 +444,10 @@ function getConvertedTemplates() {
 function display_apps($viewMode,$pageNumber=1) {
   global $communityPaths, $separateOfficial, $officialRepo, $communitySettings;
 
-  $file = readJsonFile($communityPaths['community-templates-displayed']);
-  $officialApplications = $file['official'];
+  $file                  = readJsonFile($communityPaths['community-templates-displayed']);
+  $officialApplications  = $file['official'];
   $communityApplications = $file['community'];
-  $betaApplications = $file['beta'];
-  $privateApplications = $file['private'];
+  $privateApplications   = $file['private'];
 
   $totalApplications = count($officialApplications) + count($communityApplications) + count($betaApplications) + count($privateApplications);
 
@@ -758,6 +753,9 @@ function appOfDay($file) {
   if ( $oldAppDay == $currentDay ) {
     $app = readJsonFile($communityPaths['appOfTheDay']);
   }
+  if ( count($app) < 10 ) {
+    unset($app);
+  }
   if ( ! $app ) {
     for ( $ii=0; $ii<10; $ii++ ) {
       $flag = false;
@@ -782,11 +780,11 @@ function appOfDay($file) {
 function checkRandomApp($randomApp) {
   global $file;
 
-  if ( ! $file[$randomApp]['Displayable'] ) return false;
-  if ( ! $file[$randomApp]['Compatible'] ) return false;
-  if ( $file[$randomApp]['Blacklist'] ) return false;
+  if ( ! $file[$randomApp]['Displayable'] )    return false;
+  if ( ! $file[$randomApp]['Compatible'] )     return false;
+  if ( $file[$randomApp]['Blacklist'] )        return false;
   if ( $file[$randomApp]['ModeratorComment'] ) return false;
-  if ( $file[$randomApp]['Deprecated'] ) return false;
+  if ( $file[$randomApp]['Deprecated'] )       return false;
   return true;
 }
 ##########################################################################
@@ -1042,7 +1040,6 @@ case 'get_content':
   $display             = array();
   $official            = array();
   $beta                = array();
-  $privateApplications = array();
 
   foreach ($file as $template) {
     if ( $template['Blacklist'] ) {
@@ -1119,8 +1116,6 @@ case 'get_content':
 
   $displayApplications['official']  = $official;
   $displayApplications['community'] = $display;
-  $displayApplications['beta']      = $beta;
-  $displayApplications['private']   = $privateApplications;
 
   writeJsonFile($communityPaths['community-templates-displayed'],$displayApplications);
   display_apps($sortOrder['viewMode']);
@@ -1140,11 +1135,8 @@ case 'force_update':
   }
 
   download_url($communityPaths['moderationURL'],$communityPaths['moderation']);
-  $tmpFileName = randomFile();
-  download_url($communityPaths['community-templates-url'],$tmpFileName);
-  $Repositories = readJsonFile($tmpFileName);
-  writeJsonFile($communityPaths['Repositories'],$Repositories);
-  $repositoriesLogo = readJsonFile($tmpFileName);
+  download_url($communityPaths['community-templates-url'],$communityPaths['Repositories']);
+  $repositoriesLogo = readJsonFile($communityPaths['Repositories']);
   if ( ! is_array($repositoriesLogo) ) {
     $repositoriesLogo = array();
   }
@@ -1166,11 +1158,9 @@ case 'force_update':
     break;
   }
 
-  if ( file_exists($communityPaths['lastUpdated-old']) ) {
-    $lastUpdatedOld = readJsonFile($communityPaths['lastUpdated-old']);
-  } else {
-    $lastUpdatedOld['last_updated_timestamp'] = 0;
-  }
+  $lastUpdatedOld = readJsonFile($communityPaths['lastUpdated-old']);
+  $lastUpdatedOld = $lastUpdatedOld ? $lastUpdatedOld : 0;
+
   @unlink($communityPaths['lastUpdated']);
   download_url($communityPaths['application-feed-last-updated'],$communityPaths['lastUpdated']);
 
@@ -1184,7 +1174,7 @@ case 'force_update':
     if ( $latestUpdate['last_updated_timestamp'] != INF ) {
       copy($communityPaths['lastUpdated'],$communityPaths['lastUpdated-old']);
     }
-    unlink($infoFile);
+    @unlink($infoFile);
   } else {
     moderateTemplates();
   }
