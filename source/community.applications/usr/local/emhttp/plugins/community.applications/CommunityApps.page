@@ -996,6 +996,7 @@ function previousApps(button,installed) {
   }
 
   $.post(URL,{action:'previous_apps',installed:installed},function(data) {
+    $("#debugging").html(data);
     if (data) {
       changeSortOrder(null,null,"true");
       myCloseAlert();

@@ -390,7 +390,8 @@ class TypeConverter {
 			$data = array();
 
 			if (!isset($array[$element])) {
-				$array[$element] = "";
+#				$array[$element] = "";
+$array[$element] = [];
 			}
 
 			if (!$node->attributes() || $format === self::XML_NONE) {

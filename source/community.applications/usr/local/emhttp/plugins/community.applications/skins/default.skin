@@ -17,7 +17,7 @@
     },
     "table": {
         "templateWidth": 1280,
-        "header": "<table class='tablesorter' style='table-layout: fixed;'><thead><th style='width:85px'>Application</th><th style='width:48px'></th><th style='width:100px'></th><th style='width:75px'>Downloads</th><th style='width:75px'>Author</th><th style='width:50%'>Description</th><th>Repository</th></tr></thead><tr>",
+        "header": "<table class='tablesorter' style='table-layout: fixed;'><thead><th style='width:85px'>Application</th><th style='width:48px'></th><th style='width:100px'></th><th style='width:75px'>Downloads</th><th style='width:75px'>Author</th><th style='width:50%'>Description</th><th>Repository</th></thead>",
         "sol": "<tr>",
         "template": "<td><center><font size=larger>%66$s</font><br>%47$s %46$s %45$s %44$s &nbsp;&nbsp;%43$s <br>%41$s </center><td style='margin:0;padding:0'> %60$s </td><td><center><font color='red'> %58$s </font></center>%68$s%69$s%70$s%71$s%72$s%73$s%74$s</td><td> %42$s</td><td> %59$s </td><td><b>Categories: </b>%21$s<br><br><span class='desc_readmore' style='display:block'>%22$s'</span><br>%39$s %38$s</b></strong><center>%37$s&nbsp;&nbsp;&nbsp;&nbsp;%36$s&nbsp;&nbsp;&nbsp;&nbsp;%48$s&nbsp;&nbsp;&nbsp;&nbsp;%35$s</td><td style='text-align:left'><font size=1px>%40$s </font></td>",
         "eol": "</tr>",

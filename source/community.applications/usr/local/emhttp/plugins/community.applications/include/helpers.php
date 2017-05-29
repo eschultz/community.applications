@@ -1,7 +1,7 @@
 <?PHP
 ###############################################################
 #                                                             #
-# Community Applications copyright 2015-2017, Andrew Zawadzki #
+# Community Applications copyright 2015-2016, Andrew Zawadzki #
 #                                                             #
 ###############################################################
 require_once("/usr/local/emhttp/plugins/community.applications/include/paths.php");
@@ -408,6 +408,7 @@ function makeXML($template) {
   }
 
   # hack to fix differing schema in the appfeed vs what Array2XML class wants
+#echo "<br>".$template['Repository']."<br>";
   if ( $template['Config'] ) {
     foreach ($template['Config'] as $tempArray) {
       if ( $tempArray['value'] ) {
@@ -470,7 +471,7 @@ function versionCheck($template) {
 
 function readXmlFile($xmlfile) {
   global $statistics;
-  
+
   $xml = file_get_contents($xmlfile);
   $o = TypeConverter::xmlToArray($xml,TypeConverter::XML_GROUP);
   if ( ! $o ) { return false; }
@@ -553,6 +554,20 @@ function logger($string) {
 function notify($event,$subject,$description,$message,$type="normal") {
   $command = '/usr/local/emhttp/plugins/dynamix/scripts/notify -e "'.$event.'" -s "'.$subject.'" -d "'.$description.'" -m "'.$message.'" -i "'.$type.'"';
   shell_exec($command);
+}
+
+#######################################################
+#                                                     #
+# Function to convert a Linux text file to dos format #
+#                                                     #
+#######################################################
+
+function toDOS($input,$output,$append = false) {
+  if ( $append == false ) {
+    shell_exec('/usr/bin/todos < "'.$input.'" > "'.$output.'"');
+  } else {
+    shell_exec('/usr/bin/todos < "'.$input.'" >> "'.$output.'"');
+  }
 }
 
 #######################################################
@@ -646,7 +661,8 @@ function getMaxColumns($windowWidth) {
   $communitySettings['maxDetailColumns'] = floor($windowWidth / $templateSkin['detail']['templateWidth']);
   $communitySettings['maxIconColumns'] = floor($windowWidth / $templateSkin['icon']['templateWidth']);
   if ( ! $communitySettings['maxDetailColumns'] ) $communitySettings['maxDetailColumns'] = 1;
-  if ( ! $communitySettings['maxIconColumns'] ) $communitySettings['maxIconColumns'] = 1; 
+  if ( ! $communitySettings['maxIconColumns'] ) $communitySettings['maxIconColumns'] = 1;
+  
 }
 
 #######################
