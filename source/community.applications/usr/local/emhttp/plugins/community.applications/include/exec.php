@@ -2044,11 +2044,15 @@ case 'populateModules':
   break;
 case 'statistics':
   $statistics = readJsonFile($communityPaths['statistics']);
+  if ( ! $statistics ) { $statistics = array(); }
   $moderation = readJsonFile($communityPaths['moderation']);
   $statistics['totalModeration'] = count($moderation);
   foreach ($moderation as $mod) {
     if ($mod['Blacklist'] ) {$statistics['completeBlacklist']++;}
     if ($mod['Deprecated'] ) { $statistics['totalDeprecated']++;}
+  }
+  foreach ($statistics as &$stat) {
+    if ( ! $stat ) { $stat = 0; }
   }
   if ( is_file($communityPaths['lastUpdated-old']) ) {
     $appFeedTime = readJsonFile($communityPaths['lastUpdated-old']);
@@ -2059,7 +2063,11 @@ case 'statistics':
   $updateTime = ( is_file($communityPaths['LegacyMode']) ) ? "N/A - Legacy Mode Active<br>Statistics Not Populated" : $updateTime;
   $defaultArray = Array('totalApplications' => 0, 'repository' => 0, 'docker' => 0, 'plugin' => 0, 'invalidXML' => 0, 'blacklist' => 0, 'completeBlacklist' =>0, 'totalDeprecated' => 0, 'totalModeration' => 0);
   $statistics = array_merge($defaultArray,$statistics);  
-
+  foreach ($statistics as &$stat) {
+    if ( ! $stat ) {
+      $stat = "0";
+    }
+  }
   
   $color = "<font color='coral'>";
   echo "<div style='overflow:scroll; max-height:550px; height:550px; overflow-x:hidden; overflow-y:auto;'><center><img src='/plugins/community.applications/images/CA.png'><br><font size='6' color='white'>Community Applications</font><br><br>";
