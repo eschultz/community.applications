@@ -1,5 +1,4 @@
 <?PHP
-ini_set("memory_limit", "-1");
 
 ###############################################################
 #                                                             #
@@ -20,8 +19,9 @@ $DockerTemplates = new DockerTemplates();
 $unRaidSettings = my_parse_ini_file($communityPaths['unRaidVersion']);
 $unRaidVersion = $unRaidSettings['version'];
 if ($unRaidVersion == "6.2") $unRaidVersion = "6.2.0";
+$unRaid64 = (version_compare($unRaidVersion,"6.4.0-rc0",">=")) || (is_file("/usr/local/emhttp/plugins/dynamix/styles/dynamix-gray.css"));
 
-$templateSkin = readJsonFile($communityPaths['defaultSkin']);
+$templateSkin = readJsonFile($communityPaths['defaultSkin']);   # Global Var used in helpers ( getMaxColumns() )
 
 ################################################################################
 #                                                                              #
@@ -31,13 +31,9 @@ $templateSkin = readJsonFile($communityPaths['defaultSkin']);
 
 $communitySettings = parse_plugin_cfg("$plugin");
 $communitySettings['appFeed']       = "true"; # set default for deprecated setting
-$communitySettings['maxPerPage'] = getPost("maxPerPage",$communitySettings['maxPerPage']);
-$communitySettings['iconSize'] = 96;
-
-# adjust display according to 6.4.0 CSS
-$vars = parse_ini_file("/var/local/emhttp/var.ini");
-$unRaid64 = (version_compare($vars['version'],"6.4.0-rc0",">=")) || (is_file("/usr/local/emhttp/plugins/dynamix/styles/dynamix-gray.css"));
-
+$communitySettings['maxPerPage']    = getPost("maxPerPage",$communitySettings['maxPerPage']);  # Global POST.  Used damn near everywhere
+$communitySettings['iconSize']      = 96;
+$communitySettings['maxColumn']     = 5; # Pointless on 6.3  Gets overridden on 6.4 anyways
 
 if ( $communitySettings['favourite'] != "None" ) {
   $officialRepo = str_replace("*","'",$communitySettings['favourite']);
@@ -75,25 +71,18 @@ if (!is_link("/usr/local/emhttp/state/plugins/$plugin")) symlink($communityPaths
 # Functions used to download the templates from various sources #
 #                                                               #
 #################################################################
-
 function DownloadCommunityTemplates() {
   global $communityPaths, $infoFile, $plugin, $communitySettings, $statistics;
 
   $betaComment = "<font color='purple'>The author of this template has designated it to be a beta.  You may experience issues with this application</font>";
   $moderation = readJsonFile($communityPaths['moderation']);
-  if ( ! is_array($moderation) ) {
-      $moderation = array();
-  }
+  if ( ! is_array($moderation) ) { $moderation = array(); }
 
   $DockerTemplates = new DockerTemplates();
 
-  if (! $download = download_url($communityPaths['community-templates-url']) ) {
-    return false;
-  }
+  if (! $download = download_url($communityPaths['community-templates-url']) ) { return false; }
   $Repos  = json_decode($download, true);
-  if ( ! is_array($Repos) ) {
-    return false;
-  }
+  if ( ! is_array($Repos) )                                                    { return false; }
   $statistics['repository'] = count($Repos);
   
   $appCount = 0;
@@ -315,11 +304,7 @@ function DownloadApplicationFeed() {
     $o['Compatible'] = versionCheck($o);
 
     if ( $o['Beta'] == "true" ) {
-      if ( $o['ModeratorComment'] ) {
-        $o['ModeratorComment'] .= "<br><br>$betaComment";
-      } else {
-        $o['ModeratorComment'] = $betaComment;
-      }
+      $o['ModeratorComment'] .= $o['ModeratorComment'] ? "<br><br>$betaComment" : $betaComment;
     }
 
     # Update the settings for the template
@@ -373,7 +358,7 @@ function DownloadApplicationFeed() {
 }
 
 function getConvertedTemplates() {
-  global $communityPaths, $infoFile, $plugin, $communitySettings;
+  global $communityPaths, $infoFile, $plugin, $communitySettings, $statistics;
 
 # Start by removing any pre-existing private (converted templates)
   $templates = readJsonFile($communityPaths['community-templates-info']);
@@ -428,6 +413,7 @@ function getConvertedTemplates() {
         $o['Private']      = "true";
         $o['Forum']        = "";
         $o['Compatible']   = versionCheck($o);
+        $statistics['private']++;
         
         fixSecurity($o,$o);
         $myTemplates[$i]  = $o;
@@ -445,23 +431,19 @@ function getConvertedTemplates() {
 # Routines that actually displays the template containers. #
 #                                                          #
 ############################################################
-
 function display_apps($viewMode,$pageNumber=1) {
   global $communityPaths, $separateOfficial, $officialRepo, $communitySettings;
   $file = readJsonFile($communityPaths['community-templates-displayed']);
   $officialApplications = $file['official'];
   $communityApplications = $file['community'];
-  $betaApplications = $file['beta'];
-  $privateApplications = $file['private'];
 
-  $totalApplications = count($officialApplications) + count($communityApplications) + count($betaApplications) + count($privateApplications);
+  $totalApplications = count($officialApplications) + count($communityApplications);
 
   if ( $communitySettings['dockerRunning'] ) {
     $runningDockers=str_replace('/','',shell_exec('docker ps'));
     $imagesDocker=str_replace('/','',shell_exec('docker images'));
   }
 
-  $display = "";
   $navigate = array();
 
   if ( $separateOfficial ) {
@@ -491,7 +473,6 @@ function display_apps($viewMode,$pageNumber=1) {
   $display .= ( $totalApplications == 0 ) ? "<center><font size='3'>No Matching Content Found</font></center>" : "";
  
   $totalApps = "$totalApplications";
-  $totalApps .= (count($privateApplications)) ? " <font size=1>( ".count($privateApplications)." Private )</font>" : "";
 
   $display .= "<script>$('#Total').html('$totalApps');</script>";
   $display .= changeUpdateTime();
@@ -516,7 +497,7 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker,$pageNumb
   if ( ! $officialFlag ) {
     $ct = "<br>".getPageNavigation($pageNumber,count($file),false)."<br>";
   }
-  $ct .= vsprintf($skin[$viewMode]['header'].$skin[$viewMode]['sol'],$templateFormatArray);
+  $ct .= vsprintf($skin[$viewMode]['header'],$templateFormatArray);
   $displayTemplate = $skin[$viewMode]['template'];
   if ( $unRaid64 ) {
     $communitySettings['maxColumn'] = $communitySettings['maxIconColumns'];
@@ -536,6 +517,9 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker,$pageNumb
     $startingAppCounter++;
     if ( $startingAppCounter < $startingApp ) {
       continue;
+    }
+    if ( $columnNumber == 0 ) {
+      $ct .= vsprintf($skin[$viewMode]['sol'],$templateFormatArray);
     }
     $name = $template['SortName'];
     $appName = str_replace(" ","",$template['SortName']);
@@ -655,10 +639,11 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker,$pageNumb
     if ( $communitySettings['viewMode'] == "icon" ) {
       if ( $columnNumber == $communitySettings['maxColumn'] ) {
         $columnNumber = 0;
-        $t .= vsprintf($skin[$viewMode]['eol'].$skin[$viewMode]['sol'],$templateFormatArray);
+        $t .= vsprintf($skin[$viewMode]['eol'],$templateFormatArray);
       }
     } else {
-      $t .= vsprintf($skin[$viewMode]['eol'].$skin[$viewMode]['sol'],$templateFormatArray);
+      $columnNumber = 0;
+      $t .= vsprintf($skin[$viewMode]['eol'],$templateFormatArray);
     }
  
     $ct .= $t;
@@ -744,7 +729,6 @@ function getPageNavigation($pageNumber,$totalApps,$dockerSearch) {
 # Selects an app of the day #
 #                           #
 #############################
-
 function appOfDay($file) {
   global $communityPaths, $info;
   
@@ -755,6 +739,7 @@ function appOfDay($file) {
   if ( $oldAppDay == $currentDay ) {
     $app = readJsonFile($communityPaths['appOfTheDay']);
   }
+  if ( count($app) < 9 ) { unset($app); }  # For update from old version where only 2 possible apps of day
   if ( ! $app ) {
     for ( $ii=0; $ii<10; $ii++ ) {
       $flag = false;
@@ -776,22 +761,26 @@ function appOfDay($file) {
   writeJsonFile($communityPaths['appOfTheDay'],$app);
   return $app;
 }
+
+#####################################################
+# Checks selected app for eligibility as app of day #
+#####################################################
 function checkRandomApp($randomApp) {
   global $file;
 
-  if ( ! $file[$randomApp]['Displayable'] ) return false;
-  if ( ! $file[$randomApp]['Compatible'] ) return false;
-  if ( $file[$randomApp]['Blacklist'] ) return false;
+  if ( ! $file[$randomApp]['Displayable'] )    return false;
+  if ( ! $file[$randomApp]['Compatible'] )     return false;
+  if ( $file[$randomApp]['Blacklist'] )        return false;
   if ( $file[$randomApp]['ModeratorComment'] ) return false;
-  if ( $file[$randomApp]['Deprecated'] ) return false;
+  if ( $file[$randomApp]['Deprecated'] )       return false;
   return true;
 }
+
 ##########################################################################
 #                                                                        #
 # function that comes up with alternate search suggestions for dockerHub #
 #                                                                        #
 ##########################################################################
-
 function suggestSearch($filter,$displayFlag) {
   $dockerFilter = str_replace("_","-",$filter);
   $dockerFilter = str_replace("%20","",$dockerFilter);
@@ -829,7 +818,6 @@ function suggestSearch($filter,$displayFlag) {
 # function used to display the navigation (page up/down buttons) for dockerHub results #
 #                                                                                      #
 ########################################################################################
-
 function dockerNavigate($num_pages, $pageNumber) {
   return getPageNavigation($pageNumber,$num_pages * 25, true);
 }
@@ -839,7 +827,6 @@ function dockerNavigate($num_pages, $pageNumber) {
 # function that actually displays the results from dockerHub #
 #                                                            #
 ##############################################################
-
 function displaySearchResults($pageNumber,$viewMode) {
   global $communityPaths, $communitySettings, $plugin;
 
@@ -953,7 +940,6 @@ function displaySearchResults($pageNumber,$viewMode) {
 ############################################
 ############################################
 
-
 switch ($_POST['action']) {
 
 ######################################################################################
@@ -961,12 +947,11 @@ switch ($_POST['action']) {
 # get_content - get the results from templates according to categories, filters, etc #
 #                                                                                    #
 ######################################################################################
-
 case 'get_content':
-  $filter   = getPost("filter",false);
-  $category = "/".getPost("category",false)."/i";
-  $newApp   = getPost("newApp",false);
-  $sortOrder = getSortOrder(getPostArray("sortOrder"));
+  $filter      = getPost("filter",false);
+  $category    = "/".getPost("category",false)."/i";
+  $newApp      = getPost("newApp",false);
+  $sortOrder   = getSortOrder(getPostArray("sortOrder"));
   $windowWidth = getPost("windowWidth",false);
   getMaxColumns($windowWidth);
 
@@ -1038,8 +1023,6 @@ case 'get_content':
 
   $display             = array();
   $official            = array();
-  $beta                = array();
-  $privateApplications = array();
 
   foreach ($file as $template) {
     if ( $template['Blacklist'] ) {
@@ -1089,10 +1072,7 @@ case 'get_content':
         $template['MyPath'] = $template['PluginURL'];
       }
     }
-    if ( $newApp == "true" ) {
-      if ( $template['Date'] < $newAppTime ) { continue; }
-    }
-
+    if ( ($newApp == "true") && ($template['Date'] < $newAppTime) )  { continue; }
     if ( $category && ! preg_match($category,$template['Category'])) { continue; }
 
     if ($filter) {
@@ -1116,8 +1096,6 @@ case 'get_content':
 
   $displayApplications['official']  = $official;
   $displayApplications['community'] = $display;
-  $displayApplications['beta']      = $beta;
-  $displayApplications['private']   = $privateApplications;
 
   writeJsonFile($communityPaths['community-templates-displayed'],$displayApplications);
   display_apps($sortOrder['viewMode']);
@@ -1129,7 +1107,6 @@ case 'get_content':
 # force_update -> forces an update of the applications #
 #                                                      #
 ########################################################
-
 case 'force_update':
   if ( !is_dir($communityPaths['templates-community']) ) {
     exec("mkdir -p ".$communityPaths['templates-community']);
@@ -1141,7 +1118,7 @@ case 'force_update':
   download_url($communityPaths['community-templates-url'],$tmpFileName);
   $Repositories = readJsonFile($tmpFileName);
   writeJsonFile($communityPaths['Repositories'],$Repositories);
-  $repositoriesLogo = readJsonFile($tmpFileName);
+  $repositoriesLogo = $Repositories;
   if ( ! is_array($repositoriesLogo) ) {
     $repositoriesLogo = array();
   }
@@ -1193,7 +1170,6 @@ case 'force_update':
 # force_update_button - forces the system temporarily to override the appFeed and forces an update #
 #                                                                                                  #
 ####################################################################################################
-
 case 'force_update_button':
   if ( ! is_file($communityPaths['LegacyMode']) ) {
     file_put_contents($communityPaths['appFeedOverride'],"dunno");
@@ -1207,7 +1183,6 @@ case 'force_update_button':
 # display_content - displays the templates according to view mode, sort order, etc #
 #                                                                                  #
 ####################################################################################
-
 case 'display_content':
   $sortOrder = getSortOrder(getPostArray('sortOrder'));
   $windowWidth = getPost("windowWidth",false);
@@ -1227,7 +1202,6 @@ case 'display_content':
 # change_docker_view - called when the view mode for dockerHub changes #
 #                                                                      #
 ########################################################################
-
 case 'change_docker_view':
   $sortOrder = getSortOrder(getPostArray('sortOrder'));
 
@@ -1245,7 +1219,6 @@ case 'change_docker_view':
 # convert_docker - called when system adds a container from dockerHub #
 #                                                                     #
 #######################################################################
-
 case 'convert_docker':
   $dockerID = getPost("ID","");
 
@@ -1404,7 +1377,6 @@ case 'convert_docker':
 # search_dockerhub - returns the results from dockerHub #
 #                                                       #
 #########################################################
-
 case 'search_dockerhub':
   $filter     = getPost("filter","");
   $pageNumber = getPost("page","1");
@@ -1466,7 +1438,6 @@ case 'search_dockerhub':
 # dismiss_warning - dismisses the warning from appearing at startup #
 #                                                                   #
 #####################################################################
-
 case 'dismiss_warning':
   file_put_contents("/boot/config/plugins/community.applications/accepted","warning dismissed");
   break;
@@ -1476,7 +1447,6 @@ case 'dismiss_warning':
 # Displays the list of installed or previously installed apps #
 #                                                             #
 ###############################################################
-
 case 'previous_apps':
   $installed = getPost("installed","");
   $dockerUpdateStatus = readJsonFile($communityPaths['dockerUpdateStatus']);
@@ -1674,7 +1644,6 @@ case 'previous_apps':
 # Removes an app from the previously installed list (ie: deletes the user template #
 #                                                                                  #
 ####################################################################################
-
 case 'remove_application':
   $application = getPost("application","");
   @unlink($application);
@@ -1686,7 +1655,6 @@ case 'remove_application':
 # Uninstalls a plugin #
 #                     #
 #######################
-
 case 'uninstall_application':
   $application = getPost("application","");
 
@@ -1695,6 +1663,11 @@ case 'uninstall_application':
   echo "ok";
   break;
 
+###################################################################################
+#                                                                                 #
+# Checks for an update still available (to update display) after update installed #
+#                                                                                 #
+###################################################################################
 case 'updatePLGstatus':
   $filename = getPost("filename","");
   $displayed = readJsonFile($communityPaths['community-templates-displayed']);
@@ -1710,16 +1683,12 @@ case 'updatePLGstatus':
   writeJsonFile($communityPaths['community-templates-displayed'],$newDisplayed);
   echo "ok";
   break;
-  
-            
-  
-  
+   
 #######################
 #                     #
 # Uninstalls a docker #
 #                     #
 #######################
-
 case 'uninstall_docker':
   $application = getPost("application","");
 
@@ -1751,7 +1720,6 @@ case 'uninstall_docker':
 # Deletes the appdata for an app #
 #                                #
 ##################################
-
 case 'remove_appdata':
   $appdata = getPost("appdata","");
   $appdata = trim($appdata);
@@ -1765,7 +1733,6 @@ case 'remove_appdata':
 # Displays a table of basic stats for runnings docker apps #
 #                                                          #
 ############################################################
-
 case 'resourceMonitor':
   $sortOrder = getSortOrder(getPostArray('sortOrder'));
   $sortOrder['sortBy'] = $sortOrder['resourceKey'];  #move the key and dir to the appropriate value for the sort 
@@ -1881,7 +1848,6 @@ case 'resourceMonitor':
 # Initialization stuff for the resource monitor #
 #                                               #
 #################################################
-
 case 'resourceInitialize':
   $dockerClient = new DockerClient();
   $dockerRunning = $dockerClient->getDockerContainers();
@@ -1914,7 +1880,6 @@ case 'resourceInitialize':
 # starts a script to calculate the size of appData #
 #                                                  #
 ####################################################
-  
 case 'calculateAppdata':
   $descriptorspec = array(
     0 => array("pipe", "r"),  // stdin is a pipe that the child will read from
@@ -1929,7 +1894,6 @@ case 'calculateAppdata':
 # Enable / disable the calc appdata button if script running #
 #                                                            #
 ##############################################################
-
 case 'checkCalculations':
   $o .= ( is_file($communityPaths['calculateAppdataProgress']) ) ? "<script>$('#calculateAppdata').prop('disabled',true);</script>" : "<script>$('#calculateAppdata').prop('disabled',false);</script>";
   echo $o;
@@ -1940,7 +1904,6 @@ case 'checkCalculations':
 # starts the cAdvisor app bypassing dockerMan #
 #                                             #
 ###############################################
-
 case 'startCadvisor':
   $dockerClient = new DockerClient();
   $dockerRunning = $dockerClient->getDockerContainers();
@@ -1957,7 +1920,6 @@ case 'startCadvisor':
 # Pins / Unpins an application for later viewing #
 #                                                #
 ##################################################
-
 case "pinApp":
   $repository = getPost("repository","oops");
   $pinnedApps = readJsonFile($communityPaths['pinned']);
@@ -1975,7 +1937,6 @@ case "pinApp":
 # Displays the pinned applications #
 #                                  #
 ####################################
-
 case "pinnedApps":
   $pinnedApps = getPinnedApps();
   $file = readJsonFile($communityPaths['community-templates-info']);
@@ -1999,7 +1960,6 @@ case "pinnedApps":
 # Displays the possible branch tags for an app #
 #                                              #
 ################################################
-
 case 'displayTags':
   $leadTemplate = getPost("leadTemplate","oops");
   $file = readJsonFile($communityPaths['community-templates-info']);
@@ -2023,7 +1983,6 @@ case 'displayTags':
 # Specialized search for additional CA Modules #
 #                                              #
 ################################################
-
 case 'populateModules':
   $file = readJsonFile($communityPaths['community-templates-info']);
   foreach ($file as $template) {
@@ -2042,6 +2001,12 @@ case 'populateModules':
   writeJsonFile($communityPaths['community-templates-displayed'],$displayed);  
   echo "done";
   break;
+  
+###########################################
+#                                         #
+# Displays The Statistics For The Appfeed #
+#                                         #
+###########################################
 case 'statistics':
   $statistics = readJsonFile($communityPaths['statistics']);
   if ( ! $statistics ) { $statistics = array(); }
@@ -2061,7 +2026,7 @@ case 'statistics':
   }
   $updateTime = date("F d Y H:i",$appFeedTime['last_updated_timestamp']);
   $updateTime = ( is_file($communityPaths['LegacyMode']) ) ? "N/A - Legacy Mode Active<br>Statistics Not Populated" : $updateTime;
-  $defaultArray = Array('totalApplications' => 0, 'repository' => 0, 'docker' => 0, 'plugin' => 0, 'invalidXML' => 0, 'blacklist' => 0, 'completeBlacklist' =>0, 'totalDeprecated' => 0, 'totalModeration' => 0);
+  $defaultArray = Array('totalApplications' => 0, 'repository' => 0, 'docker' => 0, 'plugin' => 0, 'invalidXML' => 0, 'blacklist' => 0, 'completeBlacklist' =>0, 'totalDeprecated' => 0, 'totalModeration' => 0, 'private' => 0);
   $statistics = array_merge($defaultArray,$statistics);  
   foreach ($statistics as &$stat) {
     if ( ! $stat ) {
@@ -2084,15 +2049,17 @@ case 'statistics':
   echo "</tr><tr>";
   echo "<td><b>{$color}Total Number Of Plugins</b></td><td>$color{$statistics['plugin']}</td>";
   echo "</tr><tr>";
+  echo "<td title='Stored at /boot/config/plugins/community.applications/private/'><b>{$color}Total Number Of Private Docker Applications</b></td><td>$color{$statistics['private']}</td>";
+  echo "</tr><tr>";
   echo "<td><b>{$color}Total Number Of Template Errors Fixed Automatically</b></td><td>$color{$statistics['caFixed']}</td>";
   echo "</tr><tr>";
   echo "<td><b>{$color}Total Number Of Invalid Templates</b></td><td>$color{$statistics['invalidXML']}</td>";
   echo "</tr><tr>";
-  echo "<td><b>{$color}Total Number Of Blacklisted Applications Found In Appfeed</b></td><td>$color{$statistics['blacklist']}</td>";
+  echo "<td title='Automatically removed from all lists'><b>{$color}Total Number Of Blacklisted Applications Found In Appfeed</b></td><td>$color{$statistics['blacklist']}</td>";
   echo "</tr><tr>";
   echo "<td><b>{$color}Total Number Of Blacklisted Applications</b></td><td>$color{$statistics['completeBlacklist']}</td>";
   echo "</tr><tr>";
-  echo "<td><b>{$color}Total Number Of Deprecated Applications</b></td><td>$color{$statistics['totalDeprecated']}</td>";
+  echo "<td title='You can only install a deprecated application if you have already had it installed'><b>{$color}Total Number Of Deprecated Applications</b></td><td>$color{$statistics['totalDeprecated']}</td>";
   echo "</tr><tr>";
   echo "<td><b>{$color}Total Number Of Moderation Entries</b></td><td>$color{$statistics['totalModeration']}</td>";
   echo "</tr>";
@@ -2100,10 +2067,22 @@ case 'statistics':
   echo "<center><a href='https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7M7CBCVU732XG' target='_blank'><img height='25px' src='https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif'></a></center>";
   echo "<center>Ensuring only safe applications are present is a full time job</center><br>";
   break;
+
+#####################################################################################
+#                                                                                   #
+# Updates The maxPerPage setting (maxPerPage is already grabbed globally from POST) #
+#                                                                                   #
+#####################################################################################
 case 'changeSettings':
   file_put_contents($communityPaths['pluginSettings'],create_ini_file($communitySettings,false));
   echo "settings updated";
   break;
+  
+##########################################
+#                                        #
+# Updates the viewMode for next instance #
+#                                        #
+##########################################
 case 'changeViewModeSettings':
   $communitySettings['viewMode'] = getPost("view",$communitySettings['viewMode']);
   file_put_contents($communityPaths['pluginSettings'],create_ini_file($communitySettings,false));
