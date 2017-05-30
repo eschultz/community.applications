@@ -15,7 +15,7 @@
 <CHANGES>
 ###2017.05.30
 - Fixed: Display Aberration in Table Mode under certain conditions
-- Enhanced: View Mode & Results per Page saved between instances
+- Enhanced: View Mode and Results per Page saved between instances
 - Enhanced: Increased compatibility with older browsers
 - Added: Statistics Display for appfeed
 - Code cleanup
