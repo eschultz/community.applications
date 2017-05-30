@@ -530,19 +530,6 @@ function notify($event,$subject,$description,$message,$type="normal") {
 
 #######################################################
 #                                                     #
-# Function to convert a Linux text file to dos format #
-#                                                     #
-#######################################################
-function toDOS($input,$output,$append = false) {
-  if ( $append == false ) {
-    shell_exec('/usr/bin/todos < "'.$input.'" > "'.$output.'"');
-  } else {
-    shell_exec('/usr/bin/todos < "'.$input.'" >> "'.$output.'"');
-  }
-}
-
-#######################################################
-#                                                     #
 # Function to check for a valid URL                   #
 #                                                     #
 #######################################################
@@ -604,6 +591,7 @@ function caGetMode() {
 # Returns the actual URL after any redirection #
 #                                              #
 ################################################
+# works, but very slow.  Switched to a simple string replace as all redirects are plugin and simply github.com/raw/ vs raw.github.usercontent/
 function getRedirectedURL($url) {
   $ch = curl_init();
   curl_setopt($ch, CURLOPT_URL, $url);
@@ -620,14 +608,18 @@ function getRedirectedURL($url) {
 #                                                         #
 ###########################################################
 function getMaxColumns($windowWidth) {
-  global $communitySettings, $templateSkin;
+  global $communitySettings, $templateSkin, $unRaid64;
   
+  if ( ! $unRaid64 ) {
+    $communitySettings['maxDetailColumns'] = 2;
+    $communitySettings['maxIconColumns'] = 5;
+    return;
+  }
   $communitySettings['windowWidth'] = $windowWidth;
   $communitySettings['maxDetailColumns'] = floor($windowWidth / $templateSkin['detail']['templateWidth']);
   $communitySettings['maxIconColumns'] = floor($windowWidth / $templateSkin['icon']['templateWidth']);
   if ( ! $communitySettings['maxDetailColumns'] ) $communitySettings['maxDetailColumns'] = 1;
-  if ( ! $communitySettings['maxIconColumns'] ) $communitySettings['maxIconColumns'] = 1;
-  
+  if ( ! $communitySettings['maxIconColumns'] ) $communitySettings['maxIconColumns'] = 1;  
 }
 
 #######################

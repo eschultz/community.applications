@@ -75,20 +75,6 @@ Favourite Repository:
 
 > Set this option to your favourite repository, so that it's applications will display first
 
-Number of columns (icon mode only):
-: <select name="maxColumn" size="1">
-  <?=mk_option($cfg['maxColumn'], "3", "3")?>
-  <?=mk_option($cfg['maxColumn'], "4", "4")?>
-  <?=mk_option($cfg['maxColumn'], "5", "5 (Default)")?>
-  <?=mk_option($cfg['maxColumn'], "6", "6")?>
-  <?=mk_option($cfg['maxColumn'], "7", "7")?>
-  <?=mk_option($cfg['maxColumn'], "8", "8")?>
-  <?=mk_option($cfg['maxColumn'], "9", "9")?>
-  <?=mk_option($cfg['maxColumn'], "10", "10")?>
-  </select>
-
-> This setting determines changes the number of columns displayed in icon mode.
-
 Show already installed apps within available apps:
 : <select name='separateInstalled' size='1'>
   <?=mk_option($cfg['separateInstalled'], "true", "No (default)")?>

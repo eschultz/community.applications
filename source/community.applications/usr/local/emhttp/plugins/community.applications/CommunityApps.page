@@ -22,7 +22,6 @@ if ( $installedVersion < $upgradeVersion ) {
 }
 $plugin = "community.applications";
 $cfg = parse_plugin_cfg($plugin);
-if ( $cfg['maxPerPage'] == -1 ) { $cfg['maxPerPage'] = 100; }          # deprecated show all results
 
 if ( ! is_file("/boot/config/plugins/$plugin/accepted") ) {
   $firstRun = "true";
@@ -995,7 +994,6 @@ function previousApps(button,installed) {
   }
 
   $.post(URL,{action:'previous_apps',installed:installed},function(data) {
-    $("#debugging").html(data);
     if (data) {
       changeSortOrder(null,null,"true");
       myCloseAlert();
@@ -1303,7 +1301,7 @@ function updateViewMode(id,buttonClass) {
 <img id='subcategoryIcon' class='ca_subcategories' title='Select Sub Category' height='50px' style='cursor:pointer;position:relative;' src='/plugins/community.applications/images/SubCategoryIcon.png'>
 <font size='2'><b>Current Section: <font color='red'><span id='currentSection'>Available Apps</span></font></b></font>
 <img class='ca_staticTips' height='35px' src='/plugins/community.applications/images/resource.png' id='monitor' title='Resource Monitor' style='margin:0px;cursor:pointer;float:right;'><br>
-<strong><font size='3'><span id="Category"></span></strong></font><span id="Total1" style='float: right';>Total Found: <strong><font size="3"><span id="Total"></span></font></strong><span>&nbsp;&nbsp;Results/page: <select id='maxPerPage' class='narrow' onchange='changeDisplayed();'><option value='10'>10</option><option value='25'>25</option><option value='50'>50</option><option value='100'>100</option></select></span></span>
+<strong><font size='3'><span id="Category"></span></strong></font><span id="Total1" style='float: right';>Total Found: <strong><font size="3"><span id="Total"></span></font></strong><span>&nbsp;&nbsp;Results/page: <select id='maxPerPage' class='narrow' onchange='changeDisplayed();'><option value='10'>10</option><option value='25'>25</option><option value='50'>50</option><option value='100'>100</option><option value='-1'>All</option></select></span></span>
 </span><br>
 
 <?if ( $upgradeAvailable ) :?>

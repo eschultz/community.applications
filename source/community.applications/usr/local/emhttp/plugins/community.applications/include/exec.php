@@ -20,7 +20,9 @@ $unRaidSettings = my_parse_ini_file($communityPaths['unRaidVersion']);
 $unRaidVersion = $unRaidSettings['version'];
 if ($unRaidVersion == "6.2") $unRaidVersion = "6.2.0";
 $unRaid64 = (version_compare($unRaidVersion,"6.4.0-rc0",">=")) || (is_file("/usr/local/emhttp/plugins/dynamix/styles/dynamix-gray.css"));
-
+if ( ! $unRaid64 ) {
+  $communityPaths['defaultSkin'] = $communityPaths['legacySkin'];
+}
 $templateSkin = readJsonFile($communityPaths['defaultSkin']);   # Global Var used in helpers ( getMaxColumns() )
 
 ################################################################################
@@ -362,6 +364,8 @@ function getConvertedTemplates() {
 
 # Start by removing any pre-existing private (converted templates)
   $templates = readJsonFile($communityPaths['community-templates-info']);
+  $statistics = readJsonFile($communityPaths['statistics']);
+  unset($statistics['private']);
 
   foreach ($templates as $template) {
     if ( $template['Private'] ) {
@@ -422,7 +426,7 @@ function getConvertedTemplates() {
     }
   }
   writeJsonFile($communityPaths['community-templates-info'],$myTemplates);
-
+  writeJsonFile($communityPaths['statistics'],$statistics);
   return true;
 }
 
@@ -2010,6 +2014,7 @@ case 'populateModules':
 case 'statistics':
   $statistics = readJsonFile($communityPaths['statistics']);
   if ( ! $statistics ) { $statistics = array(); }
+
   $moderation = readJsonFile($communityPaths['moderation']);
   $statistics['totalModeration'] = count($moderation);
   foreach ($moderation as $mod) {
@@ -2017,7 +2022,7 @@ case 'statistics':
     if ($mod['Deprecated'] ) { $statistics['totalDeprecated']++;}
   }
   foreach ($statistics as &$stat) {
-    if ( ! $stat ) { $stat = 0; }
+    if ( ! $stat ) { $stat = "1"; }
   }
   if ( is_file($communityPaths['lastUpdated-old']) ) {
     $appFeedTime = readJsonFile($communityPaths['lastUpdated-old']);
@@ -2026,7 +2031,7 @@ case 'statistics':
   }
   $updateTime = date("F d Y H:i",$appFeedTime['last_updated_timestamp']);
   $updateTime = ( is_file($communityPaths['LegacyMode']) ) ? "N/A - Legacy Mode Active<br>Statistics Not Populated" : $updateTime;
-  $defaultArray = Array('totalApplications' => 0, 'repository' => 0, 'docker' => 0, 'plugin' => 0, 'invalidXML' => 0, 'blacklist' => 0, 'completeBlacklist' =>0, 'totalDeprecated' => 0, 'totalModeration' => 0, 'private' => 0);
+  $defaultArray = Array('caFixed' => 0,'totalApplications' => 0, 'repository' => 0, 'docker' => 0, 'plugin' => 0, 'invalidXML' => 0, 'blacklist' => 0, 'completeBlacklist' =>0, 'totalDeprecated' => 0, 'totalModeration' => 0, 'private' => 0);
   $statistics = array_merge($defaultArray,$statistics);  
   foreach ($statistics as &$stat) {
     if ( ! $stat ) {
@@ -2049,17 +2054,17 @@ case 'statistics':
   echo "</tr><tr>";
   echo "<td><b>{$color}Total Number Of Plugins</b></td><td>$color{$statistics['plugin']}</td>";
   echo "</tr><tr>";
-  echo "<td title='Stored at /boot/config/plugins/community.applications/private/'><b>{$color}Total Number Of Private Docker Applications</b></td><td>$color{$statistics['private']}</td>";
+  echo "<td><a href='/Main/Browse?dir=/boot/config/plugins/community.applications/private' target='_blank'><b>{$color}Total Number Of Private Docker Applications</b></a></td><td>$color{$statistics['private']}</td>";
   echo "</tr><tr>";
   echo "<td><b>{$color}Total Number Of Template Errors Fixed Automatically</b></td><td>$color{$statistics['caFixed']}</td>";
   echo "</tr><tr>";
   echo "<td><b>{$color}Total Number Of Invalid Templates</b></td><td>$color{$statistics['invalidXML']}</td>";
   echo "</tr><tr>";
-  echo "<td title='Automatically removed from all lists'><b>{$color}Total Number Of Blacklisted Applications Found In Appfeed</b></td><td>$color{$statistics['blacklist']}</td>";
+  echo "<td title='Automatically removed from lists'><b>{$color}Total Number Of Blacklisted Applications Found In Appfeed</b></td><td>$color{$statistics['blacklist']}</td>";
   echo "</tr><tr>";
   echo "<td><b>{$color}Total Number Of Blacklisted Applications</b></td><td>$color{$statistics['completeBlacklist']}</td>";
   echo "</tr><tr>";
-  echo "<td title='You can only install a deprecated application if you have already had it installed'><b>{$color}Total Number Of Deprecated Applications</b></td><td>$color{$statistics['totalDeprecated']}</td>";
+  echo "<td title='You can only install a deprecated application if you have previously installed it'><b>{$color}Total Number Of Deprecated Applications</b></td><td>$color{$statistics['totalDeprecated']}</td>";
   echo "</tr><tr>";
   echo "<td><b>{$color}Total Number Of Moderation Entries</b></td><td>$color{$statistics['totalModeration']}</td>";
   echo "</tr>";
