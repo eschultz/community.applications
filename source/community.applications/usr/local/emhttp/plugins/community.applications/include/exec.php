@@ -65,9 +65,9 @@ if ( !is_dir($communityPaths['templates-community']) ) {
 }
 
 # Make sure the link is in place
-if (is_dir("/usr/local/emhttp/state/plugins/$plugin")) exec("rm -rf /usr/local/emhttp/state/plugins/$plugin");
+/* if (is_dir("/usr/local/emhttp/state/plugins/$plugin")) exec("rm -rf /usr/local/emhttp/state/plugins/$plugin");
 if (!is_link("/usr/local/emhttp/state/plugins/$plugin")) symlink($communityPaths['templates-community'], "/usr/local/emhttp/state/plugins/$plugin");
-
+ */
 #################################################################
 #                                                               #
 # Functions used to download the templates from various sources #
