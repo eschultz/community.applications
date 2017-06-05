@@ -45,6 +45,7 @@ if ( is_dir("/var/lib/docker/containers") ) {
   $communitySettings['dockerRunning'] = "true";
 } else {
   $communitySettings['dockerSearch'] = "no";
+  unset($communitySettings['dockerRunning']);
 }
 
 if ( $communitySettings['dockerRunning'] ) {
@@ -1774,7 +1775,11 @@ case 'resourceMonitor':
     $container['Icon'] = $runningTemplate ? $templates[$runningTemplate]['Icon'] : "/plugins/community.applications/images/question.png";
     $running[] = $container;
   }
-
+  if ( ! $running ) {
+    echo "No applications running";
+    break;
+  }
+  
   $stats      = explode("\n",shell_exec("docker stats --no-stream=true $containerID"));
   $fullImages = explode("\n",shell_exec("docker ps --no-trunc"));
 
