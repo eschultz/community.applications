@@ -2024,7 +2024,13 @@ case 'statistics':
   $statistics['totalModeration'] = count($moderation);
   foreach ($moderation as $mod) {
     if ($mod['Blacklist'] ) {$statistics['completeBlacklist']++;}
-    if ($mod['Deprecated'] ) { $statistics['totalDeprecated']++;}
+#    if ($mod['Deprecated'] ) { $statistics['totalDeprecated']++;}
+  }
+  $templates = readJsonFile($communityPaths['community-templates-info']);
+  foreach ($templates as $template) {
+    if ( $template['Deprecated'] ) {
+      $statistics['totalDeprecated']++;
+    }
   }
   foreach ($statistics as &$stat) {
     if ( ! $stat ) { $stat = "1"; }
