@@ -2,8 +2,8 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.applications">
 <!ENTITY author    "Andrew Zawadzki">
-<!ENTITY version   "2017.06.10">
-<!ENTITY md5       "8ed2ace6e0fe5aeb6f1d5e2e2b121cd2">
+<!ENTITY version   "2017.06.18">
+<!ENTITY md5       "71b27adbb380f6243e7ab1743d011de1">
 <!ENTITY launch    "Settings/PluginSettings">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/community.applications">
@@ -13,6 +13,10 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
+###2017.06.18
+- Expanded details on statistics
+- Removed resource monitor (see thread for details)
+
 ###2017.06.10
 - Adjustable Disappear time on app popups
 
