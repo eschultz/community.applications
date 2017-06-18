@@ -50,6 +50,10 @@ $communityPaths['legacySkin']                    = "/usr/local/emhttp/plugins/co
 $communityPaths['LegacyMode']                    = $communityPaths['templates-community']."/legacyModeActive";
 $communityPaths['statistics']                    = $communityPaths['tempFiles']."/statistics.json";
 $communityPaths['pluginSettings']                = "/boot/config/plugins/$plugin/$plugin.cfg";
+$communityPaths['totalDeprecated_txt']           = $communityPaths['tempFiles']."/deprecated.txt";
+$communityPaths['totalIncompatible_txt']         = $communityPaths['tempFiles']."/incompatible.txt";
+$communityPaths['blacklisted_txt']               = $communityPaths['tempFiles']."/blacklist.txt";
+$communityPaths['fixedTemplates_txt']            = $communityPaths['tempFiles']."/caFixed.txt";
 
 $infoFile                                        = $communityPaths['community-templates-info'];
 $docker_repos                                    = $communityPaths['template-repos'];

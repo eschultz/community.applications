@@ -64,7 +64,6 @@ input.allButtons {margin:-1px;}
 <?endif;?>
 <script>
 var URL = "/plugins/<?=$plugin?>/include/exec.php";
-var monitorInterval;
 var last = $('input[name$="tabs"]').length;
 var VIEWSBACKUP = " ";
 
@@ -192,7 +191,6 @@ $(function(){
     $('div[id=title]').last().append("<span id='searchFilter' class='status vhshift'><input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input class='ca_staticTips' type='button' id='updateButton' value='Legacy Mode' title='Switches CA to Legacy Mode (until the next appfeed update) - Not generally recommended' onclick='forceUpdateButton()' disabled><?if ( $toolTipsterAllowed == "false"):?><input type='button' value='CA Modules' onclick='caModules();'><?endif;?>");
   <?endif;?>
   if ( "<?=$firstRun?>" == "true" ) { $("#appWarning").show(); }
-  if ( "<?=$dockerRunning?>" == "false" ) { $("#monitor").hide(); }
   $("#maxPerPage").val("<?=$cfg['maxPerPage']?>");
 
   $('.ca_staticTips').tooltipster({
@@ -223,11 +221,6 @@ $(function(){
       } else {
         var myID = origin.attr('id');
         setSortOrder();
-        if ( $("#sortorder").attr("data-resource") ) {
-          $(".resourceMonitor").show();
-        } else {
-          $(".resourceMonitor").hide();
-        }
         var displayContent = $("#tooltipviews").html();
         $("#tooltipviews").attr("data-backup",displayContent);
         $("#tooltipviews").html("");
@@ -237,7 +230,6 @@ $(function(){
     functionReady: function(instance,helper) {
       $(".viewButton").click(function() { updateViewMode(this.id,$(this).attr("class")); });
       $(".sortButton,.dirButton").click(function() { changeSortOrder(this.id,$(this).attr("class")); });
-      $(".resourceSort,.resourceDir").click(function() { changeResource(this.id,$(this).attr("class")); });
     },
     functionAfter: function(instance,helper) {
       $("#tooltipviews").html($("#tooltipviews").attr("data-backup"));
@@ -367,8 +359,6 @@ $(function(){
     }
   });      
   
-  $("#monitor").click(function()                           { Monitor(); });
-  $("#calculateAppdata").click(function()                  { calculateAppdataSize(); });
   $(".initDockerSearch").click(function()                  { initDockerSearch(); });
   $(".moduleButton").click(function()                      { caModules(); });
 
@@ -518,15 +508,13 @@ function changeCategory(button,subSwitch) {
 
 function caModules() {
   myAlert("","Searching");
-  $("#sortorder").removeAttr("data-resource");
   $("#sortorder").removeAttr("data-docker");
   $(".appButtons,#monitor").prop("disabled",false);
   $("#CAmodules").prop("disabled",true);
   $("#sortorder").attr("data-section","CAmodules");
   $("#currentSection").html("Additional CA Modules");
-  clearTimeout(monitorInterval);  
   clearSearchBox();
-  $("#templates_content,.resourceMonitor,.dockerSearch,#AppsOnly").hide();
+  $("#templates_content,.dockerSearch,#AppsOnly").hide();
   $("#templates_content").html("<center><font size='3'>Searching</font></center>");
   $("#templates_content,#sortButtons,#Total1,#templateSortButtons").show();
   enableIcon("#sortIcon",true);
@@ -596,7 +584,6 @@ function doSearch(button) {
   $('#searchBox').val(filter);
 
   $("#monitor,.appButtons,#maxPerPage").prop("disabled",false);
-  $(".resourceMonitor").hide();
   $("#templates_content,#AppsOnly,#templateSortButtons").show();
   $("#AppStore").prop("disabled",true);
 
@@ -778,13 +765,7 @@ function getSortOrder() {
 
   if ( $("#Up").prop("disabled") )             { sortOrder.sortDir = ["sortDir","Up"];                 jsonOrder.sortDir = "#Up"; }
   if ( $("#Down").prop("disabled") )           { sortOrder.sortDir = ["sortDir","Down"];               jsonOrder.sortDir = "#Down"; }
-  
-  if ( $("#resourceName").prop("disabled") )   { sortOrder.resourceKey = ["resourceKey","Name"];       jsonOrder.resourceBy = "#resourceName"; }
-  if ( $("#resourceCPU").prop("disabled") )    { sortOrder.resourceKey = ["resourceKey","CPU"];        jsonOrder.resourceBy = "#resourceCPU"; }
-  if ( $("#resourceMemory").prop("disabled") ) { sortOrder.resourceKey = ["resourceKey","MemPercent"]; jsonOrder.resourceBy = "#resourceMemory"; }
-  
-  if ( $("#resourceUp").prop("disabled") )     { sortOrder.resourceDir = ["resourceDir","Up"];         jsonOrder.resourceDir = "#resourceUp"; }
-  if ( $("#resourceDown").prop("disabled") )   { sortOrder.resourceDir = ["resourceDir","Down"];       jsonOrder.resourceDir = "#resourceDown"; }
+
   $("#sortorder").attr("data-sortorder",JSON.stringify(jsonOrder));
   var sort = [sortOrder.viewMode,sortOrder.sortBy,sortOrder.sortDir,sortOrder.resourceKey,sortOrder.resourceDir];
   return sort;
@@ -797,8 +778,6 @@ function setSortOrder() {
   $(sortOrder.viewMode).prop("disabled",true);
   $(sortOrder.sortBy).prop("disabled",true);
   $(sortOrder.sortDir).prop("disabled",true);
-  $(sortOrder.resourceBy).prop("disabled",true);
-  $(sortOrder.resourceDir).prop("disabled",true);
 }
 
 function getContent(init,category,description,newApp) {
@@ -969,11 +948,14 @@ function my_openBox(cmd,title,height,width,load,func) {
   Shadowbox.open({content:run, player:'iframe', title:title, height:height, width:width, options:options});
 }
 
+function showModeration(script,title) {
+  my_openBox("/plugins/community.applications/scripts/"+script,title,550,900,false,false);
+}
+
 function previousApps(button,installed) {
   setPageOne();
   myAlert("","Searching");
   enableIcon("#categoryIcon, #subcategoryIcon",false);
-  $("#sortorder").removeAttr("data-resource");
   $("#sortorder").removeAttr("data-docker");
   if ( installed ) {
     $("#currentSection").html("Installed Apps");
@@ -981,14 +963,13 @@ function previousApps(button,installed) {
     $("#currentSection").html("Previously Installed Apps");
   }
   $("#sortorder").attr("data-docker","");
-  clearTimeout(monitorInterval);  
   clearSearchBox();
-  $(".appButtons,#monitor,#maxPerPage").prop("disabled",false);
+  $(".appButtons,#maxPerPage").prop("disabled",false);
   $("#"+button).prop("disabled",true);
   $("#sortorder").attr("data-section",button);
 
   $("#Total").html("Searching... <img src='/plugins/community.applications/images/spinner2.gif' style='height:30px;width:30px'>");
-  $("#templates_content,.resourceMonitor,.dockerSearch,#AppsOnly").hide();
+  $("#templates_content,.dockerSearch,#AppsOnly").hide();
   $("#templates_content,#sortButtons,#Total1,#templateSortButtons").show();
   enableIcon("#sortIcon",true);
 
@@ -1029,7 +1010,7 @@ function removeApp(application, humanName) {
 }
 
 function uninstallApp(application,humanName) {
-  if ( humanName == "Community Applications" || humanName == "CA Resource Monitor" ) {
+  if ( humanName == "Community Applications" ) {
     myAlert("AE-35 Error","<b><font color='red'>"+humanName+"</font></b> cannot be uninstalled this way.  You must go to the plugins tab and remove Community Applications from there.  <em><font color='purple'>But, why would you ever want to uninstall CA?</font></em>",null,null,true,false,true,"error");
   } else {
     swal({
@@ -1119,67 +1100,16 @@ function appStore() {
   $("#currentSection").html("Available Apps");
   $("#sortorder").attr("data-section","AppStore");
   $("#sortorder").attr("data-selected_category","");
-  clearTimeout(monitorInterval);
   $("#templates_content").html("");
-  $("#monitor,.appButtons,.allButtons").prop("disabled",false);
+  $(".appButtons,.allButtons").prop("disabled",false);
   $("#AppStore").prop("disabled",true);
-  $(".resourceMonitor,#NetworkCategory,#MediaAppCategory,#MediaServerCategory,#ToolsCategory,#NONE").hide();
+  $("#NetworkCategory,#MediaAppCategory,#MediaServerCategory,#ToolsCategory,#NONE").hide();
   $("#AppsOnly,#templates_content,#MainCategory").show();
   getContent(true,'INITIALIZE','None Selected');
   $('#searchBox').keyup(function(e) {if(e.which == 13){doSearch(false);}});
   $("#Category").html("None Selected");
   $("#sortorder").removeAttr("data-resource");
   $("#sortorder").removeAttr("data-docker");
-}
-
-function Monitor() {
-  $("#currentSection").html("Resource Monitor");
-  clearSearchBox();
-  $(".appButtons").prop("disabled",false);
-  $("#monitor").prop("disabled",true);  
-  $("#templates_content,.dockerSearch,#AppsOnly,#sortButtons,#Total1").hide();
-  enableIcon("#categoryIcon, #subcategoryIcon",false);
-  $("#sortorder").attr("data-main_category","MainCategory");
-  $("#sortorder").attr("data-section","");
-  $("#templates_content").html("");
-  $(".resourceMonitor").show();
-  enableIcon("#sortIcon",true);
-  $("#sortorder").attr("data-resource","resource running");
-  $("#resourceBody").html("<center>Initializing</center>");
-  $.post(URL,{action:'resourceInitialize'}, function(data) {
-    if (data) {
-      $("#Category").html("Docker Application Resource Monitor <font size='0'>For more detailed results, click "+data+"</font>");
-      runMonitor();
-    }
-  });
-}
-
-function runMonitor() {
-  if ( $('#monitor').prop("disabled") ) {
-    $.post(URL,{action:'checkCalculations'},function(result) {
-      if (result) {
-        $("#miscScript").html(result);
-      }
-    });
-    var sortOrder = getSortOrder();
-    $.post(URL,{action:'resourceMonitor',sortOrder:sortOrder},function(data) {
-      if (data) {
-        $('#resourceBody').html(data);
-        monitorInterval = setTimeout(runMonitor,300);
-      }
-    });
-  }
-}
-
-function changeResource(button,buttonclass) {
-  $("."+buttonclass).prop("disabled",false);
-  $("#"+button).prop("disabled",true);
-  getSortOrder();
-}
-
-function calculateAppdataSize() {
-  $("#calculateAppdata").prop("disabled",true);
-  $.post(URL,{action:'calculateAppdata'});
 }
 
 function installPLGupdate(filename,plgName) {
@@ -1194,16 +1124,6 @@ function checkPLGupdate() {
       var pageNumber = $("#currentPageNumber").html();
       changePage(pageNumber);
     }
-  });
-}
-
-function startCadvisor() {
-  myAlert("","Starting the cAdvisor application");
-  $.post(URL,{action:'startCadvisor'},function(data) {
-    if (data) {
-      myCloseAlert();
-      Monitor();
-    }  
   });
 }
 
@@ -1227,18 +1147,16 @@ function setPageOne() {
 function pinnedApps(button) {
   setPageOne();
   myAlert("","Searching");
-  $("#sortorder").removeAttr("data-resource");
   $("#sortorder").removeAttr("data-docker");
   enableIcon("#categoryIcon, #subcategoryIcon",false);
   $("#currentSection").html("Pinned Apps");
   $("#sortorder").attr("data-docker","");
   $("#maxPerPage").prop("disabled",false);
-  $(".appButtons,#monitor").prop("disabled",false);
+  $(".appButtons").prop("disabled",false);
   $("#"+button).prop("disabled",true);
   $("#sortorder").attr("data-section",button);
-  clearTimeout(monitorInterval);  
   clearSearchBox();
-  $("#templates_content,.resourceMonitor,.dockerSearch,#AppsOnly").hide();
+  $("#templates_content,.dockerSearch,#AppsOnly").hide();
   $("#templates_content").html("<center><font size='3'>Searching</font></center>");
   $("#templates_content,#sortButtons,#Total1,#templateSortButtons").show();
   enableIcon("#sortIcon",true);
@@ -1305,7 +1223,6 @@ function updateViewMode(id,buttonClass) {
 <img id='categoryIcon' class='ca_categories' title='Select Category' height='50px' style='cursor:pointer;position:relative;' src='/plugins/community.applications/images/CategoryIcon.png'>
 <img id='subcategoryIcon' class='ca_subcategories' title='Select Sub Category' height='50px' style='cursor:pointer;position:relative;' src='/plugins/community.applications/images/SubCategoryIcon.png'>
 <font size='2'><b>Current Section: <font color='red'><span id='currentSection'>Available Apps</span></font></b></font>
-<img class='ca_staticTips' height='35px' src='/plugins/community.applications/images/resource.png' id='monitor' title='Resource Monitor' style='margin:0px;cursor:pointer;float:right;'><br>
 <strong><font size='3'><span id="Category"></span></strong></font><span id="Total1" style='float: right';>Total Found: <strong><font size="3"><span id="Total"></span></font></strong><span>&nbsp;&nbsp;Results/page: <select id='maxPerPage' class='narrow' onchange='changeDisplayed();'><option value='10'>10</option><option value='25'>25</option><option value='50'>50</option><option value='100'>100</option><option value='-1'>All</option></select></span></span>
 </span><br>
 
@@ -1314,19 +1231,10 @@ function updateViewMode(id,buttonClass) {
 <?endif?>
 <div class='dockerSearch' style='display:none'><center><figure><img class='initDockerSearch' style='cursor:pointer;' src='/plugins/community.applications/images/docker.png' width='58px;'><figcaption class='initDockerSearch' style='cursor:pointer;'>Get More Results From DockerHub</figcaption></figure></center></div>
 <div style='width:100%;' id='templates_content'></div>
-<div class='resourceMonitor' hidden><input type='button' value='Calculate Appdata Size' id='calculateAppdata' style='float:right'>
-<br><br><table id='resourceHeader' class='tablesorter'>
-<thead><th></th><th>AppName</th><th>DockerHub Repository</th><th>CPU %</th><th>Memory (Used/Max)</th><th>Memory %</th><th>Network (Down/Up)</th><th>Virtual Size</th><th><center>Appdata</center></th></thead>
-<tbody id='resourceBody'></tbody>
-</table>
-</div>
+
 
 </center>
 <a href="#" class="back-to-top" style="display: inline;"><img src='/plugins/community.applications/images/up.png' style='width:30px;height:30px' href="#" class="back-to-top"></img></a>
-<!-- <div class='dockerSearch' style='display:none'><center><figure><img class='initDockerSearch' style='cursor:pointer;' src='/plugins/community.applications/images/docker.png' width='58px;'><figcaption class='initDockerSearch' style='cursor:pointer;'>Get More Results From DockerHub</figcaption></figure></center></div>
- -->
-<div style='display:none;'><center>Last Change To Appfeed: <strong><span id='updateTime'></span></strong></center>
-<a href="Settings/caHelp" target='_blank'>CA Manual</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class='ca_credits' style='cursor:pointer'>Credits</a><br><br>
 <center><a href='https://forums.lime-technology.com/topic/55246-docker-faq/' target='_blank'>Docker FAQ</a></center><br>
 <center>Community Applications Version: <?=$installedVersion?></center></div>
 > <center>For support for this plugin, visit here: <a title='click for help' href="http://lime-technology.com/forum/index.php?topic=40262.0" target="_blank">http://lime-technology.com/forum/index.php?topic=40262.0</a></center>
@@ -1350,14 +1258,6 @@ Sort Direction:
 <input type='button' class='dirButton' id='Up' value='Ascending' disabled>
 <input type='button' class='dirButton' id='Down' value='Descending'>
 </span></span>
-<div class='resourceMonitor' style='display:none;'><center>Sort By:
-<input type='button' value='Name' id='resourceName' class='resourceSort' disabled>
-<input type='button' value='CPU' id='resourceCPU' class='resourceSort'>
-<input type='button' value='Memory' id='resourceMemory' class='resourceSort'>
-Sort Direction:
-<input type='button' value='Up' id='resourceUp' class='resourceDir' disabled>
-<input type='button' value='Down' id='resourceDown' class='resourceDir'>
-</div>
 </div></div>
 <span id='sections' style='display:none;'>
 <input type='button' class='appButtons' id='AppStore' value='Available Apps' disabled onclick='appStore();'>

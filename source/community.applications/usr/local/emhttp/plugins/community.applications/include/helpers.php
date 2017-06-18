@@ -271,25 +271,39 @@ function highlight($text, $search) {
 function fixTemplates($template) {
   global $statistics;
   
-  if ( is_array($template['Support']) ) {
+  $origFixed = $statistics['caFixed'];
+# this fix must always be the first test
+  if ( is_array($template['Repository']) ) {                 # due to cmer
+    $template['Repository'] = $template['Repository'][0];
+    $statistics['caFixed']++;
+    $statistics['fixedTemplates'][$template['Repo']][$template['Repository']][] = "Multiple Repositories Found";
+  }  
+  if ( (is_array($template['Support'])) && (count($template['Support'])) ) {
     unset($template['Support']);
     $statistics['caFixed']++;
+    $statistics['fixedTemplates'][$template['Repo']][$template['Repository']][] = "Multiple Support Tags Found";
   }
   if ( ! is_string($template['Name'])  ) {
     $template['Name']=" ";
     $statistics['caFixed']++;
+    $statistics['fixedTemplates'][$template['Repo']][$template['Repository']][] = "Name is not a string";
   }
   if ( ! is_string($template['Author']) ) { 
     $template['Author']=" ";
     $statistics['caFixed']++;
+    $statistics['fixedTemplates'][$template['Repo']][$template['Repository']][] = "Author is not a string";
   }    
-  if ( ! is_string($template['Description']) ) { 
-    $template['Description']=" "; 
-    $statistics['caFixed']++;
-  }    
+  if ( is_array($template['Description']) ) {
+    $template['Description']=""; 
+    if ( count($template['Description']) > 1 ) {
+      $statistics['fixedTemplates'][$template['Repo']][$template['Repository']][] = "Multiple Description tags present";
+      $statistics['caFixed']++;
+    }
+  }
   if ( is_array($template['Beta']) ) {
     $template['Beta'] = "false";
     $statistics['caFixed']++;
+    $statistics['fixedTemplates'][$template['Repo']][$template['Repository']][] = "Multiple Beta tags found";
   } else {
     $template['Beta'] = strtolower(stripslashes($template['Beta']));
   }
@@ -298,18 +312,16 @@ function fixTemplates($template) {
   if ( ! $template['MinVer'] ) {
     $template['MinVer'] = $template['Plugin'] ? "6.1" : "6.0";
   }
-  if ( ! is_string($template['Description']) ) {
-    $template['Description'] = "";
-    $statistics['caFixed']++;
-  }
   if ( is_array($template['Category']) ) {
     $template['Category'] = $template['Category'][0];        # due to lsio / CHBMB
     $statistics['caFixed']++;
+    $statistics['fixedTemplates'][$template['Repo']][$template['Repository']][] = "Multiple Category tags or Category present but empty";
   }
   $template['Category'] = $template['Category'] ? $template['Category'] : "Uncategorized";
   if ( ! is_string($template['Category']) ) {
     $template['Category'] = "Uncategorized";
     $statistics['caFixed']++;
+    $statistics['fixedTemplates'][$template['Repo']][$template['Repository']][] = "Multiple Category tags or Category present but empty";
   }
   
   if ( !is_string($template['Overview']) ) {
@@ -319,14 +331,13 @@ function fixTemplates($template) {
     $template['SortAuthor'] = $template['SortAuthor'][0];
     $template['Author'] = $template['SortAuthor'];
     $statistics['caFixed']++;
+    $statistics['fixedTemplates'][$template['Repo']][$template['Repository']][] = "Multiple Authors / Repositories Found";
   }
-  if ( is_array($template['Repository']) ) {                 # due to cmer
-    $template['Repository'] = $template['Repository'][0];
-    $statistics['caFixed']++;
-  }
+
   if ( is_array($template['PluginURL']) ) {                  # due to coppit
     $template['PluginURL'] = $template['PluginURL'][1];
     $statistics['caFixed']++;
+    $statistics['fixedTemplates'][$template['Repo']][$template['Repository']][] = "Multiple PluginURL's found";
   }
   if ( $template['PluginURL'] ) {                            # due to bonienl
     $template['PluginURL'] = str_replace("raw.github.com","raw.githubusercontent.com",$template['PluginURL']);
@@ -339,6 +350,10 @@ function fixTemplates($template) {
     $template['Overview'] = $template['Description'];
   } else {
     $template['Description'] = fixDescription($template['Description']);
+  }
+  if ( ( ! strlen(trim($template['Overview'])) ) && ( ! strlen(trim($template['Description'])) ) ){
+    $statistics['caFixed']++;
+    $statistics['fixedTemplates'][$template['Repo']][$template['Repository']][] = "No valid Overview Or Description present";
   }
   if ( ( stripos($template['RepoName'],' beta') > 0 )  ) {
     $template['Beta'] = "true";
@@ -359,7 +374,9 @@ function fixTemplates($template) {
       $template['Category'] .= " Status:Beta";
     }
   }
-
+/*   if ( $origFixed != $statistics['caFixed'] ) {
+    $statistics['fixedTemplates'][$template['Repo']][$template['Repository']] = "{$template['Repo']} - <b>{$template['Name']}</b>";
+  } */
   $template['PopUpDescription'] = fixPopUpDescription($template['Description']);
   return $template;
 }

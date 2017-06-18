@@ -163,6 +163,7 @@ function DownloadCommunityTemplates() {
         }
         if ( $o['Blacklist'] ) {
           $statistics['blacklist']++;
+          $blacklist[] = "{$o['Repo']} - <b>{$o['Name']}</b> - {$o['ModeratorComment']}";
           unset($o);
           continue;
         } else {
@@ -206,6 +207,7 @@ function DownloadCommunityTemplates() {
       }
     }
   }
+  writeJsonFile($communityPaths['blacklisted_txt'],$blacklist);
   writeJsonFile($communityPaths['statistics'],$statistics);
   writeJsonFile($communityPaths['community-templates-info'],$myTemplates);
   file_put_contents($communityPaths['LegacyMode'],"active");
@@ -298,12 +300,14 @@ function DownloadApplicationFeed() {
       $o = array_merge($o, $moderation[$o['Repository']]);
       $file = array_merge($file, $moderation[$o['Repository']]);
     }
+
     if ($o['Blacklist']) {
       $statistics['blacklist']++;
+      $blacklist[] = "{$o['Repo']} - <b>{$o['Name']}</b> - {$o['ModeratorComment']}";
       unset($o);
       continue;
     }
-
+    
     $o['Compatible'] = versionCheck($o);
 
     if ( $o['Beta'] == "true" ) {
@@ -354,6 +358,7 @@ function DownloadApplicationFeed() {
     $templateXML = makeXML($file);
     file_put_contents($o['Path'],$templateXML);
   }
+  writeJsonFile($communityPaths['blacklisted_txt'],$blacklist);
   writeJsonFile($communityPaths['statistics'],$statistics);
   writeJsonFile($communityPaths['community-templates-info'],$myTemplates);
   @unlink($communityPaths['LegacyMode']);
@@ -1733,196 +1738,7 @@ case 'remove_appdata':
   exec($commandLine);
   break;
 
-############################################################
-#                                                          #
-# Displays a table of basic stats for runnings docker apps #
-#                                                          #
-############################################################
-case 'resourceMonitor':
-  $sortOrder = getSortOrder(getPostArray('sortOrder'));
-  $sortOrder['sortBy'] = $sortOrder['resourceKey'];  #move the key and dir to the appropriate value for the sort 
-  $sortOrder['sortDir'] = $sortOrder['resourceDir'];
-#get running containers
 
-  if ( ! is_dir("/var/lib/docker/containers") ) {
-    echo "Docker Not Running!";
-    break;
-  }
-  if ( is_file($communityPaths['cAdvisor']) ) {
-    $cAdvisorPath = file_get_contents($communityPaths['cAdvisor']);
-  }
-  $dockerClient = new DockerClient();
-  $dockerRunning = $dockerClient->getDockerContainers();
-  $templates = readJsonFile($communityPaths['community-templates-info']);
-
-  foreach ($dockerRunning as $docker) {
-    if ( ! $docker['Running'] ) {
-      continue;
-    }
-    $runningTemplate = searchArray($templates,'Name',$docker['Name']);
-    if ( $runningTemplate === false ) {
-      $tempRepo = explode(":",$docker['Image']);
-      $runningTemplate = searchArray($templates,'Repository',$tempRepo[0]);
-      if ( $runningTemplate === false ) {
-        $runningTemplate = searchArray($templates,'Repository',$docker['Image']);
-      }
-    }
-    $container['Name'] = $docker['Name'];
-    $container['ID'] = $docker['Id'];
-    $container['Image'] = $docker['Image'];
-    $container['NetworkMode'] = $docker['NetworkMode'];
-    $containerID .= $docker['Id']." ";
-    $container['Icon'] = $runningTemplate ? $templates[$runningTemplate]['Icon'] : "/plugins/community.applications/images/question.png";
-    $running[] = $container;
-  }
-  if ( ! $running ) {
-    echo "No applications running";
-    break;
-  }
-  
-  $stats      = explode("\n",shell_exec("docker stats --no-stream=true $containerID"));
-  $fullImages = explode("\n",shell_exec("docker ps --no-trunc"));
-
-  unset($stats[0]);
-  unset($fullImages[0]);
-
-  $numCPU = shell_exec("nproc");
-
-  foreach ( $stats as $line ) {
-    $containerStats = explode("*",preg_replace("/  +/","*",$line));
-    $container = searchArray($running,"ID",$containerStats[0]);
-    if ( $container !== false ) {
-      $display['Icon'] = $running[$container]['Icon'];
-      $display['Name'] = $running[$container]['Name'];
-      $display['CPU'] = round($containerStats[1] / $numCPU,2);
-      $display['Memory'] = $containerStats[2];
-      $display['MemPercent'] = str_replace("%","",$containerStats[3]);
-      $display['IO'] = ( $running[$container]['NetworkMode'] == "host" ) ? "<em><font color='red'>Unable to determine</font></em>" : $containerStats[4];
-      $display['ID'] = $running[$container]['ID'];
-      $containerRepo = explode(":",$running[$container]['Image']);
-      $imageSizes = explode("\n",shell_exec("docker images $containerRepo[0]"));
-      $statsLine = explode(" ",preg_replace('!\s+!', ' ', $imageSizes[1]));
-      $display['Repo'] = $running[$container]['Image'];
-      $display['Size'] = $statsLine[6]." ".$statsLine[7];
-
-# now get the full image id for cAdvisor usage
-      if ( $cAdvisorPath ) {
-        $display['Link'] = "";
-        foreach ($fullImages as $ImagesLine) {
-          if ( strpos($ImagesLine,$display['Name']) ) {
-            $completeImage = explode(" ",$ImagesLine);
-            $display['Link'] = $cAdvisorPath."/docker/".$completeImage[0];
-            break;
-          }
-        }
-      }
-      $myDisplay[] = $display;
-    }
-  }
-  if ( ! count($myDisplay) ) {
-    echo "</table><center>No docker applications running!</center>";
-    break;
-  }
-  usort($myDisplay,"mySort");
-
-  foreach ($myDisplay as $display) {
-    if ( $display['CPU'] > 80 ) {
-      $display['CPU'] = "<font color=red>".$display['CPU']."</font>";
-    }
-    if ( $cAdvisorPath ) {
-      $o .= "<tr><td><a href='".$display['Link']."' target='_blank' title='Click For Complete Details'><img src='".$display['Icon']."' width=48px ></a></td>";
-    } else {
-      $o .= "<tr><td><img src='".$display['Icon']."' width=48px></td>";
-    }
-    $o .= "<td>".$display['Name']."</td>";
-    $o .= "<td>".$display['Repo']."</td>";
-    $o .= "<td>".$display['CPU']." %</td>";
-    $o .= "<td>".$display['Memory']."</td>";
-    $o .= "<td>".$display['MemPercent']." %</td>";
-    $o .= "<td>".$display['IO']."</td>";
-    $o .= "<td>".$display['Size']."</td>";
-
-    if ( is_file($communityPaths['appdataSize'].$display['ID']) ) {
-      $o .= "<td>".file_get_contents($communityPaths['appdataSize'].$display['ID'])."</td>";
-    } else {
-      $o .= "<td><center><font color='red'>Unknown</font></center></td>";
-    }
-    $o .= "</tr>";
-  }
-  echo $o;
-  break;
-
-#################################################
-#                                               #
-# Initialization stuff for the resource monitor #
-#                                               #
-#################################################
-case 'resourceInitialize':
-  $dockerClient = new DockerClient();
-  $dockerRunning = $dockerClient->getDockerContainers();
-
-  $o = "<a href='AddContainer?xmlTemplate=default:/usr/local/emhttp/plugins/community.applications/xml/cadvisor.xml'>here</a> (This will install cAdvisor)<br> Note: when adding cAdvisor, do not change any of the volume mappings.  They are ALL correct as is.  Only change the HOST port if needed";
-  $cadvisor = searchArray($dockerRunning,"Image","google/cadvisor:latest");
-
-  if ( $cadvisor !== false ) {
-    if ( $dockerRunning[$cadvisor]['Running'] ) {
-      $cadvisorPort = $dockerRunning[$cadvisor]['Ports'][0]['PublicPort'];
-      $unRaidVars = my_parse_ini_file($communityPaths['unRaidVars']);
-      $unRaidIP = $unRaidVars['NAME'];
-      $cAdvisorPath = "//$unRaidIP:$cadvisorPort";
-      $o = "<a href='$cAdvisorPath' target='".$communitySettings['newWindow']."'>here</a> or click on the icon for the application";  
-      file_put_contents($communityPaths['cAdvisor'],$cAdvisorPath);
-    } else {
-      $o = "<a onclick='startCadvisor();' style='cursor:pointer'>HERE</a> to start the cAdvisor application";
-      @unlink($communityPaths['cAdvisor']);
-    }
-  } else {
-    @unlink($communityPaths['cAdvisor']);
-  }
-  $o .= ( is_file($communityPaths['calculateAppdataProgress']) ) ? "<script>$('#calculateAppdata').prop('disabled',true);</script>" : "<script>$('#calculateAppdata').prop('disabled',false);</script>";
-
-  echo $o;
-  break;
-
-####################################################
-#                                                  #
-# starts a script to calculate the size of appData #
-#                                                  #
-####################################################
-case 'calculateAppdata':
-  $descriptorspec = array(
-    0 => array("pipe", "r"),  // stdin is a pipe that the child will read from
-    1 => array("pipe", "w"),  // stdout is a pipe that the child will write to
-    2 => array("pipe", "w") // stderr is a file to write to
-  );
-  proc_open($communityPaths['calculateAppdataScript'],$descriptorspec,$pipes);
-  break;
-
-##############################################################
-#                                                            #
-# Enable / disable the calc appdata button if script running #
-#                                                            #
-##############################################################
-case 'checkCalculations':
-  $o .= ( is_file($communityPaths['calculateAppdataProgress']) ) ? "<script>$('#calculateAppdata').prop('disabled',true);</script>" : "<script>$('#calculateAppdata').prop('disabled',false);</script>";
-  echo $o;
-  break;
-
-###############################################
-#                                             #
-# starts the cAdvisor app bypassing dockerMan #
-#                                             #
-###############################################
-case 'startCadvisor':
-  $dockerClient = new DockerClient();
-  $dockerRunning = $dockerClient->getDockerContainers();
-
-  $cadvisor = searchArray($dockerRunning,"Image","google/cadvisor:latest");
-  
-  shell_exec("docker start ".$dockerRunning[$cadvisor]['Name']);
-  sleep (5);
-  echo "done";
-  break;
 
 ##################################################
 #                                                #
@@ -2022,18 +1838,37 @@ case 'statistics':
 
   $moderation = readJsonFile($communityPaths['moderation']);
   $statistics['totalModeration'] = count($moderation);
-  foreach ($moderation as $mod) {
-    if ($mod['Blacklist'] ) {$statistics['completeBlacklist']++;}
-#    if ($mod['Deprecated'] ) { $statistics['totalDeprecated']++;}
-  }
+
   $templates = readJsonFile($communityPaths['community-templates-info']);
   foreach ($templates as $template) {
     if ( $template['Deprecated'] ) {
       $statistics['totalDeprecated']++;
+      $deprecated .= "<tr><td>{$template['Repo']}</td><td><b>{$template['Name']}</b></td><td>".str_replace("<br>","",trim($template['ModeratorComment']))."</td></tr>";
     }
+    if ( ! $template['Compatible'] ) {
+      $statistics['totalIncompatible']++;
+      $incompatible .= "<td>{$template['Repo']}</td><td><b>{$template['Name']}</b></td><td><center>{$template['MinVer']}</td><td><center>{$template['MaxVer']}</td></tr>";
+    }
+  }
+  if ( $incompatible ) {
+    $incompatible = "<table style='width:auto;border:1px;border-color:red;'><thead><td>Repository</td><td>Application</td><td>Minimum OS</td><td>Maximum OS</td></thead>$incompatible</table>";
+    file_put_contents($communityPaths['totalIncompatible_txt'],$incompatible);
+  } else {
+    @unlink($communityPaths['totalIcompatible_txt']);
+  }
+  if ( $deprecated ) {
+    $deprecated = "<table style='width:auto'><thead><td style='width:25%'>Repository</td><td>Application</td><td>Comment</td></thead>$deprecated</table>";
+    file_put_contents($communityPaths['totalDeprecated_txt'],$deprecated);
+  } else {
+    @unlink($communityPaths['totalDeprecated_txt']);
   }
   foreach ($statistics as &$stat) {
     if ( ! $stat ) { $stat = "1"; }
+  }
+  if ( $statistics['fixedTemplates'] ) {
+    writeJsonFile($communityPaths['fixedTemplates_txt'],$statistics['fixedTemplates']);
+  } else {
+    @unlink($communityPaths['fixedTemplates_txt']);
   }
   if ( is_file($communityPaths['lastUpdated-old']) ) {
     $appFeedTime = readJsonFile($communityPaths['lastUpdated-old']);
@@ -2042,7 +1877,7 @@ case 'statistics':
   }
   $updateTime = date("F d Y H:i",$appFeedTime['last_updated_timestamp']);
   $updateTime = ( is_file($communityPaths['LegacyMode']) ) ? "N/A - Legacy Mode Active<br>Statistics Not Populated" : $updateTime;
-  $defaultArray = Array('caFixed' => 0,'totalApplications' => 0, 'repository' => 0, 'docker' => 0, 'plugin' => 0, 'invalidXML' => 0, 'blacklist' => 0, 'completeBlacklist' =>0, 'totalDeprecated' => 0, 'totalModeration' => 0, 'private' => 0);
+  $defaultArray = Array('caFixed' => 0,'totalApplications' => 0, 'repository' => 0, 'docker' => 0, 'plugin' => 0, 'invalidXML' => 0, 'blacklist' => 0, 'totalIncompatible' =>0, 'totalDeprecated' => 0, 'totalModeration' => 0, 'private' => 0);
   $statistics = array_merge($defaultArray,$statistics);  
   foreach ($statistics as &$stat) {
     if ( ! $stat ) {
@@ -2065,19 +1900,19 @@ case 'statistics':
   echo "</tr><tr>";
   echo "<td><b>{$color}Total Number Of Plugins</b></td><td>$color{$statistics['plugin']}</td>";
   echo "</tr><tr>";
-  echo "<td><a href='/Main/Browse?dir=/boot/config/plugins/community.applications/private' target='_blank'><b>{$color}Total Number Of Private Docker Applications</b></a></td><td>$color{$statistics['private']}</td>";
-  echo "</tr><tr>";
-  echo "<td><b>{$color}Total Number Of Template Errors Fixed Automatically</b></td><td>$color{$statistics['caFixed']}</td>";
+  echo "<td>{$color}<a href='/Main/Browse?dir=/boot/config/plugins/community.applications/private' target='_blank'><b>Total Number Of Private Docker Applications</b></a></td><td>$color{$statistics['private']}</td>";
   echo "</tr><tr>";
   echo "<td><b>{$color}Total Number Of Invalid Templates</b></td><td>$color{$statistics['invalidXML']}</td>";
   echo "</tr><tr>";
-  echo "<td title='Automatically removed from lists'><b>{$color}Total Number Of Blacklisted Applications Found In Appfeed</b></td><td>$color{$statistics['blacklist']}</td>";
+  echo "<td><b>{$color}<a onclick='showModeration(&quot;showFixed.php&quot;,&quot;Apps with template errors automatically fixed&quot;);' style='cursor:pointer'>Total Number Of Template Errors Fixed Automatically</a></b></td><td>$color{$statistics['caFixed']}</td>";
   echo "</tr><tr>";
-  echo "<td><b>{$color}Total Number Of Blacklisted Applications</b></td><td>$color{$statistics['completeBlacklist']}</td>";
+  echo "<td><b>{$color}<a onclick='showModeration(&quot;showBlacklist.php&quot;,&quot;Total Blacklisted Apps Still In Appfeed&quot;);' style='cursor:pointer'>Total Number Of Blacklisted Apps Found In Appfeed</a></b></td><td>$color{$statistics['blacklist']}</td>";
   echo "</tr><tr>";
-  echo "<td title='You can only install a deprecated application if you have previously installed it'><b>{$color}Total Number Of Deprecated Applications</b></td><td>$color{$statistics['totalDeprecated']}</td>";
+  echo "<td><b>{$color}<a onclick='showModeration(&quot;showIncompatible.php&quot;,&quot;Total Incompatible Apps Found&quot;);' style='cursor:pointer'>Total Number Of Incompatible Applications</a></b></td><td>$color{$statistics['totalIncompatible']}</td>";
   echo "</tr><tr>";
-  echo "<td><b>{$color}Total Number Of Moderation Entries</b></td><td>$color{$statistics['totalModeration']}</td>";
+  echo "<td title='You can only install a deprecated application if you have previously installed it'><b>{$color}<a onclick='showModeration(&quot;showDeprecated.php&quot;,&quot;Total Deprecated Applications&quot;);' style='cursor:pointer'>Total Number Of Deprecated Applications</a></b></td><td>$color{$statistics['totalDeprecated']}</td>";
+  echo "</tr><tr>";
+  echo "<td><b>{$color}<a onclick='showModeration(&quot;showModeration.php&quot;,&quot;All Moderation Entries&quot;);' style='cursor:pointer'>Total Number Of Moderation Entries</a></b></td><td>$color{$statistics['totalModeration']}</td>";
   echo "</tr>";
   echo "</table>";
   echo "<center><a href='https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7M7CBCVU732XG' target='_blank'><img height='25px' src='https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif'></a></center>";
