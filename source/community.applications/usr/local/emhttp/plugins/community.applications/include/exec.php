@@ -147,13 +147,13 @@ function DownloadCommunityTemplates() {
         $o['Profile'] = $Repo['profile'];
         fixSecurity($o,$o);
         $o = fixTemplates($o);
-        $o['Compatible'] = versionCheck($o);
 
         # Overwrite any template values with the moderated values
         if ( is_array($moderation[$o['Repository']]) ) {
           $o = array_merge($o, $moderation[$o['Repository']]);
         }
-        
+        $o['Compatible'] = versionCheck($o);
+
         if ( $o['Beta'] == "true" ) {
           if ( $o['ModeratorComment'] ) {
             $o['ModeratorComment'] .= "<br><br>$betaComment";
@@ -1876,7 +1876,7 @@ case 'statistics':
     $appFeedTime['last_updated_timestamp'] = filemtime($communityPaths['community-templates-info']);
   }
   $updateTime = date("F d Y H:i",$appFeedTime['last_updated_timestamp']);
-  $updateTime = ( is_file($communityPaths['LegacyMode']) ) ? "N/A - Legacy Mode Active<br>Statistics Not Populated" : $updateTime;
+  $updateTime = ( is_file($communityPaths['LegacyMode']) ) ? "N/A - Legacy Mode Active" : $updateTime;
   $defaultArray = Array('caFixed' => 0,'totalApplications' => 0, 'repository' => 0, 'docker' => 0, 'plugin' => 0, 'invalidXML' => 0, 'blacklist' => 0, 'totalIncompatible' =>0, 'totalDeprecated' => 0, 'totalModeration' => 0, 'private' => 0);
   $statistics = array_merge($defaultArray,$statistics);  
   foreach ($statistics as &$stat) {
