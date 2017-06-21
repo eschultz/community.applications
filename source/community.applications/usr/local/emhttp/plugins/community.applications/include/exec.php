@@ -610,7 +610,7 @@ function my_display_apps($viewMode,$file,$runningDockers,$imagesDocker,$pageNumb
             } else {
             $template['display_dockerInstall']   = "<input class='ca_tooltip' type='submit' style='margin:0px' title='Click to install the application' value='Add' formtarget='$tabMode' formmethod='post' formaction='AddContainer?xmlTemplate=default:".addslashes($template['Path'])."'>";
             $template['display_dockerInstall']   = $template['BranchID'] ? "<input class='ca_tooltip' type='button' style='margin:0px' title='Click to install the application' value='Add' onclick='displayTags(&quot;$ID&quot;);'>" : $template['display_dockerInstall'];
-            $template['display_dockerInstallIcon'] = "<a class='ca_tooltip' title='Click to install' href='UpdateContainer?xmlTemplate=default:".addslashes($template['Path'])."' target='$tabMode'><img src='/plugins/community.applications/images/install.png' height='25px'></a>";
+            $template['display_dockerInstallIcon'] = "<a class='ca_tooltip' title='Click to install' href='AddContainer?xmlTemplate=default:".addslashes($template['Path'])."' target='$tabMode'><img src='/plugins/community.applications/images/install.png' height='25px'></a>";
             $template['display_dockerInstallIcon'] = $template['BranchID'] ? "<a style='cursor:pointer' class='ca_tooltip' title='Click to install the application' onclick='displayTags(&quot;$ID&quot;);'><img src='/plugins/community.applications/images/install.png' height='25px'></a>" : $template['display_dockerInstallIcon'];
           }
         }
